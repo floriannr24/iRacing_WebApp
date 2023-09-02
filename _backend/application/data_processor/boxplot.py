@@ -3,8 +3,8 @@ import statistics
 
 import numpy as np
 
-from application.data.laps_multi import LapsMulti
-from application.data.results_multi import ResultsMulti
+from _backend.application.data.laps_multi import LapsMulti
+from _backend.application.data.results_multi import ResultsMulti
 
 
 class Boxplot:

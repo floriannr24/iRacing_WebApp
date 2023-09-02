@@ -1,8 +1,6 @@
 import statistics
-
-from application.data.subsession_Info import SubsessionInfo
-from application.data.results_multi import ResultsMulti
-
+from _backend.application.data.results_multi import ResultsMulti
+from _backend.application.data.subsession_Info import SubsessionInfo
 
 class SessionInfo:
 

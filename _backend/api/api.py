@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from application.data.recent_races import RecentRaces
-from application.data_processor.boxplot import Boxplot
-from application.data_processor.sessionInfo import SessionInfo
-from application.sessionbuilder.session_builder import SessionBuilder
 from fastapi.middleware.cors import CORSMiddleware
+from _backend.application.data.recent_races import RecentRaces
+from _backend.application.data_processor.boxplot import Boxplot
+from _backend.application.data_processor.sessionInfo import SessionInfo
+from _backend.application.sessionbuilder.session_builder import SessionBuilder
 
 app = FastAPI()
 
