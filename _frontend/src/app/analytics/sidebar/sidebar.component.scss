@@ -1,0 +1,127 @@
+$race-selector-text: #C7CBD0;
+$grid-box-bg: #212b33;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+
+  .grid {
+    display: grid;
+    grid-template-areas:
+    "header"
+    "options"
+    "button";
+    grid-template-rows: max-content;
+
+    .header {
+      display: flex;
+      grid-area: header;
+      flex-direction: column;
+      align-items: center;
+      color: $race-selector-text;
+      background: $grid-box-bg;
+      overflow: auto;
+      border-bottom: rgba(105, 114, 125, 0.31);
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+
+      .title {
+        margin-top: 5px;
+      }
+
+      .subsession {
+        margin: 10px;
+        font-size: 10pt;
+      }
+    }
+
+    .options {
+      display: flex;
+      grid-area: options;
+      flex-direction: column;
+      align-items: center;
+
+      .mode {
+        font-size: 13pt;
+        margin-top: 15px;
+
+        select {
+          margin-left: 5px;
+          background: #12171C;
+          border-radius: 4px;
+          border: 1px solid rgba(105, 114, 125, 0.31);
+          font-family: Segoe UI, sans-serif;
+          color: $race-selector-text;
+          font-weight: bold;
+          font-size: 12pt;
+          width: 140px;
+          text-align: center;
+        }
+      }
+
+      .options-wrapper {
+        width: 310px;
+        margin-top: 15px;
+        display: grid;
+        grid-template-areas:
+      "column1";
+
+        .column1 {
+          grid-area: column1;
+          background: #12171C;
+
+          div {
+            margin-top: 4px;
+            padding-top: 4px;
+            padding-bottom: 5px;
+            padding-left: 5px;
+            display: flex;
+
+            &:hover {
+              background: #212b33;
+              border-radius: 4px;
+            }
+
+            input {
+              margin-right: 7px;
+            }
+          }
+        }
+      }
+
+    }
+  }
+
+  .errorTag {
+    animation: myAnim 1s ease 0s 1 normal none;
+
+    @keyframes myAnim {
+      0% {
+        opacity: 1;
+        transform: translateY(250px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

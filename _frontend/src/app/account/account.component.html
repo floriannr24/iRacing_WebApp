@@ -1,0 +1,43 @@
+<div class="main_wrapper">
+
+  <div class="myaccount">
+    <h1>My account</h1>
+  </div>
+
+  <div class="main">
+    <div class="content">
+
+      Name: {{name}}<br>
+      E-Mail: {{email}}<br>
+      <br>
+      iRacing accounts: <br>
+
+      iRacing username: {{username}}<br>
+      iRacing id: {{id}}<br>
+      <button (click)="showModal()">Add iRacing account</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal_wrapper">
+  <div *ngIf="show" class="modal_addAccount">
+    <div class="header"><h3>Add iRacing Account</h3></div>
+      <div class="modal_inner_wrapper">
+        <div class="desc"><p>Enter the iRacing ID of the user you want to add.<br><br>
+          You can find your <b>own</b> ID on the top of the <a href="https://members.iracing.com/membersite/account/Home.do">My Account</a> page on iRacing's website.<br>
+          The iRacing ID of <b>other users</b> can be found in the URL when you visit their profile-page.</p></div>
+        <input type="text">
+      </div>
+
+      <div class="footer">
+        <button (click)="addUser()">Confirm</button>
+      </div>
+
+  </div>
+</div>
+
+
+
+
+

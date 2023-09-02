@@ -1,0 +1,53 @@
+.wrapper {
+  position: relative;
+
+  .svgTime {
+    position: absolute;
+    transform-box: fill-box;
+  }
+
+  .svgName {
+    position: absolute;
+    transform-box: fill-box;
+    background: #0f1317
+  }
+
+ .canvas {
+    left: 130px;
+    position: absolute;
+  }
+
+  .label_laptime {
+    position: absolute;
+    color: #FFFFFF;
+    border-radius: 6px;
+    border-style: solid;
+    border-width: 2px;
+    padding: 2px 7px 3px 5px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.68);
+
+  }
+
+  .label_zoom {
+    position: absolute;
+    z-index: 2;
+    top: 93px;
+    right: 20px;
+    color: #FFFFFF;
+    margin-top: 5px;
+    margin-right: 11px;
+  }
+
+  .label_test {
+    position: absolute;
+    z-index: 2;
+    top: 93px;
+    left: 200px;
+    color: #FFFFFF;
+    margin-top: 5px;
+    margin-right: 11px;
+  }
+}
+
+
+

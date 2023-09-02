@@ -1,0 +1,13 @@
+<div class="topnav">
+  <a routerLink="/">Overview</a>
+  <a routerLink="/analytics">Analytics</a>
+  <a routerLink="/statistics">Statistics</a>
+  <a (click)="showProfileMenu()" class="profile">{{profile}}</a>
+</div>
+
+<div *ngIf="show" class="profileMenu">
+  <a routerLink="/account">My account</a>
+  <a routerLink="">Discord</a>
+  <a routerLink="">Logout</a>
+</div>
+

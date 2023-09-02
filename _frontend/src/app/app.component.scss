@@ -1,0 +1,63 @@
+$grid-box-bg: #12171C;
+$grid-box-text: #C7CBD0;
+$grid-box-border: rgba(105, 114, 125, 0.31);
+$race-selector-text: #C7CBD0;
+$border-radius: 6px;
+
+.grid {
+  margin: 20px;
+  display: grid;
+  grid-template-areas:
+                    "race       analyzing-app"
+                    "sidebar    analyzing-app";
+  grid-template-rows: 50px 79vh;
+  grid-template-columns: 1fr 4.5fr;
+  gap: 20px;
+  user-select: none;
+}
+
+app-race-selector, app-sidebar, app-analyzing-app {
+  border-style: solid;
+  border-color: $grid-box-border;
+  border-width: 1px;
+  color: $grid-box-text;
+  background: $grid-box-bg;
+  border-radius: $border-radius;
+  overflow: hidden;
+}
+
+app-race-selector {
+  grid-area: race;
+  cursor: pointer;
+  transition: 0.1s;
+
+  &:hover {
+    background-color: #212933;
+    border-color: rgba(130, 139, 150, 0.64);
+  }
+}
+
+app-sidebar {
+  grid-area: sidebar;
+}
+
+app-analyzing-app {
+  grid-area: analyzing-app;
+  background: #0f1317;
+}
+
+app-race-selector-panel {
+  position: absolute;
+  float: left;
+  left: 20px;
+  height: 45vh;
+  width: 75vw;
+  top: 150px;
+  border-color: rgba(130, 139, 150, 0.64);
+  border-radius: $border-radius;
+  border-width: 1px;
+  box-shadow: 0 0 20px rgb(0, 0, 0, 1);
+  border-style: solid;
+  z-index: 1;
+  overflow: hidden;
+}

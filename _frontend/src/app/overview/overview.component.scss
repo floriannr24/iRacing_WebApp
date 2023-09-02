@@ -1,0 +1,73 @@
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(100vh - 73px)
+}
+
+.grid {
+  display: grid;
+  grid-template-areas:
+                    "bp     delta"
+                    "stats  settings";
+  grid-template-rows: 250px 250px;
+  grid-template-columns: 450px 450px;
+
+}
+
+.preview_analytics_bp, .preview_analytics_delta, .preview_statistics, .preview_settings {
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .child {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    width: 435px;
+    height: 235px;
+    transition: 0.1s;
+
+    &:hover {
+      width: 440px;
+      height: 240px;
+  }
+
+  }
+}
+
+.preview_analytics_bp {
+  grid-area: bp;
+
+  .child {
+    background: #ff0000;
+  }
+}
+
+.preview_analytics_delta {
+  grid-area: delta;
+
+  .child {
+    background: #40ff00;
+  }
+}
+
+.preview_statistics {
+  grid-area: stats;
+
+  .child {
+    background: #FFFFFF;
+  }
+}
+
+.preview_settings {
+  grid-area: settings;
+
+  .child {
+    background: #1582b9;
+  }
+}
+
+

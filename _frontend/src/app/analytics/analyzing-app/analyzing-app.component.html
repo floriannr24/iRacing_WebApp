@@ -1,0 +1,8 @@
+<div class="wrapper">
+  <svg class="svgTime" #svgTime></svg>
+  <canvas class="canvas" #canvas (mousemove)="mousemove($event)"></canvas>
+  <div class="label_laptime" *ngIf="show_label_detail" #label_detail>{{label_detail_content}}</div>
+  <div class="label_zoom">{{label_scale}}x</div>
+  <svg class="svgName" #svgName></svg>
+</div>
+
