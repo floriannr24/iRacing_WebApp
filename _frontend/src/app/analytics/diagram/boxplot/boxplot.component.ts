@@ -89,9 +89,12 @@ export class BoxplotComponent implements AfterViewInit {
   private draw() {
 
     this.context.clearRect(0, 0, this.context.canvas.width / this.scale, this.context.canvas.height / this.scale)
-
     this.drawBackground()
     this.drawBoxplot()
+
+    // clearing background of yAxis from Boxplot drawings
+    this.context.clearRect(0, 0, this.diaprop.yAxisBgWidth / this.scale, this.context.canvas.height / this.scale)
+
     this.drawAxes()
 
     requestAnimationFrame(this.draw.bind(this))
@@ -99,9 +102,6 @@ export class BoxplotComponent implements AfterViewInit {
   }
 
   private drawAxes() {
-
-    this.context.fillStyle = "rgba(15,19,23,0)"
-    this.context.fillRect(0, 0, this.diaprop.yAxisBgWidth / this.scale, this.appHeight / this.scale)
 
     // y-axis
     this.context.beginPath()
