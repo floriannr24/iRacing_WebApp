@@ -1,6 +1,5 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {SubsessionProviderService} from "../../_services/subsession-provider.service";
-import {APIService} from "../../_services/api.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
 
 @Component({
