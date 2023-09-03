@@ -114,8 +114,6 @@ export class BoxplotComponent implements AfterViewInit {
     // full ticks
     for (let i = 0; i < this.diaprop.yAxisTicks_end; i++) {
 
-      let y = this.convertSecondsToPixels(i) - this.scrollY
-
       this.context.beginPath()
       this.context.strokeStyle = this.diaprop.yAxis_color
       this.context.moveTo((this.diaprop.yAxis_pos - this.diaprop.fullTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
