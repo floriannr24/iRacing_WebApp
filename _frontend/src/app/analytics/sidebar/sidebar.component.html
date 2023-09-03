@@ -9,12 +9,12 @@
     </div>
     <div class="options">
       <div class="mode">Mode:
-        <select id="analyze_type" #mode (change)="onModeChange(mode.value)">
-          <option *ngFor="let m of modes | keyvalue" >{{m.value.label}}</option>
+        <select id="analyze_type" [(ngModel)]="selectedMode">
+          <option *ngFor="let m of modes | keyvalue" [value]="m.key">{{m.value.label}}</option>
         </select>
       </div>
       <div class="options-wrapper">
-        <div class="column1" *ngIf="modes['boxplot'].selected">
+        <div class="column1" *ngIf="selectedMode == 0">
           <div *ngFor="let opt of options | keyvalue">
             <div><input type="checkbox" id={{opt.key}} [checked]="opt.value.checked" #bp_opt (change)="onOptionsChange(opt.key, bp_opt.checked, 'opt_bp')"><label for={{opt.key}}>{{opt.value.label}}</label></div>
           </div>

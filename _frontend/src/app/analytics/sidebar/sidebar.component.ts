@@ -12,16 +12,19 @@ export class SidebarComponent {
   @ViewChild('errorTag') errorTag: ElementRef<HTMLDivElement>
   bpprop: BoxplotProperties
   options: Option_BP
-  modes: Mode
-  currentMode: string = "Boxplot"
+  selectedMode = ModeType.Boxplot
   showError: boolean = false
   errorTag_text: string
+  modes: Mode = {
+    [ModeType.Boxplot]: {label: "Boxplot"},
+    [ModeType.Delta]: {label: "Delta"},
+    [ModeType.Positions]: {label: "Positions"}
+  }
 
   constructor(public sps: SubsessionProviderService) {
   }
 
   ngOnInit() {
-    this.modes = this.initModes()
     try {
       this.bpprop = this.sps.loadFromCache("bpprop")
     } catch (e) {
@@ -32,30 +35,8 @@ export class SidebarComponent {
 
   }
 
-  ngAfterViewInit() {
-    this.modes['boxplot'].selected = true
-  }
-
   onModeChange(value: string) {
-
-    for (let modeKey in this.modes) {
-      this.modes[modeKey].selected = false
-    }
-
-    this.currentMode = value
-
-    switch (value) {
-      case "Boxplot":
-        this.modes['boxplot'].selected = true
-        this.sps.saveToCache("mode", value)
-        break
-      case "Median-To-First":
-        this.modes['medianToFirst'].selected = true
-        break
-      case "Delta":
-        this.modes['delta'].selected = true
-        break
-    }
+    //this.sps.saveToCache("mode", value)
   }
 
   onOptionsChange(id: string, value: boolean, type: string) {
@@ -89,21 +70,19 @@ export class SidebarComponent {
     return this.bpprop.options
   }
 
-  private initModes() {
-    return {
-      boxplot: {label: "Boxplot", selected: false},
-      medianToFirst: {label: "Median-To-First", selected: false},
-      delta: {label: "Delta", selected: false}
-    }
-  }
-
   showErrorTag(text: string) {
 
   }
 }
 
-interface Mode {
-  [type: string]: {label: string, selected: boolean}
+type Mode = {
+  [key in ModeType]: {label: string}
+}
+
+enum ModeType {
+  Boxplot,
+  Delta,
+  Positions
 }
 
 
