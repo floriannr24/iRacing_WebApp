@@ -5,7 +5,7 @@ import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './analytics/sidebar/sidebar.component';
 import { RaceSelectorComponent } from './analytics/race-selector/race-selector.component';
 import {AppComponent} from "./app.component";
-import { BoxplotComponent } from './analytics/boxplot/boxplot.component';
+import { BoxplotComponent } from './analytics/diagram/boxplot/boxplot.component';
 import { RaceSelectorPanelComponent } from './analytics/race-selector-panel/race-selector-panel.component';
 import {CdkTableModule} from "@angular/cdk/table";
 import {MatTableModule} from "@angular/material/table";
@@ -18,6 +18,7 @@ import { OverviewComponent } from './overview/overview.component';
 import { RouterModule, Routes } from "@angular/router";
 import { AnalyticsComponent } from './analytics/analytics.component';
 import { AccountComponent } from './account/account.component';
+import { DiagramComponent } from './analytics/diagram/diagram.component';
 
 const myRoutes: Routes = [
   {path: '', component: OverviewComponent},
@@ -35,7 +36,8 @@ const myRoutes: Routes = [
     RaceSelectorPanelComponent,
     OverviewComponent,
     AnalyticsComponent,
-    AccountComponent
+    AccountComponent,
+    DiagramComponent
   ],
     imports: [
         RouterModule.forRoot(myRoutes),

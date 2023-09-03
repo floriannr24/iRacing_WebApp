@@ -8,20 +8,19 @@ $border-radius: 6px;
   margin: 20px;
   display: grid;
   grid-template-areas:
-                    "race       analyzing-app"
-                    "sidebar    analyzing-app";
+                    "race       diagram"
+                    "sidebar    diagram";
   grid-template-rows: 50px 79vh;
   grid-template-columns: 1fr 4.5fr;
   gap: 20px;
   user-select: none;
 }
 
-app-race-selector, app-sidebar, app-boxplot {
+app-race-selector, app-sidebar, app-diagram {
   border-style: solid;
   border-color: $grid-box-border;
   border-width: 1px;
   color: $grid-box-text;
-  background: $grid-box-bg;
   border-radius: $border-radius;
   overflow: hidden;
 }
@@ -41,7 +40,6 @@ app-sidebar {
   grid-area: sidebar;
 }
 
-app-boxplot {
-  grid-area: analyzing-app;
-  background: #0f1317;
+app-diagram {
+  grid-area: diagram;
 }

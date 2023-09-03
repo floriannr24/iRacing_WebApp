@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
-import {SubsessionProviderService} from "../../_services/subsession-provider.service";
-import {Driver, EventData} from "../../_services/api.service";
+import {SubsessionProviderService} from "../../../_services/subsession-provider.service";
+import {Driver, EventData} from "../../../_services/api.service";
 
 @Component({
   selector: 'app-boxplot',
@@ -60,8 +60,8 @@ export class BoxplotComponent implements AfterViewInit {
     })
 
     // first init when website loads
-    this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.clientWidth - 130 // 1390
-    this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.clientHeight // 786
+    this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.parentNode.clientWidth - 130 // 1390
+    this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
     this.context = (this.canvas.nativeElement).getContext('2d')
     this.diaprop = DiagramProperties.getInstance()
     this.sps.boxplotProperties_active.subscribe(bpprop => this.bpprop = bpprop)
@@ -100,7 +100,7 @@ export class BoxplotComponent implements AfterViewInit {
 
   private drawAxes() {
 
-    this.context.fillStyle = "#0f1317"
+    this.context.fillStyle = "rgba(15,19,23,0)"
     this.context.fillRect(0, 0, this.diaprop.yAxisBgWidth / this.scale, this.appHeight / this.scale)
 
     // y-axis
