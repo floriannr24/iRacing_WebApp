@@ -45,17 +45,3 @@ app-analyzing-app {
   grid-area: analyzing-app;
   background: #0f1317;
 }
-
-app-race-selector-panel {
-  position: absolute;
-  float: left;
-  left: 20px;
-  height: 45vh;
-  width: 75vw;
-  top: 150px;
-  border: 1px solid rgba(130, 139, 150, 0.64);
-  border-radius: $border-radius;
-  box-shadow: 0 0 20px rgb(0, 0, 0, 1);
-  z-index: 1;
-  overflow: hidden;
-}
