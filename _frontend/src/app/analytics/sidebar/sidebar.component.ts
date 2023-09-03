@@ -1,6 +1,7 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {SubsessionProviderService} from "../../_services/subsession-provider.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
+import {KeyValue} from "@angular/common";
 
 @Component({
   selector: 'app-sidebar',
@@ -12,14 +13,15 @@ export class SidebarComponent {
   @ViewChild('errorTag') errorTag: ElementRef<HTMLDivElement>
   bpprop: BoxplotProperties
   options: Option_BP
-  selectedMode = ModeType.Boxplot
+  selectedMode: Mode = {mode: ModeType.Boxplot, label: "Boxplot"}
   showError: boolean = false
   errorTag_text: string
-  modes: Mode = {
-    [ModeType.Boxplot]: {label: "Boxplot"},
-    [ModeType.Delta]: {label: "Delta"},
-    [ModeType.Positions]: {label: "Positions"}
-  }
+  show: boolean = false
+  modes: Mode[] = [
+      {mode: ModeType.Boxplot, label: "Boxplot"},
+      {mode: ModeType.Delta, label: "Delta"},
+      {mode: ModeType.Positions, label: "Positions"}
+  ]
 
   constructor(public sps: SubsessionProviderService) {
   }
@@ -35,8 +37,8 @@ export class SidebarComponent {
 
   }
 
-  onModeChange(value: string) {
-    //this.sps.saveToCache("mode", value)
+  showMenu() {
+    this.show = !this.show
   }
 
   onOptionsChange(id: string, value: boolean, type: string) {
@@ -73,10 +75,17 @@ export class SidebarComponent {
   showErrorTag(text: string) {
 
   }
+
+  selectMode(value: any) {
+    this.selectedMode = value
+  }
+
+    protected readonly ModeType = ModeType;
 }
 
 type Mode = {
-  [key in ModeType]: {label: string}
+  mode: ModeType,
+  label: string
 }
 
 enum ModeType {
@@ -84,5 +93,3 @@ enum ModeType {
   Delta,
   Positions
 }
-
-

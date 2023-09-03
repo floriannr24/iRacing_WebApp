@@ -5,27 +5,40 @@
       <div class="title">Current subsession: <span style="font-weight: bold">{{sps.activeSubsession.subsession_id}}</span></div>
       <div class="subsession">{{sps.activeSubsession.session_start_time}} / {{sps.activeSubsession.series_name}} {{sps.activeSubsession.track_name}} <br> SOF: {{sps.activeSubsession.sof}} <br>
         Start: {{sps.activeSubsession.start_position}} <br> Finish: {{sps.activeSubsession.finish_position}} <br> </div>
-
     </div>
+
     <div class="options">
-      <div class="mode">Mode:
-        <select id="analyze_type" [(ngModel)]="selectedMode">
-          <option *ngFor="let m of modes | keyvalue" [value]="m.key">{{m.value.label}}</option>
-        </select>
+<!--      <div class="mode">-->
+<!--        <select id="analyze_type" [(ngModel)]="selectedMode">-->
+<!--          <option *ngFor="let m of modes | keyvalue" [value]="m.key">{{m.value.label}}</option>-->
+<!--        </select>-->
+<!--      </div>-->
+
+
+      <div class="mode" (click)="showMenu()">
+        <div class="text">{{selectedMode.label}}</div>
+        <div class="select" *ngIf="show">
+            <div class="option" *ngFor="let m of modes" (click)="selectMode(m)">{{m.label}}</div>
+        </div>
       </div>
+
+
+
       <div class="options-wrapper">
-        <div class="column1" *ngIf="selectedMode == 0">
-          <div *ngFor="let opt of options | keyvalue">
-            <div><input type="checkbox" id={{opt.key}} [checked]="opt.value.checked" #bp_opt (change)="onOptionsChange(opt.key, bp_opt.checked, 'opt_bp')"><label for={{opt.key}}>{{opt.value.label}}</label></div>
+        <div class="column1" *ngIf="selectedMode.mode == ModeType.Boxplot">
+          <div *ngFor="let opt of options | keyvalue" class="cbContainer">
+              <input type="checkbox" id={{opt.key}} [checked]="opt.value.checked" #bp_opt (change)="onOptionsChange(opt.key, bp_opt.checked, 'opt_bp')">
+                <span class="checkmark"></span>
+              <label for={{opt.key}}>{{opt.value.label}}</label>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <button (click)="showErrorTag('test')" style="height: 40px"></button>
+<!--  <button (click)="showErrorTag('test')" style="height: 40px"></button>-->
 
-  <div #errorTag class="errorTag"></div>
+<!--  <div #errorTag class="errorTag"></div>-->
 
 </div>
 

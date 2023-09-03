@@ -44,53 +44,115 @@ $grid-box-bg: #212b33;
       align-items: center;
 
       .mode {
-        font-size: 13pt;
+        position: relative;
+        display: flex;
+        border-style: solid;
+        border-radius: 6px;
+        border-color: rgba(89, 95, 102, 0.64);
+        border-width: 1px;
+        width: 300px;
+        height: 50px;
         margin-top: 15px;
+        justify-content: center;
+        align-items: center;
 
-        select {
-          margin-left: 5px;
-          background: #12171C;
-          border-radius: 4px;
-          border: 1px solid rgba(105, 114, 125, 0.31);
-          font-family: Segoe UI, sans-serif;
-          color: $race-selector-text;
+        .text {
           font-weight: bold;
-          font-size: 12pt;
-          width: 140px;
-          text-align: center;
+          font-size: 15pt;
+        }
+
+        &:hover {
+          background: #212933;
+          transition: 0.1s;
+          cursor: pointer;
         }
       }
 
-      .options-wrapper {
-        width: 310px;
-        margin-top: 15px;
-        display: grid;
-        grid-template-areas:
-      "column1";
+      .select {
+        font-weight: normal;
+        position: absolute;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        box-sizing: border-box;
+        z-index: 10;
+        width: 300px;
+        height: 150px;
+        border-width: 1px;
+        border-style: solid;
+        border-color: rgba(89, 95, 102, 0.64);
+        border-radius: 6px;
+        background: #212933;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        top: 60px;
 
-        .column1 {
-          grid-area: column1;
-          background: #12171C;
+        .option {
+          padding-left: 10px;
+          display: flex;
+          align-items: center;
+          flex-basis: calc(100% / 3);
+          color: #B5BFCA;
+          text-decoration: none;
 
-          div {
-            margin-top: 4px;
-            padding-top: 4px;
-            padding-bottom: 5px;
-            padding-left: 5px;
-            display: flex;
-
-            &:hover {
-              background: #212b33;
-              border-radius: 4px;
-            }
-
-            input {
-              margin-right: 7px;
-            }
+          &:hover {
+            background: #32414d;
           }
         }
       }
 
+    }
+
+    .options-wrapper {
+      width: 310px;
+      margin-top: 15px;
+      display: grid;
+      grid-template-areas: "column1";
+
+      .column1 {
+        grid-area: column1;
+
+        .cbContainer {
+          margin-top: 4px;
+          padding-top: 4px;
+          padding-bottom: 5px;
+          padding-left: 5px;
+          display: flex;
+
+          &:hover {
+            background: #212b33;
+            border-radius: 4px;
+          }
+
+          &:hover input ~ .checkmark {
+            border-color: #2196f3;
+          }
+
+          input:checked ~ .checkmark {
+            background-color: #2196F3;
+            border-color: #14568c;
+          }
+
+          input{
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+          }
+
+          .checkmark {
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background-color: rgba(0, 0, 0, 0);
+            margin-right: 5px;
+            border-radius: 3px;
+            border: 2px solid rgba(105, 114, 125, 0.5);
+            box-sizing: border-box;
+          }
+        }
+      }
     }
   }
 
@@ -108,7 +170,6 @@ $grid-box-bg: #212b33;
         transform: translateY(0);
       }
     }
-
   }
 }
 
