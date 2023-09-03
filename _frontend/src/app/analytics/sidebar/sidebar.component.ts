@@ -2,7 +2,6 @@ import {Component, ElementRef, ViewChild} from '@angular/core';
 import {SubsessionProviderService} from "../../_services/subsession-provider.service";
 import {APIService} from "../../_services/api.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
-import {Event} from "@angular/router";
 
 @Component({
   selector: 'app-sidebar',
@@ -19,7 +18,7 @@ export class SidebarComponent {
   showError: boolean = false
   errorTag_text: string
 
-  constructor(public sps: SubsessionProviderService, private apis: APIService) {
+  constructor(public sps: SubsessionProviderService) {
   }
 
   ngOnInit() {
