@@ -1,7 +1,7 @@
 <div class="grid">
   <app-race-selector (click)="showPanel()"></app-race-selector>
   <app-sidebar #sidebarComponent></app-sidebar>
-  <app-analyzing-app></app-analyzing-app>
+  <app-boxplot></app-boxplot>
 </div>
 
 <app-race-selector-panel *ngIf="show" (closePanelEvent)="showPanel()" (errorTag)="sidebarComponent.showErrorTag($event)"></app-race-selector-panel>

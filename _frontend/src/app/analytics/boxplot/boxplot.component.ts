@@ -3,12 +3,12 @@ import {SubsessionProviderService} from "../../_services/subsession-provider.ser
 import {Driver, EventData} from "../../_services/api.service";
 
 @Component({
-  selector: 'app-analyzing-app',
-  templateUrl: './analyzing-app.component.html',
-  styleUrls: ['./analyzing-app.component.scss']
+  selector: 'app-boxplot',
+  templateUrl: './boxplot.component.html',
+  styleUrls: ['./boxplot.component.scss']
 })
 
-export class AnalyzingAppComponent implements AfterViewInit {
+export class BoxplotComponent implements AfterViewInit {
 
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>

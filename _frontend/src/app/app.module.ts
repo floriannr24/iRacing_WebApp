@@ -5,7 +5,7 @@ import { HeaderComponent } from './header/header.component';
 import { SidebarComponent } from './analytics/sidebar/sidebar.component';
 import { RaceSelectorComponent } from './analytics/race-selector/race-selector.component';
 import {AppComponent} from "./app.component";
-import { AnalyzingAppComponent } from './analytics/analyzing-app/analyzing-app.component';
+import { BoxplotComponent } from './analytics/boxplot/boxplot.component';
 import { RaceSelectorPanelComponent } from './analytics/race-selector-panel/race-selector-panel.component';
 import {CdkTableModule} from "@angular/cdk/table";
 import {MatTableModule} from "@angular/material/table";
@@ -31,7 +31,7 @@ const myRoutes: Routes = [
     HeaderComponent,
     SidebarComponent,
     RaceSelectorComponent,
-    AnalyzingAppComponent,
+    BoxplotComponent,
     RaceSelectorPanelComponent,
     OverviewComponent,
     AnalyticsComponent,

@@ -16,7 +16,7 @@ $border-radius: 6px;
   user-select: none;
 }
 
-app-race-selector, app-sidebar, app-analyzing-app {
+app-race-selector, app-sidebar, app-boxplot {
   border-style: solid;
   border-color: $grid-box-border;
   border-width: 1px;
@@ -41,7 +41,7 @@ app-sidebar {
   grid-area: sidebar;
 }
 
-app-analyzing-app {
+app-boxplot {
   grid-area: analyzing-app;
   background: #0f1317;
 }

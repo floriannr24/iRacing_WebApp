@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AnalyzingAppComponent } from './analyzing-app.component';
+import { BoxplotComponent } from './boxplot.component';
 
-describe('AnalyzingAppComponent', () => {
-  let component: AnalyzingAppComponent;
-  let fixture: ComponentFixture<AnalyzingAppComponent>;
+describe('BoxplotComponent', () => {
+  let component: BoxplotComponent;
+  let fixture: ComponentFixture<BoxplotComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AnalyzingAppComponent ]
+      declarations: [ BoxplotComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AnalyzingAppComponent);
+    fixture = TestBed.createComponent(BoxplotComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {Driver, Event, EventData} from "./api.service";
 import {BehaviorSubject} from "rxjs";
-import {BoxplotProperties} from "../analytics/analyzing-app/analyzing-app.component";
+import {BoxplotProperties} from "../analytics/boxplot/boxplot.component";
 
 @Injectable({
   providedIn: 'root'
