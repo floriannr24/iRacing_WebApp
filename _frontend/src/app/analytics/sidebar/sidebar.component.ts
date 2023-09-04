@@ -15,7 +15,7 @@ export class SidebarComponent {
   selectedMode: Mode = {mode: ModeType.Boxplot, label: "Boxplot"}
   showError: boolean = false
   errorTag_text: string
-  show: boolean = false
+  _showMenu: boolean = false
   _showSettings: boolean = false
   modes: Mode[] = [
       {mode: ModeType.Boxplot, label: "Boxplot"},
@@ -38,7 +38,7 @@ export class SidebarComponent {
   }
 
   showMenu() {
-    this.show = !this.show
+    this._showMenu = !this._showMenu
   }
 
   onOptionsChange(id: string, value: boolean, type: string) {
@@ -72,7 +72,7 @@ export class SidebarComponent {
     return this.bpprop.options
   }
 
-  showSettings() {
+  showDiagramSettings() {
     this._showSettings = !this._showSettings
 
   }
@@ -84,12 +84,12 @@ export class SidebarComponent {
     protected readonly ModeType = ModeType;
 }
 
-type Mode = {
+export type Mode = {
   mode: ModeType,
   label: string
 }
 
-enum ModeType {
+export enum ModeType {
   Boxplot,
   Delta,
   Positions

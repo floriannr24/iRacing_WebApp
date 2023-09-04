@@ -182,6 +182,7 @@ $grid-box-bg: #212b33;
           padding-bottom: 5px;
           padding-left: 5px;
           display: flex;
+          font-size: 11pt;
 
           &:hover {
             background: #212b33;
@@ -208,8 +209,8 @@ $grid-box-bg: #212b33;
           .checkmark {
             top: 0;
             left: 0;
-            height: 20px;
-            width: 20px;
+            height: 16px;
+            width: 16px;
             background-color: rgba(0, 0, 0, 0);
             margin-right: 5px;
             border-radius: 3px;
@@ -221,7 +222,7 @@ $grid-box-bg: #212b33;
     }
   }
 
-  .settings {
+  .diasettings {
 
   }
 

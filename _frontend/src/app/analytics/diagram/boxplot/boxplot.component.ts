@@ -1948,8 +1948,10 @@ export class BoxplotProperties {
     showDiscDisq: {label: "Show disconnected / disqualified drivers", checked: false},
     showIndividualLaps: {label: "Show individual laps", checked: false},
     showMean: {label: "Show mean", checked: false},
-    showFasterSlower: {label: "Highlight faster/slower drivers", checked: false},
-    showMulticlass: {label: "Show all car classes", checked: true}
+    showFasterSlower: {label: "Highlight faster / slower drivers", checked: false},
+    showMulticlass: {label: "Show all car classes", checked: true},
+    showOrder: {label: "Sort drivers from fastest to slowest", checked: false}
+
   }
 }
 
