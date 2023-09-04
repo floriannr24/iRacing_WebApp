@@ -89,7 +89,7 @@ $grid-box-bg: #212b33;
             margin-left: 10px;
 
             span {
-              margin-left: 3px;
+              margin-left: 2px;
             }
 
           }
@@ -221,21 +221,10 @@ $grid-box-bg: #212b33;
     }
   }
 
-  .errorTag {
-    animation: myAnim 1s ease 0s 1 normal none;
+  .settings {
 
-    @keyframes myAnim {
-      0% {
-        opacity: 1;
-        transform: translateY(250px);
-      }
-
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
   }
+
 }
 
 

@@ -11,6 +11,7 @@
     background: #1460b3;
 
     h1 {
+      padding: 10px;
 
     }
 
@@ -23,6 +24,29 @@
 
     .content {
       padding: 20px;
+
+      .grid{
+        display: grid;
+        grid-template: "mainAcc otherAcc";
+        grid-template-columns: 1fr 1fr;
+
+        .mainAcc {
+          grid-area: mainAcc;
+          background: #66b0ff;
+          height: 200px;
+          width: 100%;
+        }
+
+        .otherAcc {
+          grid-area: otherAcc;
+          background: #0e4580;
+          height: 200px;
+          width: 100%;
+        }
+
+
+      }
+
     }
 
   }

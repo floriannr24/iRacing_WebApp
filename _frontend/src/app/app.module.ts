@@ -17,13 +17,13 @@ import {HttpClientModule} from "@angular/common/http";
 import { OverviewComponent } from './overview/overview.component';
 import { RouterModule, Routes } from "@angular/router";
 import { AnalyticsComponent } from './analytics/analytics.component';
-import { AccountComponent } from './account/account.component';
+import { SettingsComponent } from './settings/settings.component';
 import { DiagramComponent } from './analytics/diagram/diagram.component';
 
 const myRoutes: Routes = [
   {path: '', component: OverviewComponent},
   {path: 'analytics', component: AnalyticsComponent},
-  {path: 'account', component: AccountComponent}
+  {path: 'settings', component: SettingsComponent}
 ]
 
 @NgModule({
@@ -36,7 +36,7 @@ const myRoutes: Routes = [
     RaceSelectorPanelComponent,
     OverviewComponent,
     AnalyticsComponent,
-    AccountComponent,
+    SettingsComponent,
     DiagramComponent
   ],
     imports: [

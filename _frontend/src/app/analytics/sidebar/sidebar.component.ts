@@ -16,6 +16,7 @@ export class SidebarComponent {
   showError: boolean = false
   errorTag_text: string
   show: boolean = false
+  _showSettings: boolean = false
   modes: Mode[] = [
       {mode: ModeType.Boxplot, label: "Boxplot"},
       {mode: ModeType.Delta, label: "Delta"},
@@ -71,7 +72,8 @@ export class SidebarComponent {
     return this.bpprop.options
   }
 
-  showErrorTag(text: string) {
+  showSettings() {
+    this._showSettings = !this._showSettings
 
   }
 
