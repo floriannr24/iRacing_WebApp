@@ -10,30 +10,90 @@ $grid-box-bg: #212b33;
   .grid {
     display: grid;
     grid-template-areas:
-    "header"
-    "options"
-    "button";
+      "header"
+      "options";
     grid-template-rows: max-content;
 
     .header {
       display: flex;
       grid-area: header;
       flex-direction: column;
-      align-items: center;
       color: $race-selector-text;
       background: $grid-box-bg;
       overflow: auto;
       border-bottom: rgba(105, 114, 125, 0.31);
       border-bottom-style: solid;
       border-bottom-width: 1px;
+      text-align: center;
 
       .title {
         margin-top: 5px;
       }
 
-      .subsession {
-        margin: 10px;
-        font-size: 10pt;
+      .subsession-wrapper {
+        display: flex;
+        margin: 20px;
+
+        .subsession {
+          display: grid;
+          grid-template-areas:
+            "time     time    time     sof     sof"
+            "series   series  series  series  series"
+            "track    track   track   track   track"
+            "start    finish  finish  finish  finish";
+
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+          font-size: 10pt;
+          gap: 10px 0;
+
+
+          // wrapper for each element
+          span {
+            display: flex;
+            align-items: center;
+
+            svg {
+            }
+
+            // text
+            span {
+              margin-left: 5px;
+            }
+          }
+
+          .time {
+            grid-area: time;
+
+          }
+
+          .series {
+            grid-area: series;
+
+          }
+
+          .track {
+            grid-area: track;
+          }
+
+          .sof {
+            grid-area: sof;
+            margin-left: 10px;
+          }
+
+          .start {
+            grid-area: start;
+          }
+
+          .finish {
+            grid-area: finish;
+            margin-left: 10px;
+
+            span {
+              margin-left: 3px;
+            }
+
+          }
+        }
       }
     }
 
@@ -51,14 +111,19 @@ $grid-box-bg: #212b33;
         border-color: rgba(89, 95, 102, 0.64);
         border-width: 1px;
         width: 300px;
-        height: 50px;
+        height: 40px;
         margin-top: 15px;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
 
         .text {
           font-weight: bold;
-          font-size: 15pt;
+          font-size: 13pt;
+        }
+
+        svg {
+          position: absolute;
+          right: 15px;
         }
 
         &:hover {
@@ -77,14 +142,14 @@ $grid-box-bg: #212b33;
         box-sizing: border-box;
         z-index: 10;
         width: 300px;
-        height: 150px;
+        height: 130px;
         border-width: 1px;
         border-style: solid;
         border-color: rgba(89, 95, 102, 0.64);
         border-radius: 6px;
         background: #212933;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        top: 60px;
+        top: 45px;
 
         .option {
           padding-left: 10px;
@@ -148,7 +213,7 @@ $grid-box-bg: #212b33;
             background-color: rgba(0, 0, 0, 0);
             margin-right: 5px;
             border-radius: 3px;
-            border: 2px solid rgba(105, 114, 125, 0.5);
+            border: 2px solid rgba(105, 114, 125, 0.6);
             box-sizing: border-box;
           }
         }

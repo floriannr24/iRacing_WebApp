@@ -1,8 +1,17 @@
-.icon {
-
-}
-
-div {
+.wrapper {
+  position: relative;
   display: flex;
-  font-weight: bold;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  .title {
+    font-weight: bold;
+    font-size: 15pt;
+  }
+
+  svg {
+    position: absolute;
+    right: 15px;
+  }
 }

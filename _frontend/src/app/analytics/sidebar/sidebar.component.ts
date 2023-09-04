@@ -1,7 +1,6 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {SubsessionProviderService} from "../../_services/subsession-provider.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
-import {KeyValue} from "@angular/common";
 
 @Component({
   selector: 'app-sidebar',
