@@ -1,3 +1,140 @@
+.card-frame {
+  display: flex;
+  align-items: center;
+  width: auto;
+  flex-direction: column;
+}
+
+.card-frame-button {
+  display: flex;
+  align-items: center;
+
+  .buttonNew {
+    margin: 15px;
+    font-size: 15pt;
+    width: 100%;
+    height: 50px;
+    background: #ffffff;
+    border-radius: 10px;
+    border-style: none;
+    transition: 0.1s;
+
+    &:hover {
+      background: #f2f2f2;
+      cursor: pointer;
+    }
+  }
+}
+
+.card-frame-new {
+
+  .card-new {
+    width: 600px;
+    height: max-content;
+    min-height: 150px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #afafaf;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: 0.1s;
+    display: flex;
+    flex-direction: column;
+
+    .custid-edit {
+      margin: 10px 10px 0 10px;
+      font-size: 14pt;
+      font-weight: bold;
+      border: none;
+    }
+
+    .content-edit {
+      margin: 10px;
+      border: none;
+      resize: none;
+      font-family: Segoe UI, sans-serif;
+    }
+
+    .wrapper{
+      height: max-content;
+
+      .buttonSaveEdit {
+        margin: 10px;
+        font-size: 11pt;
+        background: #d9d9d9;
+        border-radius: 5px;
+        border: none;
+        height: 30px;
+        width: 70px;
+        cursor: pointer;
+        transition: 0.1s;
+
+        &:hover {
+          background: #cccccc;
+        }
+      }
+    }
+
+    *::placeholder {
+      color: #7a7a7a;
+    }
+
+    *:focus {
+      outline: none
+    }
+
+    *:focus::placeholder {
+      color: transparent;
+    }
+
+  }
+}
+
+.card-frame-list {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+
+  .card {
+    position: relative;
+    width: 85%;
+    height: max-content;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #afafaf;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: 0.05s;
+
+    .button-delete {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+
+    .name {
+      color: #000000;
+      margin: 10px;
+      font-size: 14pt;
+      font-weight: bold;
+    }
+
+    .custId {
+      color: #000000;
+      margin: 10px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      background: #f2f2f2;
+    }
+  }
+}
+
+.mainAcc {
+}
+
 .main_wrapper {
   display: flex;
   color: #FFFFFF;
@@ -52,7 +189,6 @@
   }
 
 }
-
 
 .modal_wrapper {
   color: #FFFFFF;

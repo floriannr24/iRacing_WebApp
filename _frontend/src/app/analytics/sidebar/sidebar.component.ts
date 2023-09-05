@@ -12,7 +12,6 @@ export class SidebarComponent {
   @ViewChild('errorTag') errorTag: ElementRef<HTMLDivElement>
   bpprop: BoxplotProperties
   options: Option_BP
-  selectedMode: Mode = {mode: ModeType.Boxplot, label: "Boxplot"}
   showError: boolean = false
   errorTag_text: string
   _showMenu: boolean = false
@@ -22,6 +21,7 @@ export class SidebarComponent {
       {mode: ModeType.Delta, label: "Delta"},
       {mode: ModeType.Positions, label: "Positions"}
   ]
+  selectedMode: Mode = this.modes[0]
 
   constructor(public sps: SubsessionProviderService) {
   }
@@ -34,7 +34,6 @@ export class SidebarComponent {
     }
     this.options = this.initOptions()
     this.loadOptionsFromBprop()
-
   }
 
   showMenu() {
@@ -80,7 +79,6 @@ export class SidebarComponent {
   selectMode(value: any) {
     this.selectedMode = value
   }
-
     protected readonly ModeType = ModeType;
 }
 

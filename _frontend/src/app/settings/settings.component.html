@@ -5,15 +5,50 @@
   </div>
 
   <div class="main">
-    <div class="content">
 
-      texttexttexttexttexttexttexttexttext <br>
+    <div class="content">
 
       <button (click)="showModal()">Add iRacing account</button>
 
       <div class="grid">
 
-        <div class="mainAcc"></div>
+        <div class="mainAcc">
+
+          <div class="card-frame-button">
+            <button class="buttonNew" *ngIf="_showAddButton" (click)="toggleAccountAdder_main()">Add new account...</button>
+          </div>
+
+          <div class="card-frame-new" *ngIf="_showItemCreator">
+            <div class="card-new">
+              <input #custid type="text" class="custid-edit" placeholder="Customer ID...">
+
+              <div class="wrapper">
+                <button type="button" class="buttonSaveEdit" (click)="addAccount(custid.value.valueOf())">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-frame-list" *ngIf="mainAccount.length > 0" >
+            <div class="card" *ngFor="let acc of mainAccount">
+              <button class="button-delete" (click)="deleteItem(acc)">x</button>
+              <div class="name">{{acc.name}}</div>
+              <div class="custId">{{acc.custId}}</div>
+            </div>
+
+<!--            <div class="card-edit2" *ngIf="editIndex == item.id && editEnabled">-->
+<!--              <input #title type="text" class="title-edit" value="{{item.title}}" placeholder="Title...">-->
+<!--              <textarea #content class="content-edit" required="true" rows="4" placeholder="Description..." >{{item.content}}</textarea>-->
+<!--              <div class="wrapper">-->
+<!--                <button type="button" class="buttonSaveEdit" (click)="saveItem(item.id, title.value, content.value)">Save</button>-->
+<!--              </div>-->
+<!--            </div>-->
+          </div>
+        </div>
+
+
+
+
+
         <div class="otherAcc"></div>
 
       </div>
@@ -35,7 +70,6 @@
       </div>
 
       <div class="footer">
-        <button (click)="addUser()">Confirm</button>
       </div>
 
   </div>

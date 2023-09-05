@@ -55,7 +55,7 @@ export class SubsessionProviderService {
 
   private initBehaviourSubject_bpprop() {
     try {
-      return this.loadFromCache("bpprop")
+      return this.loadFromCache<any>("bpprop")
     } catch (e) {
       return this.loadDefaultBpprop()
     }
@@ -70,7 +70,7 @@ export class SubsessionProviderService {
 
   private initBehaviourSubject_analyticsData() {
     try {
-      return this.loadFromCache("analyticsData")
+      return this.loadFromCache<any>("analyticsData")
     } catch (e) {
       return this.createEmptyAnalyticsData()
     }
@@ -80,7 +80,7 @@ export class SubsessionProviderService {
     localStorage.setItem(name, JSON.stringify(data));
   }
 
-  loadFromCache(name: string) {
+  loadFromCache<T>(name: string): T{
     var data = localStorage.getItem(name);
     if (!data) {
       throw new Error("No data found for key: \"" + name + "\"")
