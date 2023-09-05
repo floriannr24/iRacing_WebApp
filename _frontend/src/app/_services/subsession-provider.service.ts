@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {Driver, Event, EventData} from "./api.service";
 import {BehaviorSubject} from "rxjs";
 import {BoxplotProperties} from "../analytics/diagram/boxplot/boxplot.component";
+import {Mode, ModeType} from "../analytics/sidebar/sidebar.component";
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +13,12 @@ export class SubsessionProviderService {
 
   activeSubsession: Event
   analyticsData: EventData
-  private analyticsData_source = new BehaviorSubject<EventData>(this.initBehaviourSubject_analyticsData())
-  analyticsData_active = this.analyticsData_source.asObservable()
-  private boxplotProperties_source = new BehaviorSubject<BoxplotProperties>(this.initBehaviourSubject_bpprop())
-  boxplotProperties_active = this.boxplotProperties_source.asObservable()
+  private analyticsData_sre = new BehaviorSubject<EventData>(this.initBehaviourSubject_analyticsData())
+  analyticsData_active = this.analyticsData_sre.asObservable()
+  private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.initBehaviourSubject_bpprop())
+  boxplotProperties = this.boxplotProperties_src.asObservable()
+  private mode_src = new BehaviorSubject<Mode>({mode: ModeType.Boxplot, label: "Boxplot"})
+  mode = this.mode_src.asObservable()
 
   constructor() {
     try {
@@ -25,6 +28,18 @@ export class SubsessionProviderService {
       this.activeSubsession = this.createEmptySubsession()
       this.analyticsData = this.createEmptyAnalyticsData()
     }
+  }
+
+  changeMode(mode: Mode) {
+    this.mode_src.next(mode)
+  }
+
+  changeSubsession(subsession: EventData) {
+    this.analyticsData_sre.next(subsession)
+  }
+
+  changeBpprop(bprop: BoxplotProperties) {
+    this.boxplotProperties_src.next(bprop)
   }
 
   private createEmptyDriver() {
@@ -76,7 +91,7 @@ export class SubsessionProviderService {
     }
   }
 
-  saveToCache(name: string, data: any) {
+  saveToCache<T>(name: string, data: T) {
     localStorage.setItem(name, JSON.stringify(data));
   }
 
@@ -88,9 +103,6 @@ export class SubsessionProviderService {
     return JSON.parse(data);
   }
 
-  changeActiveSubsession(subsession: EventData) {
-    this.analyticsData_source.next(subsession)
-  }
 
   createEmptySubsession() {
 
@@ -131,8 +143,5 @@ export class SubsessionProviderService {
     return analyticsData_null
   }
 
-  changeActiveBpprop(bprop: BoxplotProperties) {
-    this.boxplotProperties_source.next(bprop)
 
-  }
 }

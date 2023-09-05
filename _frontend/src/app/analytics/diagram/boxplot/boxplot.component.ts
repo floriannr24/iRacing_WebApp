@@ -38,7 +38,7 @@ export class BoxplotComponent implements AfterViewInit {
 
     // init for when new subsession gets changed
     this.sps.analyticsData_active.subscribe(analyticsData => {
-      this.sps.boxplotProperties_active.subscribe(bpprop => this.bpprop = bpprop)
+      this.sps.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
       this.data = this.loadData(analyticsData)
       this.initBpprop()
       this.diaprop = DiagramProperties.getInstance()
@@ -49,7 +49,7 @@ export class BoxplotComponent implements AfterViewInit {
     })
 
     // init for when bpprop gets changed
-    this.sps.boxplotProperties_active.subscribe(bprop => {
+    this.sps.boxplotProperties.subscribe(bprop => {
       this.bpprop = bprop
       this.sps.analyticsData_active.subscribe(analyticsData => this.data = this.loadData(analyticsData))
       this.initBpprop()
@@ -64,7 +64,7 @@ export class BoxplotComponent implements AfterViewInit {
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
     this.context = (this.canvas.nativeElement).getContext('2d')
     this.diaprop = DiagramProperties.getInstance()
-    this.sps.boxplotProperties_active.subscribe(bpprop => this.bpprop = bpprop)
+    this.sps.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
     this.sps.analyticsData_active.subscribe(analyticsData => this.data = this.loadData(analyticsData))
     this.initBpprop()
     this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50

@@ -41,10 +41,9 @@ export class RaceSelectorPanelComponent {
           this.sendToSubsessionService(this.selectedRow)
           this.sps.saveToCache("activeSubsession", this.selectedRow)
           this.fetchData_boxplot(this.sps.activeSubsession.subsession_id)
-          // todo: saveToCache() and changeActiveSubsession() in fetchData_boxplot() bc of async stuff -> fix
         } catch (e) {
           this.sendToSubsessionService(this.sps.createEmptySubsession())
-          this.sps.changeActiveSubsession(this.sps.createEmptyAnalyticsData())
+          this.sps.changeSubsession(this.sps.createEmptyAnalyticsData())
           this.showErrorTag("Unable to fetch data from iRacing-Server")
         }
         this.closePanel()
@@ -133,7 +132,7 @@ export class RaceSelectorPanelComponent {
   private async fetchData_boxplot(subsession: number | null) {
     if (subsession) {
       var data = await lastValueFrom(this.apis.getBoxplotData(subsession))
-      this.sps.changeActiveSubsession(data)
+      this.sps.changeSubsession(data)
       this.sps.saveToCache("analyticsData", data)
     }
   }

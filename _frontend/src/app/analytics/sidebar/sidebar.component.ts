@@ -1,6 +1,7 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {SubsessionProviderService} from "../../_services/subsession-provider.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-sidebar',
@@ -10,6 +11,7 @@ import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component
 export class SidebarComponent {
 
   @ViewChild('errorTag') errorTag: ElementRef<HTMLDivElement>
+  private subscription: Subscription;
   bpprop: BoxplotProperties
   options: Option_BP
   showError: boolean = false
@@ -21,19 +23,25 @@ export class SidebarComponent {
       {mode: ModeType.Delta, label: "Delta"},
       {mode: ModeType.Positions, label: "Positions"}
   ]
-  selectedMode: Mode = this.modes[0]
+  selectedMode: Mode
 
-  constructor(public sps: SubsessionProviderService) {
+
+  constructor(public dataService: SubsessionProviderService) {
   }
 
   ngOnInit() {
     try {
-      this.bpprop = this.sps.loadFromCache("bpprop")
+      this.bpprop = this.dataService.loadFromCache("bpprop")
     } catch (e) {
       this.bpprop = BoxplotProperties.getInstance()
     }
     this.options = this.initOptions()
+    this.subscription = this.dataService.mode.subscribe(mode => this.selectedMode = mode)
     this.loadOptionsFromBprop()
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe()
   }
 
   showMenu() {
@@ -43,8 +51,8 @@ export class SidebarComponent {
   onOptionsChange(id: string, value: boolean, type: string) {
     if (type == "opt_bp") {
       this.setBoxplotProperties(id, value)
-      this.sps.saveToCache("bpprop",this.bpprop)
-      this.sps.changeActiveBpprop(this.bpprop)
+      this.dataService.saveToCache("bpprop",this.bpprop)
+      this.dataService.changeBpprop(this.bpprop)
     }
   }
 
@@ -76,8 +84,8 @@ export class SidebarComponent {
 
   }
 
-  selectMode(value: any) {
-    this.selectedMode = value
+  selectMode(mode: Mode) {
+    this.dataService.changeMode(mode)
   }
     protected readonly ModeType = ModeType;
 }
