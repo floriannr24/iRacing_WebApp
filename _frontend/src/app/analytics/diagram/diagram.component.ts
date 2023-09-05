@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import {Mode, ModeType } from '../sidebar/sidebar.component'
 import {Subscription} from "rxjs";
-import {SubsessionProviderService} from "../../_services/subsession-provider.service";
+import {DataService} from "../../_services/data.service";
 
 @Component({
   selector: 'app-diagram',
@@ -14,7 +14,7 @@ export class DiagramComponent {
   protected readonly ModeType = ModeType;
   selectedMode: Mode
 
-  constructor(private dataService: SubsessionProviderService) {
+  constructor(private dataService: DataService) {
   }
 
   ngOnInit() {

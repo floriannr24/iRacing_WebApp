@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {lastValueFrom} from 'rxjs';
-import {SubsessionProviderService} from "../../_services/subsession-provider.service";
+import {DataService} from "../../_services/data.service";
 import {APIService, Event} from "../../_services/api.service";
 
 
@@ -21,7 +21,7 @@ export class RaceSelectorPanelComponent {
   error_text: String
   selectedRowIndex = -1
 
-  constructor(private sps: SubsessionProviderService, private apis: APIService) {
+  constructor(private sps: DataService, private apis: APIService) {
   }
 
   ngOnInit() {

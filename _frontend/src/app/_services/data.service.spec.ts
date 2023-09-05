@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { SubsessionProviderService } from './subsession-provider.service';
+import { DataService } from './data.service';
 
 describe('SubsessionProviderService', () => {
-  let service: SubsessionProviderService;
+  let service: DataService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(SubsessionProviderService);
+    service = TestBed.inject(DataService);
   });
 
   it('should be created', () => {

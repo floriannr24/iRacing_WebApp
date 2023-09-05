@@ -3,13 +3,14 @@ import {Driver, Event, EventData} from "./api.service";
 import {BehaviorSubject} from "rxjs";
 import {BoxplotProperties} from "../analytics/diagram/boxplot/boxplot.component";
 import {Mode, ModeType} from "../analytics/sidebar/sidebar.component";
+import {LocalstorageService} from "./localstorage.service";
 
 @Injectable({
   providedIn: 'root'
 })
 
 
-export class SubsessionProviderService {
+export class DataService {
 
   activeSubsession: Event
   analyticsData: EventData
@@ -20,7 +21,7 @@ export class SubsessionProviderService {
   private mode_src = new BehaviorSubject<Mode>({mode: ModeType.Boxplot, label: "Boxplot"})
   mode = this.mode_src.asObservable()
 
-  constructor() {
+  constructor(private localStorage: LocalstorageService) {
     try {
       this.activeSubsession = this.loadFromCache("activeSubsession")
       this.analyticsData = this.loadFromCache("analyticsData")

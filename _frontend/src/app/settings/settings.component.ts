@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import {SubsessionProviderService} from "../_services/subsession-provider.service";
+import {DataService} from "../_services/data.service";
 
 @Component({
   selector: 'app-settings',
@@ -13,7 +13,7 @@ export class SettingsComponent {
   _showItemCreator: boolean
   _showAddButton: boolean = false
 
-  constructor(private sps: SubsessionProviderService) {
+  constructor(private sps: DataService) {
   }
 
   ngOnInit() {

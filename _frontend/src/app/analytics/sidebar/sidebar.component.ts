@@ -1,5 +1,5 @@
 import {Component, ElementRef, ViewChild} from '@angular/core';
-import {SubsessionProviderService} from "../../_services/subsession-provider.service";
+import {DataService} from "../../_services/data.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
 import {Subscription} from "rxjs";
 
@@ -26,7 +26,7 @@ export class SidebarComponent {
   selectedMode: Mode
 
 
-  constructor(public dataService: SubsessionProviderService) {
+  constructor(public dataService: DataService) {
   }
 
   ngOnInit() {

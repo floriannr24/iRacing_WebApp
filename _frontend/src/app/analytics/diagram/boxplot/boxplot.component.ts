@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
-import {SubsessionProviderService} from "../../../_services/subsession-provider.service";
+import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
 
 @Component({
@@ -31,7 +31,7 @@ export class BoxplotComponent implements AfterViewInit {
   show_label_detail: boolean
   label_detail_content: string;
 
-  constructor(private app: ElementRef, private sps: SubsessionProviderService) {
+  constructor(private app: ElementRef, private sps: DataService) {
   }
 
   ngAfterViewInit() {
