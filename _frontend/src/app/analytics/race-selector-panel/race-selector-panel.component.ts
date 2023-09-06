@@ -43,7 +43,7 @@ export class RaceSelectorPanelComponent {
           this.lsS.saveToCache("activeSubsession", this.selectedRow)
           this.fetchData_boxplot(this.dS.activeSubsession.subsession_id)
         } catch (e) {
-          this.sendToSubsessionService(this.dS.createEmptySubsession())
+          this.sendToSubsessionService(new Event())
           this.dS.changeSubsession(this.dS.createEmptyAnalyticsData())
           this.showErrorTag("Unable to fetch data from iRacing-Server")
         }

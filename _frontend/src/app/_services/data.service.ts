@@ -26,7 +26,7 @@ export class DataService {
       this.activeSubsession = this.localStorage.loadFromCache("activeSubsession")
       this.analyticsData = this.localStorage.loadFromCache("analyticsData")
     } catch (e) {
-      this.activeSubsession = this.createEmptySubsession()
+      this.activeSubsession = new Event()
       this.analyticsData = this.createEmptyAnalyticsData()
     }
   }
@@ -43,32 +43,6 @@ export class DataService {
     this.boxplotProperties_src.next(bprop)
   }
 
-  private createEmptyDriver() {
-    let driver: Driver = {
-      name: "",
-      id: 0,
-      finish_position: 1,
-      finish_position_in_class: 1,
-      result_status: "Running",
-      laps_completed: 10,
-      laps: new Array<number>(10),
-      car_class_id: 0,
-      car_class_name: "0",
-      bpdata: {
-        median: 0,
-        mean: 0,
-        Q1: 0,
-        Q3: 0,
-        whisker_top: 0,
-        whisker_bottom: 0,
-        fliers_top: new Array<number>(0),
-        fliers_bottom: Array<number>(0),
-        laps_rndFactors: Array<number>(0)
-      }
-    }
-    return driver;
-  }
-
   private initBehaviourSubject_bpprop() {
     try {
       return this.localStorage.loadFromCache<any>("bpprop")
@@ -79,7 +53,7 @@ export class DataService {
 
   private loadDefaultBpprop() {
     let bpprop = BoxplotProperties.getInstance()
-    bpprop.userDriver = this.createEmptyDriver()
+    bpprop.userDriver = new Driver()
     bpprop.userDriver.name = "Florian Niedermeier2"
     return bpprop
   }
@@ -92,42 +66,17 @@ export class DataService {
     }
   }
 
-  createEmptySubsession() {
-
-    const subsession_null: Event = {
-      subsession_id: null,
-      sof: null,
-      finish_position: null,
-      series_name: null,
-      track_name: null,
-      winner_name: null,
-      start_position: null,
-      session_start_time: "",
-    };
-
-    return subsession_null
-  }
-
   createEmptyAnalyticsData() {
 
-    let driver = this.createEmptyDriver();
+    let driver = new Driver();
 
-    let analyticsData_null: EventData = {
-      metadata: {
-        subsession_id: 0,
-        laps_completed: 0,
-        timeframe: [70, 110],
-        median: 90,
-        carclasses: [0]
-      },
-      drivers: new Array<Driver>(12)
-    }
+    let analyticsData = new EventData()
 
-    for (let i = 0; i < analyticsData_null.drivers.length; i++) {
-      analyticsData_null.drivers[i] = {...driver, finish_position: i+1, finish_position_in_class: i+1
+    for (let i = 0; i < analyticsData.drivers.length; i++) {
+      analyticsData.drivers[i] = {...driver, finish_position: i+1, finish_position_in_class: i+1
       }
     }
 
-    return analyticsData_null
+    return analyticsData
   }
 }

@@ -43,12 +43,9 @@ export class SettingsComponent {
       custId: 2,
     }
 
-    // this.api.POST_item(itemSent).subscribe(data => {
-    //   itemSent.id = data.id
-    // })
     this.mainAccount.unshift(account)
     this.toggleAccountAdder_main()
-    this.localStorageService.saveToCache("accountData",{main: this.mainAccount, other: this.otherAccounts})
+    this.localStorageService.saveToCache<Accounts>("accountData",{main: this.mainAccount, other: this.otherAccounts})
   }
 
   deleteItem(acc: Account) {
@@ -57,27 +54,12 @@ export class SettingsComponent {
       this.mainAccount.splice(deleteIndex, 1)
     }
     this.toggleAccountAdder_main()
-    this.localStorageService.saveToCache("accountData", {main: this.mainAccount, other: this.otherAccounts})
-  }
-
-  private updateItemInArray(item: Item) {
-    // let updateIndex = this.mainAccount.findIndex((itemToFind) => itemToFind.id == item.id)
-    // this.mainAccount[updateIndex] = {
-    //   id: item.id,
-    //   title: item.title,
-    //   content: item.content
-    // }
+    this.localStorageService.saveToCache<Accounts>("accountData", {main: this.mainAccount, other: this.otherAccounts})
   }
 
   showModal() {
     this.show = !this.show
   }
-}
-
-export interface Item {
-  id: number | null,
-  title: string,
-  content: string
 }
 
 export interface Account {
