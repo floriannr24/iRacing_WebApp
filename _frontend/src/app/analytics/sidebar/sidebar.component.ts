@@ -2,6 +2,7 @@ import {Component, ElementRef, ViewChild} from '@angular/core';
 import {DataService} from "../../_services/data.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
 import {Subscription} from "rxjs";
+import {LocalstorageService} from "../../_services/localstorage.service";
 
 @Component({
   selector: 'app-sidebar',
@@ -19,19 +20,18 @@ export class SidebarComponent {
   _showMenu: boolean = false
   _showSettings: boolean = false
   modes: Mode[] = [
-      {mode: ModeType.Boxplot, label: "Boxplot"},
-      {mode: ModeType.Delta, label: "Delta"},
-      {mode: ModeType.Positions, label: "Positions"}
+    new Mode(ModeType.Boxplot),
+    new Mode(ModeType.Delta),
+    new Mode(ModeType.Positions)
   ]
   selectedMode: Mode
 
-
-  constructor(public dataService: DataService) {
+  constructor(public dataService: DataService, private localstorageService: LocalstorageService) {
   }
 
   ngOnInit() {
     try {
-      this.bpprop = this.dataService.loadFromCache("bpprop")
+      this.bpprop = this.localstorageService.loadFromCache("bpprop")
     } catch (e) {
       this.bpprop = BoxplotProperties.getInstance()
     }
@@ -51,7 +51,7 @@ export class SidebarComponent {
   onOptionsChange(id: string, value: boolean, type: string) {
     if (type == "opt_bp") {
       this.setBoxplotProperties(id, value)
-      this.dataService.saveToCache("bpprop",this.bpprop)
+      this.localstorageService.saveToCache("bpprop",this.bpprop)
       this.dataService.changeBpprop(this.bpprop)
     }
   }
@@ -90,13 +90,19 @@ export class SidebarComponent {
     protected readonly ModeType = ModeType;
 }
 
-export type Mode = {
-  mode: ModeType,
-  label: string
+export enum ModeType {
+  Boxplot = "Boxplot",
+  Delta = "Delta",
+  Positions = "Positions"
 }
 
-export enum ModeType {
-  Boxplot,
-  Delta,
-  Positions
+export class Mode {
+
+  mode: ModeType
+  label: string
+
+  constructor(mode: ModeType) {
+    this.mode = mode
+    this.label = mode.toString()
+  }
 }

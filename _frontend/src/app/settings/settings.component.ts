@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {DataService} from "../_services/data.service";
+import {LocalstorageService} from "../_services/localstorage.service";
 
 @Component({
   selector: 'app-settings',
@@ -13,11 +14,11 @@ export class SettingsComponent {
   _showItemCreator: boolean
   _showAddButton: boolean = false
 
-  constructor(private sps: DataService) {
+  constructor(private localStorageService: LocalstorageService) {
   }
 
   ngOnInit() {
-    const data = this.sps.loadFromCache<Accounts>("accountData")
+    const data = this.localStorageService.loadFromCache<Accounts>("accountData")
     this.otherAccounts = data.other
     this.mainAccount = data.main
     this.toggleAccountAdder_main()
@@ -47,7 +48,7 @@ export class SettingsComponent {
     // })
     this.mainAccount.unshift(account)
     this.toggleAccountAdder_main()
-    this.sps.saveToCache("accountData",{main: this.mainAccount, other: this.otherAccounts})
+    this.localStorageService.saveToCache("accountData",{main: this.mainAccount, other: this.otherAccounts})
   }
 
   deleteItem(acc: Account) {
@@ -56,7 +57,7 @@ export class SettingsComponent {
       this.mainAccount.splice(deleteIndex, 1)
     }
     this.toggleAccountAdder_main()
-    this.sps.saveToCache("accountData", {main: this.mainAccount, other: this.otherAccounts})
+    this.localStorageService.saveToCache("accountData", {main: this.mainAccount, other: this.otherAccounts})
   }
 
   private updateItemInArray(item: Item) {

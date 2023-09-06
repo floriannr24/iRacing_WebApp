@@ -18,13 +18,13 @@ export class DataService {
   analyticsData_active = this.analyticsData_sre.asObservable()
   private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.initBehaviourSubject_bpprop())
   boxplotProperties = this.boxplotProperties_src.asObservable()
-  private mode_src = new BehaviorSubject<Mode>({mode: ModeType.Boxplot, label: "Boxplot"})
+  private mode_src = new BehaviorSubject<Mode>(new Mode(ModeType.Boxplot))
   mode = this.mode_src.asObservable()
 
   constructor(private localStorage: LocalstorageService) {
     try {
-      this.activeSubsession = this.loadFromCache("activeSubsession")
-      this.analyticsData = this.loadFromCache("analyticsData")
+      this.activeSubsession = this.localStorage.loadFromCache("activeSubsession")
+      this.analyticsData = this.localStorage.loadFromCache("analyticsData")
     } catch (e) {
       this.activeSubsession = this.createEmptySubsession()
       this.analyticsData = this.createEmptyAnalyticsData()
@@ -71,7 +71,7 @@ export class DataService {
 
   private initBehaviourSubject_bpprop() {
     try {
-      return this.loadFromCache<any>("bpprop")
+      return this.localStorage.loadFromCache<any>("bpprop")
     } catch (e) {
       return this.loadDefaultBpprop()
     }
@@ -86,24 +86,11 @@ export class DataService {
 
   private initBehaviourSubject_analyticsData() {
     try {
-      return this.loadFromCache<any>("analyticsData")
+      return this.localStorage.loadFromCache<any>("analyticsData")
     } catch (e) {
       return this.createEmptyAnalyticsData()
     }
   }
-
-  saveToCache<T>(name: string, data: T) {
-    localStorage.setItem(name, JSON.stringify(data));
-  }
-
-  loadFromCache<T>(name: string): T{
-    var data = localStorage.getItem(name);
-    if (!data) {
-      throw new Error("No data found for key: \"" + name + "\"")
-    }
-    return JSON.parse(data);
-  }
-
 
   createEmptySubsession() {
 
@@ -143,6 +130,4 @@ export class DataService {
 
     return analyticsData_null
   }
-
-
 }
