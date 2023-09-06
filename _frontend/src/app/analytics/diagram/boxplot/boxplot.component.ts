@@ -1,6 +1,7 @@
 import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-boxplot',
@@ -14,6 +15,8 @@ export class BoxplotComponent implements AfterViewInit {
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
   @ViewChild('svgName') svgName: ElementRef<SVGElement>
   @ViewChild('label_detail') label_detail: ElementRef<HTMLDivElement>
+  private analyticsDataSubscription: Subscription
+  private bppropSubscription: Subscription
   private context: CanvasRenderingContext2D | any
   private appWidth: number
   private appHeight: number
@@ -31,14 +34,24 @@ export class BoxplotComponent implements AfterViewInit {
   show_label_detail: boolean
   label_detail_content: string;
 
-  constructor(private app: ElementRef, private sps: DataService) {
+  constructor(private app: ElementRef, private dataService: DataService) {
+  }
+
+  ngOnInit() {
+    this.bppropSubscription = this.dataService.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
+    this.analyticsDataSubscription = this.dataService.analyticsData.subscribe(data => this.data = data)
+  }
+
+  ngOnDestroy() {
+    this.bppropSubscription.unsubscribe()
+    this.analyticsDataSubscription.unsubscribe()
   }
 
   ngAfterViewInit() {
 
     // init for when new subsession gets changed
-    this.sps.analyticsData_active.subscribe(analyticsData => {
-      this.sps.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
+    this.dataService.analyticsData.subscribe(analyticsData => {
+      this.dataService.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
       this.data = this.loadData(analyticsData)
       this.initBpprop()
       this.diaprop = DiagramProperties.getInstance()
@@ -49,9 +62,9 @@ export class BoxplotComponent implements AfterViewInit {
     })
 
     // init for when bpprop gets changed
-    this.sps.boxplotProperties.subscribe(bprop => {
+    this.dataService.boxplotProperties.subscribe(bprop => {
       this.bpprop = bprop
-      this.sps.analyticsData_active.subscribe(analyticsData => this.data = this.loadData(analyticsData))
+      this.dataService.analyticsData.subscribe(analyticsData => this.data = this.loadData(analyticsData))
       this.initBpprop()
       this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
       this.calculateLinearFunction()
@@ -64,8 +77,8 @@ export class BoxplotComponent implements AfterViewInit {
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
     this.context = (this.canvas.nativeElement).getContext('2d')
     this.diaprop = DiagramProperties.getInstance()
-    this.sps.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
-    this.sps.analyticsData_active.subscribe(analyticsData => this.data = this.loadData(analyticsData))
+    this.dataService.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
+    this.dataService.analyticsData.subscribe(analyticsData => this.data = this.loadData(analyticsData))
     this.initBpprop()
     this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
     this.calculateLinearFunction()

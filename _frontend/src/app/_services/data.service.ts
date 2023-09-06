@@ -13,7 +13,7 @@ export class DataService {
 
   subsessionInfo: Event
   private analyticsData_sre = new BehaviorSubject<EventData>(this.init_analyticsData())
-  analyticsData_active = this.analyticsData_sre.asObservable()
+  analyticsData = this.analyticsData_sre.asObservable()
   private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.init_bpprop())
   boxplotProperties = this.boxplotProperties_src.asObservable()
   private mode_src = new BehaviorSubject<Mode>(new Mode(ModeType.Boxplot))
