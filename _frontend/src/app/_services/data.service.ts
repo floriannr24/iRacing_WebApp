@@ -14,9 +14,9 @@ export class DataService {
 
   activeSubsession: Event
   analyticsData: EventData
-  private analyticsData_sre = new BehaviorSubject<EventData>(this.initBehaviourSubject_analyticsData())
+  private analyticsData_sre = new BehaviorSubject<EventData>(this.init_analyticsData())
   analyticsData_active = this.analyticsData_sre.asObservable()
-  private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.initBehaviourSubject_bpprop())
+  private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.init_bpprop())
   boxplotProperties = this.boxplotProperties_src.asObservable()
   private mode_src = new BehaviorSubject<Mode>(new Mode(ModeType.Boxplot))
   mode = this.mode_src.asObservable()
@@ -43,7 +43,7 @@ export class DataService {
     this.boxplotProperties_src.next(bprop)
   }
 
-  private initBehaviourSubject_bpprop() {
+  private init_bpprop() {
     try {
       return this.localStorage.loadFromCache<any>("bpprop")
     } catch (e) {
@@ -58,7 +58,7 @@ export class DataService {
     return bpprop
   }
 
-  private initBehaviourSubject_analyticsData() {
+  private init_analyticsData() {
     try {
       return this.localStorage.loadFromCache<any>("analyticsData")
     } catch (e) {
