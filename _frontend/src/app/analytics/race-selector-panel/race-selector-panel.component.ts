@@ -22,7 +22,7 @@ export class RaceSelectorPanelComponent {
   error_text: String
   selectedRowIndex = -1
 
-  constructor(private lsS: LocalstorageService, private dS: DataService, private apiS: APIService) {
+  constructor(private localstorageService: LocalstorageService, private dataService: DataService, private apiService: APIService) {
   }
 
   ngOnInit() {
@@ -40,11 +40,11 @@ export class RaceSelectorPanelComponent {
       } else {
         try {
           this.sendToSubsessionService(this.selectedRow)
-          this.lsS.saveToCache("activeSubsession", this.selectedRow)
-          this.fetchData_boxplot(this.dS.activeSubsession.subsession_id)
+          this.localstorageService.save("subsessionInfo", this.selectedRow)
+          this.fetchData_boxplot(this.dataService.subsessionInfo.subsession_id)
         } catch (e) {
           this.sendToSubsessionService(new Event())
-          this.dS.changeSubsession(this.dS.createEmptyAnalyticsData())
+          this.dataService.changeSubsession(this.dataService.createEmptyAnalyticsData())
           this.showErrorTag("Unable to fetch data from iRacing-Server")
         }
         this.closePanel()
@@ -102,39 +102,39 @@ export class RaceSelectorPanelComponent {
   async refreshTable() {
     this.data = await this.fetchData_recentRaces()
     this.convertToTimezone(this.data)
-    this.lsS.saveToCache("recentRaces", this.data)
+    this.localstorageService.save("recentRaces", this.data)
   }
 
   private sendToSubsessionService(subsession: Event) {
-    this.dS.activeSubsession = subsession
+    this.dataService.subsessionInfo = subsession
   }
 
   private initActiveSubsession() {
-    if (this.dS.activeSubsession && this.dS.activeSubsession.subsession_id) {
-      this.selectedRowIndex = this.dS.activeSubsession.subsession_id
-      this.selectedRow = this.dS.activeSubsession
+    if (this.dataService.subsessionInfo && this.dataService.subsessionInfo.subsession_id) {
+      this.selectedRowIndex = this.dataService.subsessionInfo.subsession_id
+      this.selectedRow = this.dataService.subsessionInfo
     }
   }
 
   async initDataTable() {
     try {
-      this.data = this.lsS.loadFromCache("recentRaces")
+      this.data = this.localstorageService.load("recentRaces")
     } catch (e) {
       this.data = await this.fetchData_recentRaces()
       this.convertToTimezone(this.data)
-      this.lsS.saveToCache("recentRaces", this.data)
+      this.localstorageService.save("recentRaces", this.data)
     }
   }
 
   private async fetchData_recentRaces() {
-    return await lastValueFrom(this.apiS.getRecentRaces());
+    return await lastValueFrom(this.apiService.getRecentRaces());
   }
 
   private async fetchData_boxplot(subsession: number | null) {
     if (subsession) {
-      var data = await lastValueFrom(this.apiS.getBoxplotData(subsession))
-      this.dS.changeSubsession(data)
-      this.lsS.saveToCache("analyticsData", data)
+      var data = await lastValueFrom(this.apiService.getBoxplotData(subsession))
+      this.dataService.changeSubsession(data)
+      this.localstorageService.save("analyticsData", data)
     }
   }
 
@@ -145,9 +145,9 @@ export class RaceSelectorPanelComponent {
 
   private async fetchData_subsessionInfo(input_text: any) {
     if (input_text) {
-      var data = await lastValueFrom(this.apiS.getSubsessionInfo(input_text))
-      this.dS.activeSubsession = data
-      this.lsS.saveToCache("activeSubsession", data)
+      var data = await lastValueFrom(this.apiService.getSubsessionInfo(input_text))
+      this.dataService.subsessionInfo = data
+      this.localstorageService.save("subsessionInfo", data)
     }
 
   }

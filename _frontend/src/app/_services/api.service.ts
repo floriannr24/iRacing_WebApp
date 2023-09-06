@@ -50,13 +50,13 @@ export interface EventData {
 
 export class Event {
   session_start_time: string = ""
-  series_name: string | null = null
-  start_position: number | null = null
-  finish_position: number | null = null
-  winner_name: string | null = null
-  sof: number | null = null
-  subsession_id: number | null = null
-  track_name: string | null = null
+  series_name: string = ""
+  start_position: number = 0
+  finish_position: number = 0
+  winner_name: string = ""
+  sof: number = 0
+  subsession_id: number | null = 0
+  track_name: string = ""
 }
 
 export class Driver {

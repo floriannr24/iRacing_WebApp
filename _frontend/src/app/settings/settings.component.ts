@@ -18,7 +18,7 @@ export class SettingsComponent {
   }
 
   ngOnInit() {
-    const data = this.localStorageService.loadFromCache<Accounts>("accountData")
+    const data = this.localStorageService.load<Accounts>("accountData")
     this.otherAccounts = data.other
     this.mainAccount = data.main
     this.toggleAccountAdder_main()
@@ -45,7 +45,7 @@ export class SettingsComponent {
 
     this.mainAccount.unshift(account)
     this.toggleAccountAdder_main()
-    this.localStorageService.saveToCache<Accounts>("accountData",{main: this.mainAccount, other: this.otherAccounts})
+    this.localStorageService.save<Accounts>("accountData",{main: this.mainAccount, other: this.otherAccounts})
   }
 
   deleteItem(acc: Account) {
@@ -54,7 +54,7 @@ export class SettingsComponent {
       this.mainAccount.splice(deleteIndex, 1)
     }
     this.toggleAccountAdder_main()
-    this.localStorageService.saveToCache<Accounts>("accountData", {main: this.mainAccount, other: this.otherAccounts})
+    this.localStorageService.save<Accounts>("accountData", {main: this.mainAccount, other: this.otherAccounts})
   }
 
   showModal() {

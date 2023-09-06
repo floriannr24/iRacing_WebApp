@@ -31,7 +31,7 @@ export class SidebarComponent {
 
   ngOnInit() {
     try {
-      this.bpprop = this.localstorageService.loadFromCache("bpprop")
+      this.bpprop = this.localstorageService.load("bpprop")
     } catch (e) {
       this.bpprop = BoxplotProperties.getInstance()
     }
@@ -51,7 +51,7 @@ export class SidebarComponent {
   onOptionsChange(id: string, value: boolean, type: string) {
     if (type == "opt_bp") {
       this.setBoxplotProperties(id, value)
-      this.localstorageService.saveToCache("bpprop",this.bpprop)
+      this.localstorageService.save("bpprop",this.bpprop)
       this.dataService.changeBpprop(this.bpprop)
     }
   }

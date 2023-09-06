@@ -1949,7 +1949,7 @@ export class BoxplotProperties {
     showIndividualLaps: {label: "Show individual laps", checked: false},
     showMean: {label: "Show mean", checked: false},
     showFasterSlower: {label: "Highlight faster / slower drivers", checked: false},
-    showMulticlass: {label: "Show all car classes", checked: true},
+    showMulticlass: {label: "Show all car classes", checked: false},
     showOrder: {label: "Sort drivers from fastest to slowest", checked: false}
 
   }
@@ -2003,8 +2003,6 @@ class DiagramProperties {
   drivernameLabel_y: number = 55
   drivernameLabel_fontSize: number = 20
   drivernameLabel_fontColor: string = "#d9d9d9"
-
-
 }
 
 class BoxplotElement {

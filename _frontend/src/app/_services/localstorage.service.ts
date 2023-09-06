@@ -5,13 +5,11 @@ import { Injectable } from '@angular/core';
 })
 export class LocalstorageService {
 
-  constructor() { }
-
-  saveToCache<T>(name: string, data: T) {
+  save<T>(name: LocalStorageItem | string, data: T) {
     localStorage.setItem(name, JSON.stringify(data));
   }
 
-  loadFromCache<T>(name: string): T{
+  load<T>(name: LocalStorageItem | string): T{
     var data = localStorage.getItem(name);
     if (!data) {
       throw new Error("No data found for key: \"" + name + "\"")
@@ -19,4 +17,11 @@ export class LocalstorageService {
     return JSON.parse(data);
   }
 
+}
+
+enum LocalStorageItem {
+  analyticsData = "analyticsData",
+  bpprop = "bpprop",
+  recentRaces = "recentRaces",
+  subsessionInfo = "subsessionInfo"
 }

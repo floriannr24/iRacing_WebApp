@@ -9,11 +9,9 @@ import {LocalstorageService} from "./localstorage.service";
   providedIn: 'root'
 })
 
-
 export class DataService {
 
-  activeSubsession: Event
-  analyticsData: EventData
+  subsessionInfo: Event
   private analyticsData_sre = new BehaviorSubject<EventData>(this.init_analyticsData())
   analyticsData_active = this.analyticsData_sre.asObservable()
   private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.init_bpprop())
@@ -23,11 +21,9 @@ export class DataService {
 
   constructor(private localStorage: LocalstorageService) {
     try {
-      this.activeSubsession = this.localStorage.loadFromCache("activeSubsession")
-      this.analyticsData = this.localStorage.loadFromCache("analyticsData")
+      this.subsessionInfo = this.localStorage.load("subsessionInfo")
     } catch (e) {
-      this.activeSubsession = new Event()
-      this.analyticsData = this.createEmptyAnalyticsData()
+      this.subsessionInfo = new Event()
     }
   }
 
@@ -45,7 +41,7 @@ export class DataService {
 
   private init_bpprop() {
     try {
-      return this.localStorage.loadFromCache<any>("bpprop")
+      return this.localStorage.load<any>("bpprop")
     } catch (e) {
       return this.loadDefaultBpprop()
     }
@@ -60,7 +56,7 @@ export class DataService {
 
   private init_analyticsData() {
     try {
-      return this.localStorage.loadFromCache<any>("analyticsData")
+      return this.localStorage.load<any>("analyticsData")
     } catch (e) {
       return this.createEmptyAnalyticsData()
     }
