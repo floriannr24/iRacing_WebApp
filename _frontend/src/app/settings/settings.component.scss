@@ -1,3 +1,7 @@
+$card-bg: #e6e6e6;
+$card-bg-hover: #ffffff;
+
+
 .main_wrapper {
   display: flex;
   color: #FFFFFF;
@@ -5,13 +9,13 @@
   justify-content: center;
   align-items: center;
 
-  .myaccount {
+  .settings {
     width: 60%;
     height: 200px;
-    background: #1460b3;
+    background: #143a66;
 
     h1 {
-      padding: 10px;
+      margin: 5px 0 0 15px
 
     }
 
@@ -19,11 +23,12 @@
 
   .main {
     width: 60%;
-    height: 500px;
+    height: calc(100vh - 273px);
     background: #12171C;
 
     .content {
-      padding: 20px;
+      padding: 15px;
+      height: max-content;
 
       .grid {
         display: grid;
@@ -33,12 +38,20 @@
         .mainAcc {
           position: relative;
           grid-area: mainAcc;
-          background: #66b0ff;
+          background: #1f2833;
+
+          .info {
+            margin: 0 10px 0 10px;
+            min-height: 140px;
+
+            h2 {
+              margin: 0;
+            }
+
+          }
 
           .card-frame {
-            position: absolute;
             display: flex;
-            top: 0;
             width: 100%;
             justify-content: center;
 
@@ -47,13 +60,13 @@
               width: 90%;
               font-size: 15pt;
               height: 50px;
-              background: #ffffff;
+              background: $card-bg;
               border-radius: 10px;
               border-style: none;
               transition: 0.1s;
 
               &:hover {
-                background: #f2f2f2;
+                background: $card-bg-hover;
                 cursor: pointer;
               }
             }
@@ -66,9 +79,8 @@
                 margin: 25px;
                 width: 90%;
                 display: flex;
-                background: #ffffff;
+                background: $card-bg;
                 border-radius: 10px;
-                box-shadow: 0 0 10px #afafaf;
                 flex-direction: column;
                 overflow: hidden;
 
@@ -91,7 +103,7 @@
                   .buttonSaveEdit {
                     margin: 10px;
                     font-size: 11pt;
-                    background: #d9d9d9;
+                    background: $card-bg;
                     border-radius: 5px;
                     border: none;
                     height: 30px;
@@ -100,7 +112,7 @@
                     transition: 0.1s;
 
                       &:hover {
-                        background: #cccccc;
+                        background: $card-bg-hover;
                       }
                     }
 
@@ -120,9 +132,8 @@
                 width: 90%;
                 margin: 25px;
                 height: max-content;
-                background: #ffffff;
+                background: $card-bg;
                 border-radius: 10px;
-                box-shadow: 0 0 10px #afafaf;
                 overflow: hidden;
                 transition: 0.1s;
 
@@ -147,20 +158,145 @@
 
                 &:hover {
                   cursor: pointer;
-                  background: #e6e6e6;
+                  background: $card-bg-hover;
                 }
               }
             }
 
           }
         }
+
         .otherAcc {
           grid-area: otherAcc;
-          background: #0e4580;
-          height: 200px;
+          background: #1f2834;
+          height: max-content;
+
+          .info {
+            margin: 0 10px 0 10px;
+            min-height: 140px;
+
+            h2 {
+              margin: 0;
+            }
+          }
+
+          .card-frame {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            flex-direction: column;
+
+            .buttonNew {
+              margin: 25px;
+              width: 90%;
+              font-size: 15pt;
+              height: 50px;
+              background: $card-bg;
+              border-radius: 10px;
+              border-style: none;
+              transition: 0.1s;
+
+              &:hover {
+                background: $card-bg-hover;
+                cursor: pointer;
+              }
+            }
+
+            .card-new-wrapper {
+              width: 100%;
+
+              .card-new {
+                position: relative;
+                margin: 25px;
+                width: 90%;
+                display: flex;
+                background: $card-bg;
+                border-radius: 10px;
+                flex-direction: column;
+                overflow: hidden;
+
+                .x {
+                  position: absolute;
+                  right: 0;
+                  top: 0;
+                }
+
+                .custid-edit {
+                  margin: 10px 10px 0 10px;
+                  font-size: 14pt;
+                  font-weight: bold;
+                  border: none;
+                }
+
+                .wrapper{
+                  height: max-content;
+
+                  .buttonSaveEdit {
+                    margin: 10px;
+                    font-size: 11pt;
+                    background: $card-bg;
+                    border-radius: 5px;
+                    border: none;
+                    height: 30px;
+                    width: 70px;
+                    cursor: pointer;
+                    transition: 0.1s;
+
+                    &:hover {
+                      background: $card-bg-hover;
+                    }
+                  }
+
+                  .error {
+                    margin-left: 15px;
+                    color: #ff3434;
+                  }
+                }
+              }
+            }
+
+            .card-list-wrapper {
+              width: 100%;
+
+              .card {
+                position: relative;
+                width: 90%;
+                margin: 25px;
+                height: max-content;
+                background: $card-bg;
+                border-radius: 10px;
+                overflow: hidden;
+                transition: 0.1s;
+
+                .x {
+                  position: absolute;
+                  right: 0;
+                  top: 0;
+                }
+
+                .name {
+                  min-height: 25px;
+                  color: #000000;
+                  margin: 10px;
+                  font-size: 14pt;
+                  font-weight: bold;
+                }
+
+                .custId {
+                  color: #000000;
+                  margin: 10px;
+                }
+
+                &:hover {
+                  cursor: pointer;
+                  background: $card-bg-hover;
+                }
+              }
+            }
+
+          }
+
         }
-
-
       }
 
     }

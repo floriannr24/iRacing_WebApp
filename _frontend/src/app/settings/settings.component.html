@@ -1,6 +1,6 @@
 <div class="main_wrapper">
 
-  <div class="myaccount">
+  <div class="settings">
     <h1>Settings</h1>
   </div>
 
@@ -12,16 +12,21 @@
 
         <div class="mainAcc">
 
+          <div class="info">
+            <h2>Main account</h2><br>
+            <span>Add your own account by entering your iRacing member ID. You can find your iRacing ID on the top of your iRacing account page. This ID will be used to highlight yourself in the diagrams</span>
+          </div>
+
           <div class="card-frame">
 
-            <button class="buttonNew" *ngIf="_showAddButton" (click)="toggleAccountAdder_main()">Add new account...</button>
+            <button class="buttonNew" *ngIf="_showAddButton_main" (click)="toggleAccountAdder_main()">Add new account...</button>
 
-            <div class="card-new-wrapper" *ngIf="_showItemCreator">
+            <div class="card-new-wrapper" *ngIf="_showItemCreator_main">
               <div class="card-new">
-                <button class="x" (click)="abortCreation()">X</button>
+                <button class="x" (click)="abortCreation_main()">X</button>
                 <input #custid type="text" class="custid-edit" placeholder="Customer ID...">
                 <div class="wrapper">
-                  <button type="button" class="buttonSaveEdit" (click)="addAccount(custid.value.valueOf())">Save</button>
+                  <button type="button" class="buttonSaveEdit" (click)="addAccount_main(custid.value.valueOf())">Save</button>
                   <span class="error" *ngIf="validationError">{{error_text}}</span>
                 </div>
               </div>
@@ -29,7 +34,7 @@
 
             <div class="card-list-wrapper" *ngIf="mainAccount.length > 0" >
               <div class="card" *ngFor="let acc of mainAccount">
-                <button class="x" (click)="deleteItem(acc)">x</button>
+                <button class="x" (click)="deleteItem_main(acc)">x</button>
                 <div class="name">{{acc.name}}</div>
                 <div class="custId">{{acc.custId}}</div>
               </div>
@@ -40,28 +45,45 @@
 
         </div>
 
-        <div class="otherAcc"></div>
+        <div class="otherAcc">
+
+          <div class="info">
+            <h2>Other accounts</h2><br>
+            <span>Add the account of your friends or of your team by entering your iRacing member ID. Their iRacing ID can be found in the URL when you visit their profile-page. The ID will be used to highlight these accounts in the diagrams</span>
+          </div>
+
+          <div class="card-frame">
+
+            <button class="buttonNew" *ngIf="_showAddButton_other" (click)="toggleAccountAdder_other()">Add new account...</button>
+
+            <div class="card-new-wrapper" *ngIf="_showItemCreator_other">
+              <div class="card-new">
+                <button class="x" (click)="abortCreation_other()">X</button>
+                <input #custid type="text" class="custid-edit" placeholder="Customer ID...">
+                <div class="wrapper">
+                  <button type="button" class="buttonSaveEdit" (click)="addAccount_other(custid.value.valueOf())">Save</button>
+                  <span class="error" *ngIf="validationError">{{error_text}}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-list-wrapper" *ngIf="otherAccounts.length > 0" >
+              <div class="card" *ngFor="let acc of otherAccounts">
+                <button class="x" (click)="deleteItem_other(acc)">x</button>
+                <div class="name">{{acc.name}}</div>
+                <div class="custId">{{acc.custId}}</div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 
 
     </div>
-
-  </div>
-</div>
-
-<div class="modal_wrapper">
-  <div *ngIf="show" class="modal_addAccount">
-    <div class="header"><h3>Add iRacing Account</h3></div>
-      <div class="modal_inner_wrapper">
-        <div class="desc"><p>Enter the iRacing ID of the user you want to add.<br><br>
-          You can find your <b>own</b> ID on the top of the <a href="https://members.iracing.com/membersite/account/Home.do">My Account</a> page on iRacing's website.<br>
-          The iRacing ID of <b>other users</b> can be found in the URL when you visit their profile-page.</p></div>
-        <input type="text">
-      </div>
-
-      <div class="footer">
-      </div>
 
   </div>
 </div>
