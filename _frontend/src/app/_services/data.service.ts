@@ -64,7 +64,7 @@ export class DataService {
   private loadDefaultBpprop() {
     let bpprop = BoxplotProperties.getInstance()
     bpprop.userDriver = new Driver()
-    bpprop.userDriver.name = ""
+    bpprop.userDriver.name = "Florian Niedermeier2"
     return bpprop
   }
 
