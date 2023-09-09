@@ -4,7 +4,7 @@ import {BehaviorSubject} from "rxjs";
 import {BoxplotProperties} from "../analytics/diagram/boxplot/boxplot.component";
 import {Mode, ModeType} from "../analytics/sidebar/sidebar.component";
 import {LocalStorageItem, LocalstorageService} from "./localstorage.service";
-import {Accounts} from "../settings/settings.component";
+import {Account, Accounts} from "../settings/settings.component";
 
 @Injectable({
   providedIn: 'root'
@@ -13,18 +13,19 @@ import {Accounts} from "../settings/settings.component";
 export class DataService {
 
   subsessionInfo: Event
+  private mainAcc_src = new BehaviorSubject<Account>(this.initMainAcc())
+  mainAcc = this.mainAcc_src.asObservable()
   private analyticsData_sre = new BehaviorSubject<EventData>(this.init_analyticsData())
   analyticsData = this.analyticsData_sre.asObservable()
   private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.init_bpprop())
   boxplotProperties = this.boxplotProperties_src.asObservable()
   private mode_src = new BehaviorSubject<Mode>(new Mode(ModeType.Boxplot))
   mode = this.mode_src.asObservable()
-  private custid_src = new BehaviorSubject<number>(this.initCustid())
-  custid = this.custid_src.asObservable()
+
 
   constructor(private localStorage: LocalstorageService) {
     try {
-      this.subsessionInfo = this.localStorage.load("subsessionInfo")
+      this.subsessionInfo = this.localStorage.load(LocalStorageItem.subsessionInfo)
     } catch (e) {
       this.subsessionInfo = new Event()
     }
@@ -42,8 +43,8 @@ export class DataService {
     this.boxplotProperties_src.next(bprop)
   }
 
-  changeCustid(id: number) {
-    this.custid_src.next(id)
+  changeMainAcc(acc: Account) {
+    this.mainAcc_src.next(acc)
   }
 
   private init_bpprop() {
@@ -57,7 +58,7 @@ export class DataService {
   private loadDefaultBpprop() {
     let bpprop = BoxplotProperties.getInstance()
     bpprop.userDriver = new Driver()
-    bpprop.userDriver.name = "Florian Niedermeier2"
+    bpprop.userDriver.name = ""
     return bpprop
   }
 
@@ -83,11 +84,22 @@ export class DataService {
     return analyticsData
   }
 
-  private initCustid() {
+  private initMainAcc(): Account {
+
+    let acc: Account = {
+      custId: 0,
+      name: ""
+    }
+
     try {
-      return this.localStorage.load<Accounts>(LocalStorageItem.accountData).main[0].custId
+      let accSaved = this.localStorage.load<Accounts>(LocalStorageItem.accountData)
+      if (accSaved.main.length == 0) {
+        return accSaved.main[0]
+      } else {
+        return acc
+      }
     } catch (e) {
-      return 0
+      return acc
     }
   }
 }

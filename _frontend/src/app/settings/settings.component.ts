@@ -63,7 +63,7 @@ export class SettingsComponent {
     })
 
     this.mainAccount.unshift(account)
-    this.dataService.changeCustid(custid)
+    this.dataService.changeMainAcc(account)
     this.toggleAccountAdder_main()
   }
 
@@ -130,7 +130,7 @@ export class SettingsComponent {
     })
 
     this.otherAccounts.unshift(account)
-    this.dataService.changeCustid(custid)
+    this.dataService.changeMainAcc(account)
     this.toggleAccountAdder_other()
 
   }
