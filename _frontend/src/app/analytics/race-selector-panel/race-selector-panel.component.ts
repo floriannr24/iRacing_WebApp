@@ -96,7 +96,6 @@ export class RaceSelectorPanelComponent {
   private showError(text: String) {
     this.validationError = true
     this.error_text = text
-
   }
 
   async refreshTable() {

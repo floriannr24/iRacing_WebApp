@@ -9,7 +9,7 @@ export class LocalstorageService {
     localStorage.setItem(name, JSON.stringify(data));
   }
 
-  load<T>(name: LocalStorageItem | string): T{
+  load<T>(name: LocalStorageItem | string): T {
     var data = localStorage.getItem(name);
     if (!data) {
       throw new Error("No data found for key: \"" + name + "\"")
@@ -19,9 +19,10 @@ export class LocalstorageService {
 
 }
 
-enum LocalStorageItem {
+export enum LocalStorageItem {
   analyticsData = "analyticsData",
   bpprop = "bpprop",
   recentRaces = "recentRaces",
-  subsessionInfo = "subsessionInfo"
+  subsessionInfo = "subsessionInfo",
+  accountData = "accountData"
 }

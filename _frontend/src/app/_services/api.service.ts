@@ -22,7 +22,7 @@ export class APIService {
 
   public getAccountInfo(id: number) {
     try {
-      return this.http.get<Account>("http://localhost:8000/accountInfo/"+id)
+      return this.http.get<string>("http://localhost:8000/accountInfo/"+id)
     } catch (e) {
       throw new Error("Unable to fetch info from iRacing server")
     }

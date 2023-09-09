@@ -1,140 +1,3 @@
-.card-frame {
-  display: flex;
-  align-items: center;
-  width: auto;
-  flex-direction: column;
-}
-
-.card-frame-button {
-  display: flex;
-  align-items: center;
-
-  .buttonNew {
-    margin: 15px;
-    font-size: 15pt;
-    width: 100%;
-    height: 50px;
-    background: #ffffff;
-    border-radius: 10px;
-    border-style: none;
-    transition: 0.1s;
-
-    &:hover {
-      background: #f2f2f2;
-      cursor: pointer;
-    }
-  }
-}
-
-.card-frame-new {
-
-  .card-new {
-    width: 600px;
-    height: max-content;
-    min-height: 150px;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #afafaf;
-    margin-bottom: 15px;
-    overflow: hidden;
-    transition: 0.1s;
-    display: flex;
-    flex-direction: column;
-
-    .custid-edit {
-      margin: 10px 10px 0 10px;
-      font-size: 14pt;
-      font-weight: bold;
-      border: none;
-    }
-
-    .content-edit {
-      margin: 10px;
-      border: none;
-      resize: none;
-      font-family: Segoe UI, sans-serif;
-    }
-
-    .wrapper{
-      height: max-content;
-
-      .buttonSaveEdit {
-        margin: 10px;
-        font-size: 11pt;
-        background: #d9d9d9;
-        border-radius: 5px;
-        border: none;
-        height: 30px;
-        width: 70px;
-        cursor: pointer;
-        transition: 0.1s;
-
-        &:hover {
-          background: #cccccc;
-        }
-      }
-    }
-
-    *::placeholder {
-      color: #7a7a7a;
-    }
-
-    *:focus {
-      outline: none
-    }
-
-    *:focus::placeholder {
-      color: transparent;
-    }
-
-  }
-}
-
-.card-frame-list {
-  display: flex;
-  position: relative;
-  align-items: center;
-  justify-content: center;
-
-  .card {
-    position: relative;
-    width: 85%;
-    height: max-content;
-    background: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px #afafaf;
-    margin-bottom: 15px;
-    overflow: hidden;
-    transition: 0.05s;
-
-    .button-delete {
-      position: absolute;
-      right: 0;
-      top: 0;
-    }
-
-    .name {
-      color: #000000;
-      margin: 10px;
-      font-size: 14pt;
-      font-weight: bold;
-    }
-
-    .custId {
-      color: #000000;
-      margin: 10px;
-    }
-
-    &:hover {
-      cursor: pointer;
-      background: #f2f2f2;
-    }
-  }
-}
-
-.mainAcc {
-}
-
 .main_wrapper {
   display: flex;
   color: #FFFFFF;
@@ -162,23 +25,139 @@
     .content {
       padding: 20px;
 
-      .grid{
+      .grid {
         display: grid;
         grid-template: "mainAcc otherAcc";
         grid-template-columns: 1fr 1fr;
 
         .mainAcc {
+          position: relative;
           grid-area: mainAcc;
           background: #66b0ff;
-          height: 200px;
-          width: 100%;
-        }
 
+          .card-frame {
+            position: absolute;
+            display: flex;
+            top: 0;
+            width: 100%;
+            justify-content: center;
+
+            .buttonNew {
+              margin: 25px;
+              width: 90%;
+              font-size: 15pt;
+              height: 50px;
+              background: #ffffff;
+              border-radius: 10px;
+              border-style: none;
+              transition: 0.1s;
+
+              &:hover {
+                background: #f2f2f2;
+                cursor: pointer;
+              }
+            }
+
+            .card-new-wrapper {
+              width: 100%;
+
+              .card-new {
+                position: relative;
+                margin: 25px;
+                width: 90%;
+                display: flex;
+                background: #ffffff;
+                border-radius: 10px;
+                box-shadow: 0 0 10px #afafaf;
+                flex-direction: column;
+                overflow: hidden;
+
+                .x {
+                  position: absolute;
+                  right: 0;
+                  top: 0;
+                }
+
+                .custid-edit {
+                  margin: 10px 10px 0 10px;
+                  font-size: 14pt;
+                  font-weight: bold;
+                  border: none;
+                }
+
+                .wrapper{
+                  height: max-content;
+
+                  .buttonSaveEdit {
+                    margin: 10px;
+                    font-size: 11pt;
+                    background: #d9d9d9;
+                    border-radius: 5px;
+                    border: none;
+                    height: 30px;
+                    width: 70px;
+                    cursor: pointer;
+                    transition: 0.1s;
+
+                      &:hover {
+                        background: #cccccc;
+                      }
+                    }
+
+                  .error {
+                    margin-left: 15px;
+                    color: #ff3434;
+                  }
+                }
+              }
+            }
+
+            .card-list-wrapper {
+              width: 100%;
+
+              .card {
+                position: relative;
+                width: 90%;
+                margin: 25px;
+                height: max-content;
+                background: #ffffff;
+                border-radius: 10px;
+                box-shadow: 0 0 10px #afafaf;
+                overflow: hidden;
+                transition: 0.1s;
+
+                .x {
+                  position: absolute;
+                  right: 0;
+                  top: 0;
+                }
+
+                .name {
+                  min-height: 25px;
+                  color: #000000;
+                  margin: 10px;
+                  font-size: 14pt;
+                  font-weight: bold;
+                }
+
+                .custId {
+                  color: #000000;
+                  margin: 10px;
+                }
+
+                &:hover {
+                  cursor: pointer;
+                  background: #e6e6e6;
+                }
+              }
+            }
+
+          }
+        }
         .otherAcc {
           grid-area: otherAcc;
           background: #0e4580;
           height: 200px;
-          width: 100%;
         }
 
 
@@ -188,89 +167,6 @@
 
   }
 
-}
-
-.modal_wrapper {
-  color: #FFFFFF;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  top: 100px;
-
-  .modal_addAccount {
-    width: 700px;
-    height: 300px;
-    background: #212933;
-    border-radius: 6px;
-    border: 1px solid rgba(130, 139, 150, 0.64);
-
-    .header {
-      border-bottom-style: solid;
-      border-bottom-color: rgba(130, 139, 150, 0.64);
-      border-bottom-width: 1px;
-      padding-left: 20px;
-
-    }
-
-    .modal_inner_wrapper {
-
-      padding: 20px;
-
-      .desc {
-        p {
-          margin-top: 0;
-        }
-
-        a {
-          color: #66b0ff;
-        }
-      }
-
-      input {
-        margin-top: 10px;
-        width: 100%;
-      }
-    }
-
-    .footer{
-      border-top-width: 1px;
-      border-top-color: rgba(130, 139, 150, 0.64);
-      border-top-style: solid;
-      padding-left: 20px;
-      display: flex;
-      align-items: center;
-      height: 62px;
-
-      button {
-        background: #1569c5;
-        border-radius: 6px;
-        border: 1px solid #0e4580;
-        width: 110px;
-        height: 30px;
-        transition: 0.05s;
-        color: #C7CBD0;
-        font-size: 12pt;
-        cursor: pointer;
-
-        &:hover {
-          background: #1460b3;
-        }
-
-        &:active {
-          background: #1258a3;
-        }
-
-        &:disabled {
-          background: #7a7a7a;
-          border: 1px solid #4f4f4f;
-          cursor: auto;
-        }
-      }
-    }
-  }
 }
 
 
