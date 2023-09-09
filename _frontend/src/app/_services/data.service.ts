@@ -3,7 +3,8 @@ import {Driver, Event, EventData} from "./api.service";
 import {BehaviorSubject} from "rxjs";
 import {BoxplotProperties} from "../analytics/diagram/boxplot/boxplot.component";
 import {Mode, ModeType} from "../analytics/sidebar/sidebar.component";
-import {LocalstorageService} from "./localstorage.service";
+import {LocalStorageItem, LocalstorageService} from "./localstorage.service";
+import {Accounts} from "../settings/settings.component";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,8 @@ export class DataService {
   boxplotProperties = this.boxplotProperties_src.asObservable()
   private mode_src = new BehaviorSubject<Mode>(new Mode(ModeType.Boxplot))
   mode = this.mode_src.asObservable()
+  private custid_src = new BehaviorSubject<number>(this.initCustid())
+  custid = this.custid_src.asObservable()
 
   constructor(private localStorage: LocalstorageService) {
     try {
@@ -37,6 +40,10 @@ export class DataService {
 
   changeBpprop(bprop: BoxplotProperties) {
     this.boxplotProperties_src.next(bprop)
+  }
+
+  changeCustid(id: number) {
+    this.custid_src.next(id)
   }
 
   private init_bpprop() {
@@ -74,5 +81,13 @@ export class DataService {
     }
 
     return analyticsData
+  }
+
+  private initCustid() {
+    try {
+      return this.localStorage.load<Accounts>(LocalStorageItem.accountData).main[0].custId
+    } catch (e) {
+      return 0
+    }
   }
 }

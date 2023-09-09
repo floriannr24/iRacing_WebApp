@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from _backend.application.data.driver import Driver
 from _backend.application.data.recent_races import RecentRaces
 from _backend.application.data_processor.boxplot import Boxplot
 from _backend.application.data_processor.sessionInfo import SessionInfo
@@ -38,5 +40,8 @@ def getBoxplotData(subsession_id: int):
 def getSubsessionInfo(subsession_id: int):
     return SessionInfo(session).get_SessionInfo_Data(subsession_id)
 
+@app.get("/accountInfo/{cust_id}")
+def getAccountInfo(cust_id: int):
+    return Driver(session).get_AccountInfo(cust_id)
 
-getRecentRaces(817320)
+getAccountInfo(817320)

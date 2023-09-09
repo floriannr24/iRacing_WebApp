@@ -1,19 +1,36 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
+import {Observable, Subscription} from "rxjs";
+import {DataService} from "./data.service";
+import {Account} from "../settings/settings.component";
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class APIService {
+  private custidSubscription: Subscription
+  private custId: number
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private dataService: DataService) {
+    this.custidSubscription = this.dataService.custid.subscribe(id => this.custId = id)
+  }
+
+  ngOnDestroy() {
+    this.custidSubscription.unsubscribe()
+  }
+
+  public getAccountInfo(id: number) {
+    try {
+      return this.http.get<Account>("http://localhost:8000/accountInfo/"+id)
+    } catch (e) {
+      throw new Error("Unable to fetch info from iRacing server")
+    }
   }
 
   public getRecentRaces(): Observable<Event[]> {
     try {
-      return this.http.get<Event[]>("http://localhost:8000/data/recentRaces/817320")
+      return this.http.get<Event[]>("http://localhost:8000/data/recentRaces/"+this.custId)
     } catch (e) {
       throw new Error("Unable to fetch latest races from iRacing server")
     }
