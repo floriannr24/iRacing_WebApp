@@ -13,7 +13,12 @@ export class APIService {
   private custId: number
 
   constructor(private http: HttpClient, private dataService: DataService) {
-    this.custidSubscription = this.dataService.mainAcc.subscribe(acc => this.custId = acc.custId)
+    this.custidSubscription = this.dataService.mainAcc.subscribe(acc => {
+      if (acc != undefined) {
+        this.custId = acc.custId
+      }
+
+    })
   }
 
   ngOnDestroy() {

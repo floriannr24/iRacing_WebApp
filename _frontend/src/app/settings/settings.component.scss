@@ -31,6 +31,7 @@ $saveBttn-bg-hover: #bfbfbf;
     .content {
       padding: 15px;
       height: max-content;
+      min-height: 266px;
 
       .grid {
         display: grid;

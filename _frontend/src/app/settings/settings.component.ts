@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {DataService} from "../_services/data.service";
 import {LocalStorageItem, LocalstorageService} from "../_services/localstorage.service";
 import {APIService} from "../_services/api.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-settings',
@@ -9,48 +10,54 @@ import {APIService} from "../_services/api.service";
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
+  private mainAccSubscription: Subscription;
+  private otherAccSubscription: Subscription;
   show: boolean = false
-  otherAccounts: Account[] = new Array<Account>()
-  mainAccount: Account[] = new Array<Account>()
+  otherAccounts: Account[]
+  mainAccount: Account | undefined
   _showAddButton_main: boolean
   _showItemCreator_main: boolean
   _showAddButton_other: boolean
   _showItemCreator_other: boolean
-  validationError: boolean = false
+  _validationError_main: boolean = false
+  _validationError_other: boolean = false
   error_text: String
+
+
   constructor(private localStorageService: LocalstorageService, private dataService: DataService, private apiService: APIService) {
   }
 
   ngOnInit() {
-    const data = this.localStorageService.load<Accounts>("accountData")
-    this.otherAccounts = data.other
-    this.mainAccount = data.main
-    this._showAddButton_main = this.mainAccount.length <= 0;
+    this.mainAccSubscription = this.dataService.mainAcc.subscribe(acc => this.mainAccount = acc)
+    this.otherAccSubscription = this.dataService.otherAcc.subscribe(acc => this.otherAccounts = acc)
+    this._showAddButton_main = this.mainAccount == undefined;
     this._showAddButton_other = true
   }
 
   toggleAccountAdder_main() {
-    if (this.mainAccount.length > 0) {
-      this._showAddButton_main = false
-    } else {
-      this._showAddButton_main = !this._showAddButton_main
-    }
+    this._showAddButton_main = !this._showAddButton_main
     this._showItemCreator_main = !this._showItemCreator_main
+    this._validationError_main = false
   }
 
   async addAccount_main(data: string) {
 
     if (this.inputIsEmpty(data)) {
-      this.showError("User ID is missing")
+      this.showError_main("User ID is missing")
       return
     }
 
     if (this.inputContainsLetters(data)) {
-      this.showError("User ID may only contain numeric values!")
+      this.showError_main("User ID may only contain numeric values!")
       return
     }
 
-    const custid = parseInt(data)
+    let custid = parseInt(data)
+
+    if (this.IDisAlreadyInUse(custid)) {
+      this.showError_main("This ID is already in use!")
+      return
+    }
 
     let account: Account = {
       name: "",
@@ -61,17 +68,13 @@ export class SettingsComponent {
       account.name = name
       this.localStorageService.save<Accounts>(LocalStorageItem.accountData,{main: this.mainAccount, other: this.otherAccounts})
     })
-
-    this.mainAccount.unshift(account)
     this.dataService.changeMainAcc(account)
-    this.toggleAccountAdder_main()
+    this._showAddButton_main = false
+    this._showItemCreator_main = false
   }
 
-  deleteItem_main(acc: Account) {
-    let deleteIndex = this.mainAccount.findIndex((accToDelete) => accToDelete.custId == acc.custId)
-    if (deleteIndex >= 0) {
-      this.mainAccount.splice(deleteIndex, 1)
-    }
+  deleteItem_main() {
+    this.mainAccount = undefined
     this.localStorageService.save<Accounts>(LocalStorageItem.accountData, {main: this.mainAccount, other: this.otherAccounts})
     this._showAddButton_main = true
   }
@@ -81,8 +84,13 @@ export class SettingsComponent {
     return hasLetters.test(text)
   }
 
-  private showError(text: String) {
-    this.validationError = true
+  private showError_main(text: String) {
+    this._validationError_main = true
+    this.error_text = text
+  }
+
+  private showError_other(text: String) {
+    this._validationError_other = true
     this.error_text = text
   }
 
@@ -108,16 +116,21 @@ export class SettingsComponent {
   addAccount_other(data: string) {
 
     if (this.inputIsEmpty(data)) {
-      this.showError("User ID is missing")
+      this.showError_main("User ID is missing!")
       return
     }
 
     if (this.inputContainsLetters(data)) {
-      this.showError("User ID may only contain numeric values!")
+      this.showError_main("User ID may only contain numeric values!")
       return
     }
 
-    const custid = parseInt(data)
+    let custid = parseInt(data)
+
+    if (this.IDisAlreadyInUse(custid)) {
+      this.showError_other("This ID is already in use!")
+      return
+    }
 
     let account: Account = {
       name: "",
@@ -130,7 +143,7 @@ export class SettingsComponent {
     })
 
     this.otherAccounts.unshift(account)
-    this.dataService.changeMainAcc(account)
+    this.dataService.changeOtherAcc(this.otherAccounts)
     this.toggleAccountAdder_other()
 
   }
@@ -143,6 +156,19 @@ export class SettingsComponent {
     this.localStorageService.save<Accounts>(LocalStorageItem.accountData, {main: this.mainAccount, other: this.otherAccounts})
     this._showAddButton_other = true
   }
+
+  private IDisAlreadyInUse(data: number) {
+    if (data == this.mainAccount?.custId) {
+      return true
+    }
+
+    for (let i = 0; i < this.otherAccounts.length; i++) {
+      if (this.otherAccounts[i].custId == data) {
+        return true
+      }
+    }
+    return false
+  }
 }
 
 export type Account = {
@@ -151,6 +177,6 @@ export type Account = {
 }
 
 export type Accounts = {
-  main: Account[]
+  main: Account | undefined
   other: Account[]
 }

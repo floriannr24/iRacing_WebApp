@@ -13,8 +13,10 @@ import {Account, Accounts} from "../settings/settings.component";
 export class DataService {
 
   subsessionInfo: Event
-  private mainAcc_src = new BehaviorSubject<Account>(this.initMainAcc())
+  private mainAcc_src = new BehaviorSubject<Account|undefined>(this.initAccounts().main)
   mainAcc = this.mainAcc_src.asObservable()
+  private otherAcc_src = new BehaviorSubject<Account[]>(this.initAccounts().other)
+  otherAcc = this.otherAcc_src.asObservable()
   private analyticsData_sre = new BehaviorSubject<EventData>(this.init_analyticsData())
   analyticsData = this.analyticsData_sre.asObservable()
   private boxplotProperties_src = new BehaviorSubject<BoxplotProperties>(this.init_bpprop())
@@ -45,6 +47,10 @@ export class DataService {
 
   changeMainAcc(acc: Account) {
     this.mainAcc_src.next(acc)
+  }
+
+  changeOtherAcc(acc: Account[]) {
+    this.otherAcc_src.next(acc)
   }
 
   private init_bpprop() {
@@ -84,17 +90,17 @@ export class DataService {
     return analyticsData
   }
 
-  private initMainAcc(): Account {
+  private initAccounts() {
 
-    let acc: Account = {
-      custId: 0,
-      name: ""
+    let acc: Accounts = {
+      main: undefined,
+      other: []
     }
 
     try {
       let accSaved = this.localStorage.load<Accounts>(LocalStorageItem.accountData)
-      if (accSaved.main.length == 0) {
-        return accSaved.main[0]
+      if (accSaved != undefined) {
+        return accSaved
       } else {
         return acc
       }
