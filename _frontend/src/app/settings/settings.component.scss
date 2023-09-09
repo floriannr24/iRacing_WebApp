@@ -1,5 +1,7 @@
 $card-bg: #e6e6e6;
 $card-bg-hover: #ffffff;
+$saveBttn-bg: #b3b3b3;
+$saveBttn-bg-hover: #bfbfbf;
 
 
 .main_wrapper {
@@ -34,11 +36,12 @@ $card-bg-hover: #ffffff;
         display: grid;
         grid-template: "mainAcc otherAcc";
         grid-template-columns: 1fr 1fr;
+        background: #1f2834;
+        min-height: max-content;
 
         .mainAcc {
           position: relative;
           grid-area: mainAcc;
-          background: #1f2833;
 
           .info {
             margin: 0 10px 0 10px;
@@ -95,6 +98,7 @@ $card-bg-hover: #ffffff;
                   font-size: 14pt;
                   font-weight: bold;
                   border: none;
+                  background: $card-bg;
                 }
 
                 .wrapper{
@@ -103,7 +107,7 @@ $card-bg-hover: #ffffff;
                   .buttonSaveEdit {
                     margin: 10px;
                     font-size: 11pt;
-                    background: $card-bg;
+                    background: $saveBttn-bg;
                     border-radius: 5px;
                     border: none;
                     height: 30px;
@@ -112,13 +116,13 @@ $card-bg-hover: #ffffff;
                     transition: 0.1s;
 
                       &:hover {
-                        background: $card-bg-hover;
+                        background: $saveBttn-bg-hover;
                       }
                     }
 
                   .error {
                     margin-left: 15px;
-                    color: #ff3434;
+                    color: #ff1818;
                   }
                 }
               }
@@ -168,8 +172,7 @@ $card-bg-hover: #ffffff;
 
         .otherAcc {
           grid-area: otherAcc;
-          background: #1f2834;
-          height: max-content;
+
 
           .info {
             margin: 0 10px 0 10px;
@@ -226,6 +229,7 @@ $card-bg-hover: #ffffff;
                   font-size: 14pt;
                   font-weight: bold;
                   border: none;
+                  background: $card-bg;
                 }
 
                 .wrapper{
@@ -234,7 +238,7 @@ $card-bg-hover: #ffffff;
                   .buttonSaveEdit {
                     margin: 10px;
                     font-size: 11pt;
-                    background: $card-bg;
+                    background: $saveBttn-bg;
                     border-radius: 5px;
                     border: none;
                     height: 30px;
@@ -243,13 +247,13 @@ $card-bg-hover: #ffffff;
                     transition: 0.1s;
 
                     &:hover {
-                      background: $card-bg-hover;
+                      background: $saveBttn-bg-hover;
                     }
                   }
 
                   .error {
                     margin-left: 15px;
-                    color: #ff3434;
+                    color: #ff1818;
                   }
                 }
               }
