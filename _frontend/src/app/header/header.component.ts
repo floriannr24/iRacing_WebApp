@@ -17,8 +17,11 @@ export class HeaderComponent {
 
   ngOnInit() {
     this.nameSubscription = this.dataService.mainAcc.subscribe(acc => {
+      console.log(acc)
       if (acc != undefined) {
         this.name = acc.name.split(/\s+/)[0]
+      } else {
+        this.name = "User"
       }
       }
     )

@@ -45,7 +45,7 @@ export class DataService {
     this.boxplotProperties_src.next(bprop)
   }
 
-  changeMainAcc(acc: Account) {
+  changeMainAcc(acc: Account | undefined) {
     this.mainAcc_src.next(acc)
   }
 

@@ -67,15 +67,17 @@ export class SettingsComponent {
     this.apiService.getAccountInfo(custid).subscribe(name => {
       account.name = name
       this.localStorageService.save<Accounts>(LocalStorageItem.accountData,{main: this.mainAccount, other: this.otherAccounts})
+      this.dataService.changeMainAcc(account)
     })
-    this.dataService.changeMainAcc(account)
+    this.mainAccount =  account
     this._showAddButton_main = false
     this._showItemCreator_main = false
   }
 
   deleteItem_main() {
     this.mainAccount = undefined
-    this.localStorageService.save<Accounts>(LocalStorageItem.accountData, {main: this.mainAccount, other: this.otherAccounts})
+    this.dataService.changeMainAcc(undefined)
+    this.localStorageService.save<Accounts>(LocalStorageItem.accountData, {main: undefined, other: this.otherAccounts})
     this._showAddButton_main = true
   }
 
