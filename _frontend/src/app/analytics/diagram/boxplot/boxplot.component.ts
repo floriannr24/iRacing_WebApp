@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
-import {Subscription} from "rxjs";
+import {Subject, Subscription, takeUntil} from "rxjs";
 
 @Component({
   selector: 'app-boxplot',
@@ -15,8 +15,7 @@ export class BoxplotComponent implements AfterViewInit {
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
   @ViewChild('svgName') svgName: ElementRef<SVGElement>
   @ViewChild('label_detail') label_detail: ElementRef<HTMLDivElement>
-  private analyticsDataSubscription: Subscription
-  private bppropSubscription: Subscription
+  private $stop = new Subject<void>()
   private context: CanvasRenderingContext2D | any
   private appWidth: number
   private appHeight: number
@@ -25,9 +24,10 @@ export class BoxplotComponent implements AfterViewInit {
   private scrollX = 0
   private scrollY = 0
   private data_live: Array<BoxplotElement>
+  private data_original: EventData
   private data: EventData
   private bpprop: BoxplotProperties
-  private diaprop: DiagramProperties
+  private diaprop: DiagramProperties = DiagramProperties.getInstance()
   private highlightedDriver: Driver | null
   private highlightedData: any
   label_scale = "1.0"
@@ -38,47 +38,29 @@ export class BoxplotComponent implements AfterViewInit {
   }
 
   ngOnInit() {
-    this.bppropSubscription = this.dataService.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
-    this.analyticsDataSubscription = this.dataService.analyticsData.subscribe(data => this.data = data)
+  this.dataService.boxplotProperties.pipe(takeUntil(this.$stop)).subscribe(bpprop => {
+    this.bpprop = bpprop
+    this.updateBoxplot()
+
+  })
+  this.dataService.analyticsData.pipe(takeUntil(this.$stop)).subscribe(data => {
+    this.data_original = data
+    this.updateBoxplot();
+  })
   }
 
   ngOnDestroy() {
-    this.bppropSubscription.unsubscribe()
-    this.analyticsDataSubscription.unsubscribe()
+    this.$stop.next()
+    this.$stop.complete()
   }
 
   ngAfterViewInit() {
 
-    // init for when new subsession gets changed
-    this.dataService.analyticsData.subscribe(analyticsData => {
-      this.dataService.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
-      this.data = this.loadData(analyticsData)
-      this.initBpprop()
-      this.diaprop = DiagramProperties.getInstance()
-      this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
-      this.calculateLinearFunction()
-      this.drawSVG_Y_laptimeLabels()
-      this.drawSVG_X_driverLabels()
-    })
-
-    // init for when bpprop gets changed
-    this.dataService.boxplotProperties.subscribe(bprop => {
-      this.bpprop = bprop
-      this.dataService.analyticsData.subscribe(analyticsData => this.data = this.loadData(analyticsData))
-      this.initBpprop()
-      this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
-      this.calculateLinearFunction()
-      this.drawSVG_Y_laptimeLabels()
-      this.drawSVG_X_driverLabels()
-    })
-
-    // first init when website loads
+    // first init when view loads
     this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.parentNode.clientWidth - 130 // 1390
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
     this.context = (this.canvas.nativeElement).getContext('2d')
     this.diaprop = DiagramProperties.getInstance()
-    this.dataService.boxplotProperties.subscribe(bpprop => this.bpprop = bpprop)
-    this.dataService.analyticsData.subscribe(analyticsData => this.data = this.loadData(analyticsData))
     this.initBpprop()
     this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
     this.calculateLinearFunction()
@@ -1071,7 +1053,7 @@ export class BoxplotComponent implements AfterViewInit {
     this.svgName.nativeElement.append(separator)
   }
 
-  private loadData(data: EventData) {
+  private prepareData(data: EventData) {
 
     // set user driver in bpprop
     data.drivers.forEach(driver => {
@@ -1198,6 +1180,15 @@ export class BoxplotComponent implements AfterViewInit {
 
   private setColor_Fliers() {
     this.context.strokeStyle = this.bpprop.default.fliers.color
+  }
+
+  private updateBoxplot() {
+    this.data = this.prepareData(this.data_original)
+    this.initBpprop()
+    this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
+    this.calculateLinearFunction()
+    this.drawSVG_Y_laptimeLabels()
+    this.drawSVG_X_driverLabels()
   }
 
   private initBpprop() {
