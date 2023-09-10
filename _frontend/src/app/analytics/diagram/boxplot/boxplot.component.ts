@@ -15,7 +15,7 @@ export class BoxplotComponent implements AfterViewInit {
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
   @ViewChild('svgName') svgName: ElementRef<SVGElement>
   @ViewChild('label_detail') label_detail: ElementRef<HTMLDivElement>
-  private $stop = new Subject<void>()
+  private stop$ = new Subject<void>()
   private context: CanvasRenderingContext2D | any
   private appWidth: number
   private appHeight: number
@@ -38,20 +38,20 @@ export class BoxplotComponent implements AfterViewInit {
   }
 
   ngOnInit() {
-  this.dataService.boxplotProperties.pipe(takeUntil(this.$stop)).subscribe(bpprop => {
+  this.dataService.boxplotProperties.pipe(takeUntil(this.stop$)).subscribe(bpprop => {
     this.bpprop = bpprop
-    this.updateBoxplot()
+    this.updateDiagram()
 
   })
-  this.dataService.analyticsData.pipe(takeUntil(this.$stop)).subscribe(data => {
+  this.dataService.analyticsData.pipe(takeUntil(this.stop$)).subscribe(data => {
     this.data_original = data
-    this.updateBoxplot();
+    this.updateDiagram();
   })
   }
 
   ngOnDestroy() {
-    this.$stop.next()
-    this.$stop.complete()
+    this.stop$.next()
+    this.stop$.complete()
   }
 
   ngAfterViewInit() {
@@ -60,7 +60,6 @@ export class BoxplotComponent implements AfterViewInit {
     this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.parentNode.clientWidth - 130 // 1390
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
     this.context = (this.canvas.nativeElement).getContext('2d')
-    this.diaprop = DiagramProperties.getInstance()
     this.initBpprop()
     this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
     this.calculateLinearFunction()
@@ -1182,7 +1181,7 @@ export class BoxplotComponent implements AfterViewInit {
     this.context.strokeStyle = this.bpprop.default.fliers.color
   }
 
-  private updateBoxplot() {
+  private updateDiagram() {
     this.data = this.prepareData(this.data_original)
     this.initBpprop()
     this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50

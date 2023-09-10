@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {DataService} from "../_services/data.service";
 import {LocalStorageItem, LocalstorageService} from "../_services/localstorage.service";
 import {APIService} from "../_services/api.service";
-import {Subscription} from "rxjs";
+import {Subject, Subscription, takeUntil} from "rxjs";
 
 @Component({
   selector: 'app-settings',
@@ -10,8 +10,7 @@ import {Subscription} from "rxjs";
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
-  private mainAccSubscription: Subscription;
-  private otherAccSubscription: Subscription;
+  private stop$ = new Subject<void>()
   show: boolean = false
   otherAccounts: Account[]
   mainAccount: Account | undefined
@@ -28,10 +27,15 @@ export class SettingsComponent {
   }
 
   ngOnInit() {
-    this.mainAccSubscription = this.dataService.mainAcc.subscribe(acc => this.mainAccount = acc)
-    this.otherAccSubscription = this.dataService.otherAcc.subscribe(acc => this.otherAccounts = acc)
+    this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.mainAccount = acc)
+    this.dataService.otherAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.otherAccounts = acc)
     this._showAddButton_main = this.mainAccount == undefined;
     this._showAddButton_other = true
+  }
+
+  ngOnDestroy() {
+    this.stop$.next()
+    this.stop$.complete()
   }
 
   toggleAccountAdder_main() {
