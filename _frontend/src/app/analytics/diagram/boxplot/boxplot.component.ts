@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
-import {Subject, Subscription, takeUntil} from "rxjs";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
   selector: 'app-boxplot',

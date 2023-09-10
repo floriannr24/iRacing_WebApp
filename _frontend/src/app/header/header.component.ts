@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {DataService} from "../_services/data.service";
-import {map, Observable, Subscription} from "rxjs";
+import {map, Observable } from "rxjs";
 
 @Component({
   selector: 'app-header',

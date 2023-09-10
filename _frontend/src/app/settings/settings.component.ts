@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import {DataService} from "../_services/data.service";
 import {LocalStorageItem, LocalstorageService} from "../_services/localstorage.service";
 import {APIService} from "../_services/api.service";
-import {Subject, Subscription, takeUntil} from "rxjs";
+import {Subject, takeUntil} from "rxjs";
 
 @Component({
   selector: 'app-settings',

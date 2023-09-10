@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {Mode, ModeType } from '../sidebar/sidebar.component'
-import {map, Observable, Subscription} from "rxjs";
+import { ModeType } from '../sidebar/sidebar.component'
+import {map, Observable } from "rxjs";
 import {DataService} from "../../_services/data.service";
 
 @Component({
