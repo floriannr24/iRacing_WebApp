@@ -15,6 +15,9 @@ export class BoxplotComponent implements AfterViewInit {
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
   @ViewChild('svgName') svgName: ElementRef<SVGElement>
   @ViewChild('label_detail') label_detail: ElementRef<HTMLDivElement>
+  label_scale = "1.0"
+  show_label_detail: boolean
+  label_detail_content: string
   private stop$ = new Subject<void>()
   private context: CanvasRenderingContext2D | any
   private appWidth: number
@@ -24,29 +27,35 @@ export class BoxplotComponent implements AfterViewInit {
   private scrollX = 0
   private scrollY = 0
   private data_live: Array<BoxplotElement>
-  private data_original: EventData
-  private data: EventData
+  private data_original: EventData = new EventData()
+  private data: EventData = new EventData()
   private bpprop: BoxplotProperties
   private diaprop: DiagramProperties = DiagramProperties.getInstance()
   private highlightedDriver: Driver | null
   private highlightedData: any
-  label_scale = "1.0"
-  show_label_detail: boolean
-  label_detail_content: string;
+  private isDown: boolean
+  private startX: number
+  private startY: number
+  private offsetX: number
+  private offsetY: number
+  private mouseX: number
+  private mouseY: number
+  private netPanningX: number = 0
+  private netPanningY: number = 0
 
   constructor(private app: ElementRef, private dataService: DataService) {
   }
 
   ngOnInit() {
-  this.dataService.boxplotProperties.pipe(takeUntil(this.stop$)).subscribe(bpprop => {
-    this.bpprop = bpprop
-    this.updateDiagram()
+    this.dataService.boxplotProperties.pipe(takeUntil(this.stop$)).subscribe(bpprop => {
+      this.bpprop = bpprop
+      this.updateDiagram()
 
-  })
-  this.dataService.analyticsData.pipe(takeUntil(this.stop$)).subscribe(data => {
-    this.data_original = data
-    this.updateDiagram();
-  })
+    })
+    this.dataService.analyticsData.pipe(takeUntil(this.stop$)).subscribe(data => {
+      this.data_original = data
+      this.updateDiagram();
+    })
   }
 
   ngOnDestroy() {
@@ -59,6 +68,8 @@ export class BoxplotComponent implements AfterViewInit {
     // first init when view loads
     this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.parentNode.clientWidth - 130 // 1390
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
+    this.offsetX = this.canvas.nativeElement.getBoundingClientRect().left
+    this.offsetY = this.canvas.nativeElement.getBoundingClientRect().top
     this.context = (this.canvas.nativeElement).getContext('2d')
     this.initBpprop()
     this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
@@ -69,16 +80,38 @@ export class BoxplotComponent implements AfterViewInit {
     this.draw()
   }
 
-  @HostListener('wheel', ['$event'])
-  mousewheel(event: WheelEvent) {
-    this.scaleCanvas(event)
-    this.drawSVG_Y_laptimeLabels()
-    this.drawSVG_X_driverLabels()
-  }
+  // @HostListener('wheel', ['$event'])
+  // mousewheel(event: WheelEvent) {
+  //   this.scaleCanvas(event)
+  //   this.drawSVG_Y_laptimeLabels()
+  //   this.drawSVG_X_driverLabels()
+  // }
 
   mousemove(event: MouseEvent) {
-    this.detectHover(event)
+    // this.detectHover(event)
   }
+
+  @HostListener('mouseup', ['$event'])
+  mouseUp(event: MouseEvent) {
+    this.handleMouseUp(event)
+  }
+
+  @HostListener('mousedown', ['$event'])
+  mouseDown(event: MouseEvent) {
+    this.handleMouseDown(event)
+  }
+
+  @HostListener('mouseout', ['$event'])
+  mouseOut(event: MouseEvent) {
+    this.handleMouseOut(event)
+  }
+
+  @HostListener('mousemove', ['$event'])
+  mouseMove(event: MouseEvent) {
+    this.handleMouseMove(event)
+  }
+
+
 
   private draw() {
 
@@ -89,7 +122,13 @@ export class BoxplotComponent implements AfterViewInit {
     // clearing background of yAxis from Boxplot drawings
     this.context.clearRect(0, 0, this.diaprop.yAxisBgWidth / this.scale, this.context.canvas.height / this.scale)
 
+    this.context.fillStyle = "#FFFFFF"
+    this.context.fillRect(200,200,200,200)
+
     this.drawAxes()
+
+
+
 
     requestAnimationFrame(this.draw.bind(this))
 
@@ -1255,6 +1294,52 @@ export class BoxplotComponent implements AfterViewInit {
       default: return this.bpprop.default
     }
   }
+
+  private handleMouseUp(event: MouseEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+    this.isDown = false
+  }
+
+  private handleMouseDown(event: MouseEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    this.startX = event.clientX - this.offsetX
+    this.startY = event.clientY - this.offsetY
+    this.isDown = true
+  }
+
+  private handleMouseOut(event: MouseEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+    this.isDown = false
+  }
+
+  private handleMouseMove(event: MouseEvent) {
+
+    if (!this.isDown) {
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
+
+    this.mouseX = event.clientX - this.startX
+    this.mouseY = event.clientY - this.startY
+
+    let dx = this.mouseX - this.startX
+    let dy = this.mouseY - this.startY
+
+    this.startX = this.mouseX
+    this.startY = this.mouseY
+
+    this.netPanningX += dx
+    this.netPanningY += dy
+  }
+
+
+
 }
 
 export class BoxplotProperties {

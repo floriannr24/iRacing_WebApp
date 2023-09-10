@@ -59,17 +59,6 @@ export class APIService {
 }
 
 
-export interface EventData {
-  metadata: {
-    subsession_id: number,
-    laps_completed: number,
-    timeframe: Array<number>,
-    median: number,
-    carclasses: Array<number>
-  },
-  drivers: Array<Driver>
-}
-
 export class Event {
   session_start_time: string = ""
   series_name: string = ""
@@ -89,7 +78,7 @@ export class Driver {
   finish_position_in_class: number | string = 1
   result_status: string = "Running"
   laps_completed: number = 10
-  laps: Array<number> = new Array<number>(10)
+  laps: number[] = new Array<number>(10)
   car_class_id: number = 0
   car_class_name: string = ""
   bpdata: BoxplotData = new BoxplotData()
@@ -102,15 +91,15 @@ export class BoxplotData {
   Q3: number = 0
   whisker_top: number = 0
   whisker_bottom: number = 0
-  fliers_top: Array<number> = new Array<number>(0)
-  fliers_bottom: Array<number> = new Array<number>(0)
-  laps_rndFactors: Array<number> = new Array<number>(0)
+  fliers_top: number[] = new Array<number>(0)
+  fliers_bottom: number[] = new Array<number>(0)
+  laps_rndFactors: number[] = new Array<number>(0)
 }
 
 export class EventData {
 
   metadata: Metadata
-  drivers: Array<Driver> = new Array<Driver>(12)
+  drivers: Driver[] = new Array<Driver>(12)
 
   constructor() {
     this.metadata = {
@@ -126,9 +115,9 @@ export class EventData {
 export interface Metadata {
     subsession_id: number,
     laps_completed: number,
-    timeframe: Array<number>,
+    timeframe: number[],
     median: number
-    carclasses: Array<number>
+    carclasses: number[]
 }
 
 

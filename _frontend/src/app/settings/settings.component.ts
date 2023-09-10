@@ -11,7 +11,6 @@ import {Subject, takeUntil} from "rxjs";
 })
 export class SettingsComponent {
   private stop$ = new Subject<void>()
-  show: boolean = false
   otherAccounts: Account[]
   mainAccount: Account | undefined
   _showAddButton_main: boolean
@@ -68,7 +67,7 @@ export class SettingsComponent {
       custId: custid,
     }
 
-    this.apiService.getAccountInfo(custid).subscribe(name => {
+    this.apiService.getAccountInfo(custid).pipe(takeUntil(this.stop$)).subscribe(name => {
       account.name = name
       this.localStorageService.save<Accounts>(LocalStorageItem.accountData,{main: this.mainAccount, other: this.otherAccounts})
       this.dataService.changeMainAcc(account)
@@ -143,7 +142,7 @@ export class SettingsComponent {
       custId: custid,
     }
 
-    this.apiService.getAccountInfo(custid).subscribe(name => {
+    this.apiService.getAccountInfo(custid).pipe(takeUntil(this.stop$)).subscribe(name => {
       account.name = name
       this.localStorageService.save<Accounts>(LocalStorageItem.accountData,{main: this.mainAccount, other: this.otherAccounts})
     })
