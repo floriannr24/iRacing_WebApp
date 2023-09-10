@@ -7,9 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AnalyticsComponent {
   title = "angular-app";
-  show = false;
+  _showRaceSelectorPanel = false;
 
-  showPanel() {
-    this.show = !this.show
+  showRaceSelectorPanel() {
+    this._showRaceSelectorPanel = !this._showRaceSelectorPanel
   }
 }

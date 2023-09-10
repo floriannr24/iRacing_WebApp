@@ -1,7 +1,7 @@
 <div class="grid">
-  <app-race-selector (click)="showPanel()"></app-race-selector>
+  <app-race-selector (click)="showRaceSelectorPanel()"></app-race-selector>
   <app-sidebar></app-sidebar>
   <app-diagram></app-diagram>
 </div>
 
-<app-race-selector-panel *ngIf="show" (closePanelEvent)="showPanel()"></app-race-selector-panel>
+<app-race-selector-panel *ngIf="_showRaceSelectorPanel" (closePanelEvent)="showRaceSelectorPanel()"></app-race-selector-panel>

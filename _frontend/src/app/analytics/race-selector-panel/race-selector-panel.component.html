@@ -70,7 +70,7 @@
 
   <div class="button-wrapper">
     <button (click)="confirm(radio_table, radio_text, input_text.value)">Confirm</button>
-    <span class="error" *ngIf="validationError">{{error_text}}</span>
+    <span class="error" *ngIf="_showValidationError">{{error_text}}</span>
   </div>
 
 </div>

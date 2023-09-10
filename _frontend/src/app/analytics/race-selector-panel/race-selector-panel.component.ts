@@ -18,7 +18,7 @@ export class RaceSelectorPanelComponent {
   @Output() errorTag = new EventEmitter<string>()
   data: Event[]
   selectedRow: Event
-  validationError: boolean
+  _showValidationError: boolean
   error_text: String
   selectedRowIndex = -1
 
@@ -32,7 +32,7 @@ export class RaceSelectorPanelComponent {
 
   confirm(radio_table: any, radio_text: any, input_text: any) {
 
-    this.validationError = false;
+    this._showValidationError = false;
 
     if (radio_table.checked) {
       if (this.noRowSelected()) {
@@ -94,7 +94,7 @@ export class RaceSelectorPanelComponent {
   }
 
   private showError(text: String) {
-    this.validationError = true
+    this._showValidationError = true
     this.error_text = text
   }
 
