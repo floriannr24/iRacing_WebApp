@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { ModeType } from '../sidebar/sidebar.component'
 import {map, Observable } from "rxjs";
 import {DataService} from "../../_services/data.service";
@@ -8,7 +8,7 @@ import {DataService} from "../../_services/data.service";
   templateUrl: './diagram.component.html',
   styleUrls: ['./diagram.component.scss']
 })
-export class DiagramComponent {
+export class DiagramComponent implements OnInit{
 
   mode$: Observable<any>
   protected readonly ModeType = ModeType;

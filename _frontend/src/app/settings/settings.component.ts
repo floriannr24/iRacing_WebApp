@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {DataService} from "../_services/data.service";
 import {LocalStorageItem, LocalstorageService} from "../_services/localstorage.service";
 import {APIService} from "../_services/api.service";
@@ -9,7 +9,7 @@ import {Subject, takeUntil} from "rxjs";
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit, OnDestroy {
   private stop$ = new Subject<void>()
   otherAccounts: Account[]
   mainAccount: Account | undefined

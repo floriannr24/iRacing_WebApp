@@ -1,4 +1,4 @@
-import {Component, ElementRef, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../_services/data.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
 import {Subscription} from "rxjs";
@@ -9,7 +9,7 @@ import {LocalstorageService} from "../../_services/localstorage.service";
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit, OnDestroy{
 
   @ViewChild('errorTag') errorTag: ElementRef<HTMLDivElement>
   private subscription: Subscription;

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {lastValueFrom} from 'rxjs';
 import {DataService} from "../../_services/data.service";
 import {APIService, Event} from "../../_services/api.service";
@@ -13,7 +13,7 @@ import {LocalstorageService} from "../../_services/localstorage.service";
 
 // todo: convert gmt to corresponding timezone
 
-export class RaceSelectorPanelComponent {
+export class RaceSelectorPanelComponent implements OnInit{
   @Output() closePanelEvent = new EventEmitter<any>()
   @Output() errorTag = new EventEmitter<string>()
   data: Event[]

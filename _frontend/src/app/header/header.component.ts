@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {DataService} from "../_services/data.service";
 import {map, Observable } from "rxjs";
 
@@ -7,7 +7,7 @@ import {map, Observable } from "rxjs";
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit{
   name$: Observable<string>
   _showProfileMenu: boolean = false
 

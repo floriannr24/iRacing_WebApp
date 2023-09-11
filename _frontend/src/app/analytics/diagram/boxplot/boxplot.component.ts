@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
 import {Subject, takeUntil} from "rxjs";
@@ -9,7 +9,7 @@ import {Subject, takeUntil} from "rxjs";
   styleUrls: ['./boxplot.component.scss']
 })
 
-export class BoxplotComponent implements AfterViewInit {
+export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
@@ -123,7 +123,7 @@ export class BoxplotComponent implements AfterViewInit {
     this.context.clearRect(0, 0, this.diaprop.yAxisBgWidth / this.scale, this.context.canvas.height / this.scale)
 
     this.context.fillStyle = "#FFFFFF"
-    this.context.fillRect(200,200,200,200)
+    this.context.fillRect(200-this.netPanningX,200-this.netPanningY,200,200)
 
     this.drawAxes()
 
