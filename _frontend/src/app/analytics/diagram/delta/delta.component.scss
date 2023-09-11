@@ -3,6 +3,10 @@
 
   .canvas {
 
+    &:focus {
+      outline: #000000 solid 0px
+    }
+
   }
 }
 

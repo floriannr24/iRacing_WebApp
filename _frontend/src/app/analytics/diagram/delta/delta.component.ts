@@ -1,6 +1,5 @@
 import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
-import {Subject, takeUntil} from "rxjs";
-import {Driver, EventData} from "../../../_services/api.service";
+import {iif, mergeWith, Subject, takeUntil} from "rxjs";
 import {DataService} from "../../../_services/data.service";
 
 @Component({
@@ -20,7 +19,7 @@ export class DeltaComponent implements AfterViewInit {
   private context: CanvasRenderingContext2D
   private appWidth: number
   private appHeight: number
-  private scale = 1
+  private scale: {x: number, y: number} = {x: 1, y: 1}
   private scaleFactor = 0.1
   private scrollX = 0
   private scrollY = 0
@@ -37,12 +36,18 @@ export class DeltaComponent implements AfterViewInit {
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
     this.context = this.canvas.nativeElement.getContext('2d')!
     this.context.setTransform(1, 0, 0, 1,this.cameraOffset.x,this.cameraOffset.y)
+    this.context.canvas.focus()
     this.draw()
   }
 
+
   @HostListener('wheel', ['$event'])
   mousewheel(event: WheelEvent) {
-    this.scaleCanvas(event)
+    if (event.ctrlKey) {
+      this.scaleCanvasVertically(event)
+    } else {
+      this.scaleCanvas(event)
+    }
   }
 
   @HostListener('mouseup', ['$event'])
@@ -67,31 +72,13 @@ export class DeltaComponent implements AfterViewInit {
 
   private draw() {
 
-    this.context.clearRect(0, 0, this.context.canvas.width / this.scale, this.context.canvas.height / this.scale)
+    this.context.clearRect(0, 0, this.context.canvas.width / this.scale.x, this.context.canvas.height / this.scale.x)
 
     this.context.fillStyle = "#FFFFFF"
     this.context.fillRect(0-this.scrollX,0-this.scrollY,200,200)
 
     requestAnimationFrame(this.draw.bind(this))
 
-  }
-
-  private scaleCanvas(event: WheelEvent) {
-    event.preventDefault()
-    event.stopPropagation()
-    let previousScale = this.scale
-    let direction = event.deltaY > 0 ? -1 : 1
-    this.scale += this.scaleFactor * direction
-    this.label_scale = this.scale.toFixed(1)
-
-    this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale) - ((event.offsetX - this.cameraOffset.x) / this.scale);
-    this.scrollY += ((event.offsetY - this.cameraOffset.y) / previousScale) - ((event.offsetY - this.cameraOffset.y) / this.scale);
-
-    this.canvas.nativeElement.width = this.appWidth
-    this.canvas.nativeElement.height = this.appHeight
-
-    this.context.setTransform(1, 0, 0, 1,this.cameraOffset.x,this.cameraOffset.y)
-    this.context.scale(this.scale, this.scale)
   }
 
   private handleMouseUp(event: MouseEvent) {
@@ -128,13 +115,46 @@ export class DeltaComponent implements AfterViewInit {
     this.cameraOffset.x = event.clientX - this.startX
     this.cameraOffset.y = event.clientY - this.startY
 
+    this.applyScale()
+  }
+
+  private scaleCanvas(event: WheelEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+    let previousScale = {x: this.scale.x, y: this.scale.y}
+    let direction = event.deltaY > 0 ? -1 : 1
+    this.scale.x += this.scaleFactor * direction
+    this.scale.y += this.scaleFactor * direction
+    this.label_scale = this.scale.y.toFixed(1)
+
+    this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
+    this.scrollY += ((event.offsetY - this.cameraOffset.y) / previousScale.y) - ((event.offsetY - this.cameraOffset.y) / this.scale.y);
+
+    this.applyScale()
+  }
+
+  private scaleCanvasVertically(event: WheelEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+    let previousScale = {x: this.scale.x, y: this.scale.y}
+    let direction = event.deltaY > 0 ? -1 : 1
+    this.scale.x += this.scaleFactor * direction
+    this.scale.y += this.scaleFactor * direction
+    this.label_scale = this.scale.x.toFixed(1)
+
+    this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
+    this.scrollY += ((event.offsetY - this.cameraOffset.y) / previousScale.y) - ((event.offsetY - this.cameraOffset.y) / this.scale.y);
+
+    this.scale.x = 1
+
+    this.applyScale();
+  }
+
+  private applyScale() {
     this.canvas.nativeElement.width = this.appWidth
     this.canvas.nativeElement.height = this.appHeight
 
-    this.context.setTransform(1, 0, 0, 1,this.cameraOffset.x,this.cameraOffset.y)
-    this.context.scale(this.scale, this.scale)
-
-
-
+    this.context.setTransform(1, 0, 0, 1, this.cameraOffset.x, this.cameraOffset.y)
+    this.context.scale(this.scale.x, this.scale.y)
   }
 }
