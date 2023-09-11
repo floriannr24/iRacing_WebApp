@@ -19,6 +19,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { AnalyticsComponent } from './analytics/analytics.component';
 import { SettingsComponent } from './settings/settings.component';
 import { DiagramComponent } from './analytics/diagram/diagram.component';
+import { DeltaComponent } from './analytics/diagram/delta/delta.component';
 
 const myRoutes: Routes = [
   {path: '', component: OverviewComponent},
@@ -37,7 +38,8 @@ const myRoutes: Routes = [
     OverviewComponent,
     AnalyticsComponent,
     SettingsComponent,
-    DiagramComponent
+    DiagramComponent,
+    DeltaComponent
   ],
     imports: [
         RouterModule.forRoot(myRoutes),

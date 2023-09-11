@@ -80,15 +80,15 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.draw()
   }
 
-  // @HostListener('wheel', ['$event'])
-  // mousewheel(event: WheelEvent) {
-  //   this.scaleCanvas(event)
-  //   this.drawSVG_Y_laptimeLabels()
-  //   this.drawSVG_X_driverLabels()
-  // }
+  @HostListener('wheel', ['$event'])
+  mousewheel(event: WheelEvent) {
+    this.scaleCanvas(event)
+    this.drawSVG_Y_laptimeLabels()
+    this.drawSVG_X_driverLabels()
+  }
 
   mousemove(event: MouseEvent) {
-    // this.detectHover(event)
+    this.detectHover(event)
   }
 
   @HostListener('mouseup', ['$event'])
@@ -111,8 +111,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.handleMouseMove(event)
   }
 
-
-
   private draw() {
 
     this.context.clearRect(0, 0, this.context.canvas.width / this.scale, this.context.canvas.height / this.scale)
@@ -122,13 +120,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     // clearing background of yAxis from Boxplot drawings
     this.context.clearRect(0, 0, this.diaprop.yAxisBgWidth / this.scale, this.context.canvas.height / this.scale)
 
-    this.context.fillStyle = "#FFFFFF"
-    this.context.fillRect(200-this.netPanningX,200-this.netPanningY,200,200)
-
     this.drawAxes()
-
-
-
 
     requestAnimationFrame(this.draw.bind(this))
 

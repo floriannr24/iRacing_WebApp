@@ -67,21 +67,21 @@
 // let isDragging = false
 // let dragStart = { x: 0, y: 0 }
 //
-// function onPointerDown(e)
+// function onMouseDown(e)
 // {
 //   isDragging = true
 //   dragStart.x = getEventLocation(e).x/cameraZoom - cameraOffset.x
 //   dragStart.y = getEventLocation(e).y/cameraZoom - cameraOffset.y
 // }
 //
-// function onPointerUp(e)
+// function onMouseUp(e)
 // {
 //   isDragging = false
 //   initialPinchDistance = null
 //   lastZoom = cameraZoom
 // }
 //
-// function onPointerMove(e)
+// function onMouseMove(e)
 // {
 //   if (isDragging)
 //   {
@@ -147,12 +147,12 @@
 //   }
 // }
 //
-// canvas.addEventListener('mousedown', onPointerDown)
-// canvas.addEventListener('touchstart', (e) => handleTouch(e, onPointerDown))
-// canvas.addEventListener('mouseup', onPointerUp)
-// canvas.addEventListener('touchend',  (e) => handleTouch(e, onPointerUp))
-// canvas.addEventListener('mousemove', onPointerMove)
-// canvas.addEventListener('touchmove', (e) => handleTouch(e, onPointerMove))
+// canvas.addEventListener('mousedown', onMouseDown)
+// canvas.addEventListener('touchstart', (e) => handleTouch(e, onMouseDown))
+// canvas.addEventListener('mouseup', onMouseUp)
+// canvas.addEventListener('touchend',  (e) => handleTouch(e, onMouseUp))
+// canvas.addEventListener('mousemove', onMouseMove)
+// canvas.addEventListener('touchmove', (e) => handleTouch(e, onMouseMove))
 // canvas.addEventListener( 'wheel', (e) => adjustZoom(e.deltaY*SCROLL_SENSITIVITY))
 //
 // // Ready, set, go

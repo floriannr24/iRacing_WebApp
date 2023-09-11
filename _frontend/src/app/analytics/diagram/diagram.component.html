@@ -1,3 +1,3 @@
-<app-boxplot *ngIf="(mode$ | async) == ModeType.Boxplot"></app-boxplot>
-<!--<app-delta *ngIf="selectedMode.mode == ModeType.Delta"></app-delta> -->
+<app-boxplot *ngIf="(mode$ | async) == ModeType.Delta"></app-boxplot>
+<app-delta *ngIf="(mode$ | async) == ModeType.Boxplot"></app-delta>
 
