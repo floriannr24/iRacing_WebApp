@@ -40,7 +40,6 @@ export class DeltaComponent implements AfterViewInit {
     this.draw()
   }
 
-
   @HostListener('wheel', ['$event'])
   mousewheel(event: WheelEvent) {
     if (event.ctrlKey) {
@@ -72,10 +71,12 @@ export class DeltaComponent implements AfterViewInit {
 
   private draw() {
 
-    this.context.clearRect(0, 0, this.context.canvas.width / this.scale.x, this.context.canvas.height / this.scale.x)
+    this.context.clearRect(0, 0, this.context.canvas.width / this.scale.x, this.context.canvas.height / this.scale.y)
 
     this.context.fillStyle = "#FFFFFF"
     this.context.fillRect(0-this.scrollX,0-this.scrollY,200,200)
+
+    console.log(this.scale.x/this.scale.y + " / ")
 
     requestAnimationFrame(this.draw.bind(this))
 
@@ -123,8 +124,8 @@ export class DeltaComponent implements AfterViewInit {
     event.stopPropagation()
     let previousScale = {x: this.scale.x, y: this.scale.y}
     let direction = event.deltaY > 0 ? -1 : 1
-    this.scale.x += this.scaleFactor * direction
-    this.scale.y += this.scaleFactor * direction
+    this.scale.x += (this.scaleFactor*this.scale.x) * direction
+    this.scale.y += (this.scaleFactor*this.scale.y) * direction
     this.label_scale = this.scale.y.toFixed(1)
 
     this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
@@ -140,9 +141,8 @@ export class DeltaComponent implements AfterViewInit {
     let direction = event.deltaY > 0 ? -1 : 1
     this.scale.x += this.scaleFactor * direction
     this.scale.y += this.scaleFactor * direction
-    this.label_scale = this.scale.x.toFixed(1)
 
-    this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
+    //this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
     this.scrollY += ((event.offsetY - this.cameraOffset.y) / previousScale.y) - ((event.offsetY - this.cameraOffset.y) / this.scale.y);
 
     this.scale.x = 1
