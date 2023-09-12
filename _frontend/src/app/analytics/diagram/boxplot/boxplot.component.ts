@@ -46,11 +46,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // new bpprop
     this.dataService.boxplotProperties.pipe(takeUntil(this.stop$)).subscribe(bpprop => {
       this.bpprop = bpprop
       this.updateDiagram()
-
     })
+
+    // new data
     this.dataService.analyticsData.pipe(takeUntil(this.stop$)).subscribe(data => {
       this.data_original = data
       this.updateDiagram();
@@ -113,17 +115,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private draw() {
 
-    this.context.clearRect(
-      0 - this.cameraOffset.x / this.scale.x,
-      0 - this.cameraOffset.y / this.scale.y,
-      this.context.canvas.width / this.scale.x,
-      this.context.canvas.height / this.scale.y)
-
-    this.contextAxis.clearRect(
-      0,
-      0 - this.cameraOffset.y / this.scale.y,
-      this.contextAxis.canvas.width / this.scale.x,
-      this.contextAxis.canvas.height / this.scale.y)
+    this.clearCanvas()
 
     this.drawBackground()
     this.drawBoxplot()
@@ -782,7 +774,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private placeLabelDetail_Running(x_pos: number, y_pos: number, type: DetailType, time: number, driver: Driver, lapNr?: number) {
 
     x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
-    y_pos = y_pos * this.scale.y - 14 + this.cameraOffset.y
+    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
 
     this.label_detail.nativeElement.style.top = y_pos + "px"
 
@@ -869,47 +861,47 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         this.label_detail.nativeElement.style.borderColor = this.bpprop.default.bp.color.running.detail.line
         this.label_detail.nativeElement.style.background = this.bpprop.default.bp.color.running.detail.bg
       }
-
-
     }
   }
 
   private placeLabelDetail_DiscDisq(x_pos: number, y_pos: number, type: DetailType, time: number, lapNr?: number) {
 
-    this.label_detail.nativeElement.style.top = y_pos * this.scale.x - 10 + "px"
+    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
+    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
+    this.label_detail.nativeElement.style.top = y_pos + "px"
 
     let time_str = this.convertTimeFormat(time)
 
     if (type == DetailType.LAP) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str + " (" + lapNr + ")"
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
     }
 
     if (type == DetailType.MEAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
     }
 
     if (type == DetailType.MEDIAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.disc.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.disc.detail.bg
     }
 
     if (type == DetailType.WHISKER_TOP || type == DetailType.WHISKER_BOTTOM) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_whisker_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.disc.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.whiskers.color.disc.detail.bg
     }
 
     if (type == DetailType.Q1 || type == DetailType.Q3) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.bp.color.disc.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.bp.color.disc.bg
@@ -1367,6 +1359,21 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       let x = this.bpprop.default.bp.prop.location - this.scrollX
       console.log(x)
 
+  }
+
+  private clearCanvas() {
+
+    this.context.clearRect(
+      0 - this.cameraOffset.x / this.scale.x,
+      0 - this.cameraOffset.y / this.scale.y,
+      this.context.canvas.width / this.scale.x,
+      this.context.canvas.height / this.scale.y)
+
+    this.contextAxis.clearRect(
+      0,
+      0 - this.cameraOffset.y / this.scale.y,
+      this.contextAxis.canvas.width / this.scale.x,
+      this.contextAxis.canvas.height / this.scale.y)
   }
 }
 
