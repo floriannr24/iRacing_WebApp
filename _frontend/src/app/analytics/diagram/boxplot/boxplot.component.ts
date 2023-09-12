@@ -107,7 +107,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('mousemove', ['$event'])
   mouseMove(event: MouseEvent) {
-    //this.detectHover(event)
+    this.detectHover(event)
     this.handleMouseMove(event)
   }
 
@@ -303,6 +303,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //top
     this.context.beginPath()
+
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.Q3)) {
       this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_SELECT / this.scale.x
       if (this.driverRunning(driver)) {
@@ -780,26 +781,29 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private placeLabelDetail_Running(x_pos: number, y_pos: number, type: DetailType, time: number, driver: Driver, lapNr?: number) {
 
-    this.label_detail.nativeElement.style.top = y_pos * this.scale.x - 10 + "px"
+    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
+    y_pos = y_pos * this.scale.y - 14 + this.cameraOffset.y
+
+    this.label_detail.nativeElement.style.top = y_pos + "px"
 
     let time_str = this.convertTimeFormat(time)
 
     if (type == DetailType.LAP) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str + " (" + lapNr + ")"
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
     }
 
     if (type == DetailType.MEAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
     }
 
     if (type == DetailType.MEDIAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.running.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.running.detail.bg
@@ -840,7 +844,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if (type == DetailType.WHISKER_TOP || type == DetailType.WHISKER_BOTTOM) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_whisker_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
       this.label_detail_content = time_str
 
       if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
@@ -854,7 +858,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if (type == DetailType.Q1 || type == DetailType.Q3) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
 
       if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
@@ -941,12 +945,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private detectHover(event: MouseEvent) {
-    let x = event.offsetX / this.scale.x
-    let y = event.offsetY / this.scale.x
+    // detects, if mouse hovers over a specific element
+
+    let x_mouse = (event.offsetX - this.cameraOffset.x) / this.scale.x
+    let y_mouse = (event.offsetY - this.cameraOffset.y) / this.scale.x
 
     this.highlightedDriver = null
-
-    this.context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
 
     outerloop:
       for (let i = this.data_live.length - 1, element; element = this.data_live[i]; i--) {
@@ -963,7 +967,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         //laps
         if (this.bpprop.options['showIndividualLaps'].checked) {
           for (let d = laps.length - 1, lap; lap = laps[d]; d--) {
-            if (x >= (lap.x - this.bpprop.default.laps.prop.radius_HITBOX) && x <= lap.x + this.bpprop.default.laps.prop.radius_HITBOX && y >= (lap.y - this.bpprop.default.laps.prop.radius_HITBOX) && y <= (lap.y + this.bpprop.default.laps.prop.radius_HITBOX)) {
+            if (x_mouse >= (lap.x - this.bpprop.default.laps.prop.radius_HITBOX) && x_mouse <= lap.x + this.bpprop.default.laps.prop.radius_HITBOX && y_mouse >= (lap.y - this.bpprop.default.laps.prop.radius_HITBOX) && y_mouse <= (lap.y + this.bpprop.default.laps.prop.radius_HITBOX)) {
               this.highlightedDriver = this.data.drivers[i]
               this.highlightedData = laps[d].y
               this.show_label_detail = true
@@ -976,7 +980,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         // mean
         if (this.bpprop.options['showMean'].checked) {
-          if (x >= (mean.x - this.bpprop.default.mean.prop.radius_HITBOX) && x <= (mean.x + this.bpprop.default.mean.prop.radius_HITBOX) && y >= (mean.y - this.bpprop.default.mean.prop.radius_HITBOX) && y <= (mean.y + this.bpprop.default.mean.prop.radius_HITBOX)) {
+          if (x_mouse >= (mean.x - this.bpprop.default.mean.prop.radius_HITBOX) && x_mouse <= (mean.x + this.bpprop.default.mean.prop.radius_HITBOX) && y_mouse >= (mean.y - this.bpprop.default.mean.prop.radius_HITBOX) && y_mouse <= (mean.y + this.bpprop.default.mean.prop.radius_HITBOX)) {
             this.highlightedDriver = this.data.drivers[i]
             this.highlightedData = DetailType.MEAN
             this.show_label_detail = true
@@ -987,7 +991,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         // median
-        if (x >= median.x.start && x <= median.x.end && y >= median.y - this.bpprop.default.median.prop.lineThickness_HITBOX && y <= median.y + this.bpprop.default.median.prop.lineThickness_HITBOX) {
+        if (x_mouse >= median.x.start && x_mouse <= median.x.end && y_mouse >= median.y - this.bpprop.default.median.prop.lineThickness_HITBOX && y_mouse <= median.y + this.bpprop.default.median.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedData = DetailType.MEDIAN
           this.show_label_detail = true
@@ -997,7 +1001,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         // whisker-top
-        if (x >= whisker_top.x.start && x <= whisker_top.x.end && y >= whisker_top.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y <= whisker_top.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
+        if (x_mouse >= whisker_top.x.start && x_mouse <= whisker_top.x.end && y_mouse >= whisker_top.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_top.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedData = DetailType.WHISKER_TOP
           this.show_label_detail = true
@@ -1007,7 +1011,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         //whisker-bottom
-        if (x >= whisker_btm.x.start && x <= whisker_btm.x.end && y >= whisker_btm.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y <= whisker_btm.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
+        if (x_mouse >= whisker_btm.x.start && x_mouse <= whisker_btm.x.end && y_mouse >= whisker_btm.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_btm.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedData = DetailType.WHISKER_BOTTOM
           this.show_label_detail = true
@@ -1017,7 +1021,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         //q3
-        if (x >= q3.x.start && x <= q3.x.end && y >= q3.y - this.bpprop.default.q3.prop.lineThickness_HITBOX && y <= q3.y + this.bpprop.default.q3.prop.lineThickness_HITBOX) {
+        if (x_mouse >= q3.x.start && x_mouse <= q3.x.end && y_mouse >= q3.y - this.bpprop.default.q3.prop.lineThickness_HITBOX && y_mouse <= q3.y + this.bpprop.default.q3.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedData = DetailType.Q3
           this.show_label_detail = true
@@ -1027,7 +1031,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         //q1
-        if (x >= q1.x.start && x <= q1.x.end && y >= q1.y - this.bpprop.default.q1.prop.lineThickness_HITBOX && y <= q1.y + this.bpprop.default.q1.prop.lineThickness_HITBOX) {
+        if (x_mouse >= q1.x.start && x_mouse <= q1.x.end && y_mouse >= q1.y - this.bpprop.default.q1.prop.lineThickness_HITBOX && y_mouse <= q1.y + this.bpprop.default.q1.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedData = DetailType.Q1
           this.show_label_detail = true
