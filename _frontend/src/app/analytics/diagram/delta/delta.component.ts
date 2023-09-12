@@ -76,7 +76,7 @@ export class DeltaComponent implements AfterViewInit {
     this.context.fillStyle = "#FFFFFF"
     this.context.fillRect(0-this.scrollX,0-this.scrollY,200,200)
 
-    console.log(this.scale.x/this.scale.y + " / ")
+    console.log(this.scale.y/this.scale.x)
 
     requestAnimationFrame(this.draw.bind(this))
 
@@ -139,8 +139,8 @@ export class DeltaComponent implements AfterViewInit {
     event.stopPropagation()
     let previousScale = {x: this.scale.x, y: this.scale.y}
     let direction = event.deltaY > 0 ? -1 : 1
-    this.scale.x += this.scaleFactor * direction
-    this.scale.y += this.scaleFactor * direction
+    this.scale.x += (this.scaleFactor) * direction
+    this.scale.y += (this.scaleFactor) * direction
 
     //this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
     this.scrollY += ((event.offsetY - this.cameraOffset.y) / previousScale.y) - ((event.offsetY - this.cameraOffset.y) / this.scale.y);
