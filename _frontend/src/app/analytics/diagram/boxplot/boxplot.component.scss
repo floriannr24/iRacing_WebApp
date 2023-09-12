@@ -12,10 +12,16 @@
     background: #0f1317
   }
 
- .canvas {
+  .canvasAxis {
     left: 130px;
     position: absolute;
   }
+
+  .canvas {
+    left: 150px;
+    position: absolute;
+  }
+
 
   .label_laptime {
     position: absolute;

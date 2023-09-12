@@ -26,7 +26,8 @@ export class DeltaComponent implements AfterViewInit {
   private isDown: boolean
   private startX: number
   private startY: number
-  cameraOffset: {x: number, y: number} = {x:200,y:200}
+  private cameraOffset: {x: number, y: number} = {x:0,y:0}
+  private scaledVertically: boolean = false
 
   constructor(private app: ElementRef, private dataService: DataService) {
   }
@@ -43,7 +44,7 @@ export class DeltaComponent implements AfterViewInit {
   @HostListener('wheel', ['$event'])
   mousewheel(event: WheelEvent) {
     if (event.ctrlKey) {
-      this.scaleCanvasVertically(event)
+      // this.scaleCanvasVertically(event)
     } else {
       this.scaleCanvas(event)
     }
@@ -71,12 +72,33 @@ export class DeltaComponent implements AfterViewInit {
 
   private draw() {
 
-    this.context.clearRect(0, 0, this.context.canvas.width / this.scale.x, this.context.canvas.height / this.scale.y)
+    console.log("ScrollX: " + this.scrollX, "ScaleX: "+this.scale.x, "OffsetX: "+this.cameraOffset.x)
 
-    this.context.fillStyle = "#FFFFFF"
-    this.context.fillRect(0-this.scrollX,0-this.scrollY,200,200)
+    let x = 0 - this.cameraOffset.x / this.scale.x
+    let y = 0 - this.cameraOffset.y / this.scale.y
+    let w = this.context.canvas.width / this.scale.x
+    let h = this.context.canvas.height / this.scale.y
 
-    console.log(this.scale.y/this.scale.x)
+    this.context.clearRect(x,y,w,h)
+
+    this.context.fillStyle = "rgba(18,150,203,0.52)"
+    this.context.fillRect(x,y,w,h)
+
+    this.context.fillStyle = "rgba(20,29,33,0.52)"
+    this.context.fillRect(200-this.scrollX,200-this.scrollY,200,200)
+
+    // this.context.beginPath()
+    // this.context.lineWidth = 1
+    // this.context.strokeStyle = '#FFFFFF'
+    // this.context.moveTo(0-this.scrollX, 500-this.scrollY)
+    // this.context.lineTo(500-this.scrollX,500-this.scrollY)
+    // this.context.stroke()
+    // console.log(this.scrollX)
+
+    // 1. F5
+    // 2. scale
+    // 3. scaleVertically
+    // --> bug
 
     requestAnimationFrame(this.draw.bind(this))
 
@@ -124,8 +146,15 @@ export class DeltaComponent implements AfterViewInit {
     event.stopPropagation()
     let previousScale = {x: this.scale.x, y: this.scale.y}
     let direction = event.deltaY > 0 ? -1 : 1
-    this.scale.x += (this.scaleFactor*this.scale.x) * direction
-    this.scale.y += (this.scaleFactor*this.scale.y) * direction
+
+    if (direction > 0) {
+      this.scale.x = this.scale.x + this.scaleFactor * this.scale.x * direction
+      this.scale.y = this.scale.y + this.scaleFactor * this.scale.y * direction
+    } else {
+      this.scale.x = this.scale.x + this.scaleFactor * this.scale.x * direction
+      this.scale.y = this.scale.y + this.scaleFactor * this.scale.y * direction
+    }
+
     this.label_scale = this.scale.y.toFixed(1)
 
     this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
@@ -135,12 +164,14 @@ export class DeltaComponent implements AfterViewInit {
   }
 
   private scaleCanvasVertically(event: WheelEvent) {
+    this.scaledVertically = true
     event.preventDefault()
     event.stopPropagation()
     let previousScale = {x: this.scale.x, y: this.scale.y}
     let direction = event.deltaY > 0 ? -1 : 1
-    this.scale.x += (this.scaleFactor) * direction
-    this.scale.y += (this.scaleFactor) * direction
+
+    // this.scale.x = this.scale.x + this.scaleFactor * direction
+    this.scale.y = this.scale.y + this.scaleFactor * direction
 
     //this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
     this.scrollY += ((event.offsetY - this.cameraOffset.y) / previousScale.y) - ((event.offsetY - this.cameraOffset.y) / this.scale.y);

@@ -12,6 +12,7 @@ import {Subject, takeUntil} from "rxjs";
 export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>
+  @ViewChild('canvasAxis') canvasAxis: ElementRef<HTMLCanvasElement>
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
   @ViewChild('svgName') svgName: ElementRef<SVGElement>
   @ViewChild('label_detail') label_detail: ElementRef<HTMLDivElement>
@@ -20,28 +21,26 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   label_detail_content: string
   private stop$ = new Subject<void>()
   private context: CanvasRenderingContext2D | any
+  private contextAxis: CanvasRenderingContext2D | any
   private appWidth: number
   private appHeight: number
-  private scale = 1
-  private scaleFactor = 0.1
-  private scrollX = 0
-  private scrollY = 0
-  private data_live: Array<BoxplotElement>
+
+  private data_live: BoxplotElement[]
   private data_original: EventData = new EventData()
   private data: EventData = new EventData()
   private bpprop: BoxplotProperties
-  private diaprop: DiagramProperties = DiagramProperties.getInstance()
+  private diaprop: DiagramProperties = new DiagramProperties()
   private highlightedDriver: Driver | null
   private highlightedData: any
+
+  private scale: xy = {x: 1, y: 1}
+  private scaleFactor = 0.1
+  private scrollX = 0
+  private scrollY = 0
   private isDown: boolean
   private startX: number
   private startY: number
-  private offsetX: number
-  private offsetY: number
-  private mouseX: number
-  private mouseY: number
-  private netPanningX: number = 0
-  private netPanningY: number = 0
+  private cameraOffset: xy = {x: 0, y: 0}
 
   constructor(private app: ElementRef, private dataService: DataService) {
   }
@@ -66,14 +65,14 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   ngAfterViewInit() {
 
     // first init when view loads
-    this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.parentNode.clientWidth - 130 // 1390
+    this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.parentNode.clientWidth - 150 // 1390
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
-    this.offsetX = this.canvas.nativeElement.getBoundingClientRect().left
-    this.offsetY = this.canvas.nativeElement.getBoundingClientRect().top
-    this.context = (this.canvas.nativeElement).getContext('2d')
+    this.context = this.canvas.nativeElement.getContext('2d')
+    this.contextAxis = this.canvasAxis.nativeElement.getContext('2d')
     this.initBpprop()
-    this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
-    this.calculateLinearFunction()
+    this.initDiaprop()
+    this.canvasAxis.nativeElement.width = this.diaprop.yAxisBgWidth
+    this.canvasAxis.nativeElement.height = this.appHeight
     this.initSVGs()
     this.drawSVG_Y_laptimeLabels()
     this.drawSVG_X_driverLabels()
@@ -82,13 +81,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('wheel', ['$event'])
   mousewheel(event: WheelEvent) {
-    this.scaleCanvas(event)
-    this.drawSVG_Y_laptimeLabels()
-    this.drawSVG_X_driverLabels()
-  }
-
-  mousemove(event: MouseEvent) {
-    this.detectHover(event)
+    if (event.ctrlKey) {
+      // this.scaleCanvasVertically(event)
+    } else {
+      this.scaleCanvas(event)
+      this.drawSVG_Y_laptimeLabels()
+      this.drawSVG_X_driverLabels()
+    }
   }
 
   @HostListener('mouseup', ['$event'])
@@ -108,18 +107,26 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @HostListener('mousemove', ['$event'])
   mouseMove(event: MouseEvent) {
+    //this.detectHover(event)
     this.handleMouseMove(event)
   }
 
   private draw() {
 
-    this.context.clearRect(0, 0, this.context.canvas.width / this.scale, this.context.canvas.height / this.scale)
+    this.context.clearRect(
+      0 - this.cameraOffset.x / this.scale.x,
+      0 - this.cameraOffset.y / this.scale.y,
+      this.context.canvas.width / this.scale.x,
+      this.context.canvas.height / this.scale.y)
+
+    this.contextAxis.clearRect(
+      0,
+      0 - this.cameraOffset.y / this.scale.y,
+      this.contextAxis.canvas.width / this.scale.x,
+      this.contextAxis.canvas.height / this.scale.y)
+
     this.drawBackground()
     this.drawBoxplot()
-
-    // clearing background of yAxis from Boxplot drawings
-    this.context.clearRect(0, 0, this.diaprop.yAxisBgWidth / this.scale, this.context.canvas.height / this.scale)
-
     this.drawAxes()
 
     requestAnimationFrame(this.draw.bind(this))
@@ -129,60 +136,60 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private drawAxes() {
 
     // y-axis
-    this.context.beginPath()
-    this.context.moveTo(this.diaprop.yAxis_pos / this.scale, 0)
-    this.context.lineTo(this.diaprop.yAxis_pos / this.scale, this.appHeight / this.scale)
-    this.context.strokeStyle = this.diaprop.yAxis_color
-    this.context.lineWidth = 1 / this.scale
-    this.context.stroke()
+    this.contextAxis.beginPath()
+    this.contextAxis.moveTo(this.diaprop.yAxis_pos / this.scale.x, this.diaprop.renderStart.y)
+    this.contextAxis.lineTo(this.diaprop.yAxis_pos / this.scale.x, this.diaprop.renderEnd.y / this.scale.y)
+    this.contextAxis.strokeStyle = this.diaprop.yAxis_color
+    this.contextAxis.lineWidth = 1 / this.scale.x
+    this.contextAxis.stroke()
 
     // full ticks
     for (let i = 0; i < this.diaprop.yAxisTicks_end; i++) {
 
-      this.context.beginPath()
-      this.context.strokeStyle = this.diaprop.yAxis_color
-      this.context.moveTo((this.diaprop.yAxis_pos - this.diaprop.fullTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-      this.context.lineTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-      this.context.stroke()
+      this.contextAxis.beginPath()
+      this.contextAxis.strokeStyle = this.diaprop.yAxis_color
+      this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+      this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+      this.contextAxis.stroke()
 
-      this.context.beginPath()
-      this.context.strokeStyle = this.diaprop.fullTick_color
-      this.context.moveTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale, (this.convertSecondsToPixels(i)) - this.scrollY)
-      this.context.lineTo((this.diaprop.yAxisBgWidth / this.scale), (this.convertSecondsToPixels(i)) - this.scrollY)
-      this.context.stroke()
+      this.contextAxis.beginPath()
+      this.contextAxis.strokeStyle = this.diaprop.fullTick_color
+      this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale.x, (this.convertSecondsToPixels(i)) - this.scrollY)
+      this.contextAxis.lineTo((this.diaprop.yAxisBgWidth / this.scale.x), (this.convertSecondsToPixels(i)) - this.scrollY)
+      this.contextAxis.stroke()
     }
 
     // 1/2 ticks
-    if (this.scale > 1.0) {
+    if (this.scale.x > 1.0) {
       for (let i = 0.5; i < this.diaprop.yAxisTicks_end; i++) {
-        this.context.beginPath()
-        this.context.strokeStyle = this.diaprop.yAxis_color
-        this.context.moveTo((this.diaprop.yAxis_pos - this.diaprop.halfTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.lineTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.stroke()
+        this.contextAxis.beginPath()
+        this.contextAxis.strokeStyle = this.diaprop.yAxis_color
+        this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.stroke()
 
-        this.context.beginPath()
-        this.context.strokeStyle = this.diaprop.halfTick_color
-        this.context.moveTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.lineTo(this.diaprop.yAxisBgWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.stroke()
+        this.contextAxis.beginPath()
+        this.contextAxis.strokeStyle = this.diaprop.halfTick_color
+        this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.lineTo(this.diaprop.yAxisBgWidth / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.stroke()
       }
     }
 
     // 1/4 ticks
-    if (this.scale > 2.0) {
+    if (this.scale.x > 2.0) {
       for (let i = 0.25; i < this.diaprop.yAxisTicks_end;) {
-        this.context.beginPath()
-        this.context.strokeStyle = this.diaprop.yAxis_color
-        this.context.moveTo((this.diaprop.yAxis_pos - this.diaprop.quarterTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.lineTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.stroke()
+        this.contextAxis.beginPath()
+        this.contextAxis.strokeStyle = this.diaprop.yAxis_color
+        this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.stroke()
 
-        this.context.beginPath()
-        this.context.strokeStyle = this.diaprop.quarterTick_color
-        this.context.moveTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.lineTo(this.diaprop.yAxisBgWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.stroke()
+        this.contextAxis.beginPath()
+        this.contextAxis.strokeStyle = this.diaprop.quarterTick_color
+        this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.lineTo(this.diaprop.yAxisBgWidth / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.contextAxis.stroke()
 
         i = i + 0.5
       }
@@ -192,41 +199,41 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private drawBackground() {
 
     this.context.beginPath()
-    this.context.lineWidth = 1 / this.scale
+    this.context.lineWidth = 1 / this.scale.x
     this.context.strokeStyle = this.diaprop.fullTick_color
 
-    this.numberOfLabelsToDraw()
+    //this.numberOfLabelsToDraw()
 
-    // full ticks
+    // full seconds
     for (let i = 0; i < this.diaprop.yAxisTicks_end; i++) {
-      this.context.moveTo(this.diaprop.yAxisBgWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-      this.context.lineTo(this.appWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
+      this.context.moveTo(0 - this.cameraOffset.x / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+      this.context.lineTo((this.context.canvas.width - this.cameraOffset.x) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
     }
 
     this.context.stroke()
 
-    // 1/2 ticks
-    if (this.scale > 1.0) {
+    // 1/2 seconds
+    if (this.scale.x > 1.0) {
 
       this.context.beginPath()
       this.context.strokeStyle = this.diaprop.halfTick_color
 
       for (let i = 0.5; i < this.diaprop.yAxisTicks_end; i++) {
-        this.context.moveTo(this.diaprop.yAxisBgWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.lineTo(this.appWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
+        this.context.moveTo(0 - this.cameraOffset.x / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.context.lineTo((this.context.canvas.width - this.cameraOffset.x) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
       }
       this.context.stroke()
     }
 
-    // 1/4 ticks
-    if (this.scale > 2.0) {
+    // 1/4 seconds
+    if (this.scale.x > 2.0) {
 
       this.context.beginPath()
       this.context.strokeStyle = this.diaprop.quarterTick_color
 
       for (let i = 0.25; i < this.diaprop.yAxisTicks_end;) {
-        this.context.moveTo(this.diaprop.yAxisBgWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
-        this.context.lineTo(this.appWidth / this.scale, this.convertSecondsToPixels(i) - this.scrollY)
+        this.context.moveTo(0 - this.cameraOffset.x / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+        this.context.lineTo((this.context.canvas.width - this.cameraOffset.x) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
 
         i = i + 0.5
       }
@@ -244,7 +251,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       if (driver.laps.length > 0) {
 
         let bpelement = new BoxplotElement()
-        this.bpprop.default.bp.prop.location = this.diaprop.yAxisBgWidth + this.bpprop.default.bp.prop.gap + i * (this.bpprop.default.bp.prop.width + this.bpprop.default.bp.prop.gap)
+        this.bpprop.default.bp.prop.location = this.bpprop.default.bp.prop.gap + i * (this.bpprop.default.bp.prop.width + this.bpprop.default.bp.prop.gap)
         this.bpprop.default.bp.prop.middle = this.bpprop.default.bp.prop.location + (this.bpprop.default.bp.prop.width / 2)
 
         // original values (laptimes)
@@ -297,14 +304,14 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     //top
     this.context.beginPath()
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.Q3)) {
-      this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_SELECT / this.scale
+      this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_SELECT / this.scale.x
       if (this.driverRunning(driver)) {
         this.placeLabelDetail_Running(q3_x_end, q3_y, DetailType.Q3, q3, driver)
       } else {
         this.placeLabelDetail_DiscDisq(q3_x_end, q3_y, DetailType.Q3, q3)
       }
     } else {
-      this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_DEFAULT / this.scale
+      this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_DEFAULT / this.scale.x
     }
 
     this.context.moveTo(q3_x_start, q3_y)
@@ -313,7 +320,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //right
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_DEFAULT / this.scale
+    this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_DEFAULT / this.scale.x
     this.context.moveTo(q1_x_start + this.bpprop.default.bp.prop.width, q1_y)
     this.context.lineTo(q1_x_start + this.bpprop.default.bp.prop.width, q3_y)
     this.context.stroke()
@@ -321,7 +328,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     //bottom
     this.context.beginPath()
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.Q1)) {
-      this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_SELECT / this.scale
+      this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_SELECT / this.scale.x
 
       if (this.driverRunning(driver)) {
         this.placeLabelDetail_Running(q1_x_end, q1_y, DetailType.Q1, q1, driver)
@@ -330,7 +337,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
 
     } else {
-      this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_DEFAULT / this.scale
+      this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_DEFAULT / this.scale.x
     }
     this.context.moveTo(q1_x_start, q1_y)
     this.context.lineTo(q1_x_start + this.bpprop.default.bp.prop.width, q1_y)
@@ -338,7 +345,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //left
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_DEFAULT  / this.scale
+    this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_DEFAULT  / this.scale.x
     this.context.moveTo(q1_x_start, q1_y)
     this.context.lineTo(q1_x_start, q3_y)
     this.context.stroke()
@@ -373,7 +380,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
 
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.MEDIAN)) {
-      this.context.lineWidth = (this.bpprop.default.median.prop.lineThickness_SELECT) / this.scale
+      this.context.lineWidth = (this.bpprop.default.median.prop.lineThickness_SELECT) / this.scale.x
       this.context.moveTo(median_x_start, median_y)
       this.context.lineTo(median_x_end, median_y)
 
@@ -384,7 +391,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
 
     } else {
-      this.context.lineWidth = this.bpprop.default.median.prop.lineThickness_DEFAULT / this.scale
+      this.context.lineWidth = this.bpprop.default.median.prop.lineThickness_DEFAULT / this.scale.x
       this.context.moveTo(median_x_start, median_y)
       this.context.lineTo(median_x_end, median_y)
     }
@@ -430,7 +437,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //line to whisker top
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale
+    this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
     this.context.moveTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(q3) - this.scrollY)
     this.context.lineTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(whisker_top) - this.scrollY)
     this.context.stroke()
@@ -446,7 +453,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.WHISKER_TOP)) {
 
-      this.context.lineWidth = (this.bpprop.default.whiskers.prop.lineThickness_SELECT) / this.scale
+      this.context.lineWidth = (this.bpprop.default.whiskers.prop.lineThickness_SELECT) / this.scale.x
       this.context.moveTo(top_x_start, top_y)
       this.context.lineTo(top_x_end, top_y)
 
@@ -457,7 +464,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
 
     } else {
-      this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale
+      this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
       this.context.moveTo(top_x_start, top_y)
       this.context.lineTo(top_x_end, top_y)
     }
@@ -465,7 +472,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //line to whisker bottom
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale
+    this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
     this.context.moveTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(q1) - this.scrollY)
     this.context.lineTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(whisker_bottom) - this.scrollY)
     this.context.stroke()
@@ -480,7 +487,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     // on-hover (whisker bottom)
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.WHISKER_BOTTOM)) {
 
-      this.context.lineWidth = (this.bpprop.default.whiskers.prop.lineThickness_SELECT) / this.scale
+      this.context.lineWidth = (this.bpprop.default.whiskers.prop.lineThickness_SELECT) / this.scale.x
       this.context.moveTo(bottom_x_start, bottom_y)
       this.context.lineTo(bottom_x_end, bottom_y)
 
@@ -491,7 +498,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
 
     } else {
-      this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale
+      this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
       this.context.moveTo(bottom_x_start, bottom_y)
       this.context.lineTo(bottom_x_end, bottom_y)
     }
@@ -584,10 +591,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let x = this.diaprop.tickLabel_x
 
     // omit every 2nd tick
-    if (this.scale < 0.7) {
+    if (this.scale.x < 0.7) {
       for (let i = 0; i < this.diaprop.yAxisTicks_end;) {
 
-        let y = (this.convertSecondsToPixels(i) - this.scrollY) * this.scale + 9.5
+        let y = (this.convertSecondsToPixels(i) - this.scrollY) * this.scale.x + 9.5 + this.cameraOffset.y
 
         if (0 < y && y < this.appHeight) {
 
@@ -614,10 +621,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     // full ticks
-    if (this.scale >= 0.7) {
+    if (this.scale.x >= 0.7) {
       for (let i = 0; i < this.diaprop.yAxisTicks_end; i++) {
 
-        let y = (this.convertSecondsToPixels(i) - this.scrollY) * this.scale + 9.5
+        let y = (this.convertSecondsToPixels(i) - this.scrollY) * this.scale.x + 9.5 + this.cameraOffset.y
 
         if (0 < y && y < this.appHeight) {
 
@@ -641,10 +648,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     // 1/2 ticks
-    if (this.scale > 2.0) {
+    if (this.scale.x > 2.0) {
       for (let i = 0.5; i < this.diaprop.yAxisTicks_end; i++) {
 
-        let y = (this.convertSecondsToPixels(i) - this.scrollY) * this.scale + 9.5
+        let y = (this.convertSecondsToPixels(i) - this.scrollY) * this.scale.x + 9.5 + this.cameraOffset.y
 
         if (0 < y && y < this.appHeight) {
 
@@ -705,14 +712,14 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     let bp_width = this.bpprop.default.bp.prop.width
 
-    while (1390 < this.diaprop.yAxisBgWidth + this.bpprop.default.bp.prop.gap + (this.data.drivers.length) * (bp_width + this.bpprop.default.bp.prop.gap)) {
+    while (this.canvas.nativeElement.width < this.bpprop.default.bp.prop.gap + (this.data.drivers.length) * (bp_width + this.bpprop.default.bp.prop.gap)) {
       bp_width = bp_width - 0.1
     }
 
     let bp_location = this.diaprop.yAxisBgWidth + this.bpprop.default.bp.prop.gap + i * (bp_width + this.bpprop.default.bp.prop.gap)
-    let bp_middle = (bp_location + (bp_width / 2) - this.scrollX) * this.scale
+    let bp_middle = (bp_location + (bp_width / 2) - this.scrollX) * this.scale.x
 
-    return bp_middle + 130;
+    return bp_middle + 130 + this.cameraOffset.x;
   }
 
   private drawSVG_X_driverLabels_name(x_pos: number, driver: Driver) {
@@ -768,31 +775,31 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private convertSecondsToPixels(seconds: number) {
-    return Math.round(this.bpprop.lineafunction_m * seconds + this.bpprop.linearfunction_t) + 0.5
+    return Math.round(this.diaprop.lineafunction_m * seconds + this.diaprop.linearfunction_t) + 0.5
   }
 
   private placeLabelDetail_Running(x_pos: number, y_pos: number, type: DetailType, time: number, driver: Driver, lapNr?: number) {
 
-    this.label_detail.nativeElement.style.top = y_pos * this.scale - 10 + "px"
+    this.label_detail.nativeElement.style.top = y_pos * this.scale.x - 10 + "px"
 
     let time_str = this.convertTimeFormat(time)
 
     if (type == DetailType.LAP) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str + " (" + lapNr + ")"
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
     }
 
     if (type == DetailType.MEAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
     }
 
     if (type == DetailType.MEDIAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.running.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.running.detail.bg
@@ -833,7 +840,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if (type == DetailType.WHISKER_TOP || type == DetailType.WHISKER_BOTTOM) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_whisker_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_whisker_gap + "px"
       this.label_detail_content = time_str
 
       if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
@@ -847,7 +854,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if (type == DetailType.Q1 || type == DetailType.Q3) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
 
       if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
@@ -865,40 +872,40 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private placeLabelDetail_DiscDisq(x_pos: number, y_pos: number, type: DetailType, time: number, lapNr?: number) {
 
-    this.label_detail.nativeElement.style.top = y_pos * this.scale - 10 + "px"
+    this.label_detail.nativeElement.style.top = y_pos * this.scale.x - 10 + "px"
 
     let time_str = this.convertTimeFormat(time)
 
     if (type == DetailType.LAP) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str + " (" + lapNr + ")"
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
     }
 
     if (type == DetailType.MEAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_dot_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
     }
 
     if (type == DetailType.MEDIAN) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.disc.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.disc.detail.bg
     }
 
     if (type == DetailType.WHISKER_TOP || type == DetailType.WHISKER_BOTTOM) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_whisker_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_whisker_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.disc.detail.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.whiskers.color.disc.detail.bg
     }
 
     if (type == DetailType.Q1 || type == DetailType.Q3) {
-      this.label_detail.nativeElement.style.left = x_pos * this.scale + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
+      this.label_detail.nativeElement.style.left = x_pos * this.scale.x + 130 + this.diaprop.laptime_detail_q1q3median_gap + "px"
       this.label_detail_content = time_str
       this.label_detail.nativeElement.style.borderColor = this.bpprop.default.bp.color.disc.line
       this.label_detail.nativeElement.style.background = this.bpprop.default.bp.color.disc.bg
@@ -918,56 +925,24 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private numberOfLabelsToDraw() {
-    return Math.round(Math.ceil(768 / this.diaprop.fullTick_spacing) / this.scale) + 1
-
-  }
-
-  private calculateLinearFunction() {
-
-    let tickSpacing = this.diaprop.fullTick_spacing
-
-    let x1 = this.data.metadata.median
-    let y1 = this.appHeight / 2
-
-    this.bpprop.lineafunction_m = -tickSpacing
-    this.bpprop.linearfunction_t = y1 - (-tickSpacing * x1)
+    return Math.round(Math.ceil(768 / this.diaprop.fullTick_spacing) / this.scale.x) + 1
   }
 
   private calculateBoxplotWidth() {
 
-    while (1390 < this.diaprop.yAxisBgWidth + this.bpprop.default.bp.prop.gap + this.data.drivers.length * (this.bpprop.default.bp.prop.width + this.bpprop.default.bp.prop.gap)) {
+    // use default boxplot width (=200px) and subtract -0.1 from it until the array of boxplots (incl gaps between) fits into the canvas
+    while (this.canvas.nativeElement.width < this.bpprop.default.bp.prop.gap + this.data.drivers.length * (this.bpprop.default.bp.prop.width + this.bpprop.default.bp.prop.gap)) {
       this.bpprop.default.bp.prop.width = this.bpprop.default.bp.prop.width - 0.1
     }
+
+    // set median and whisker width accordingly
     this.bpprop.default.median.prop.width = this.bpprop.default.bp.prop.width
     this.bpprop.default.whiskers.prop.width = this.bpprop.default.bp.prop.width * 0.6
   }
 
-  private scaleCanvas(event: WheelEvent) {
-    event.preventDefault()
-    let previousScale = this.scale
-    let direction = event.deltaY > 0 ? -1 : 1
-    this.scale += this.scaleFactor * direction
-    this.label_scale = this.scale.toFixed(1)
-
-    if (this.scale >= 0.40000000000000013) {
-
-      this.scrollX += (event.offsetX / previousScale) - (event.offsetX / this.scale);
-      this.scrollY += (event.offsetY / previousScale) - (event.offsetY / this.scale);
-
-      this.context.setTransform(1, 0, 0, 1, 0, 0)
-      this.context.scale(this.scale, this.scale)
-    } else {
-      this.scale = 0.40000000000000013
-      this.scrollX += (event.offsetX / previousScale) - (event.offsetX / 0.40000000000000013);
-      this.scrollY += (event.offsetY / previousScale) - (event.offsetY / 0.40000000000000013);
-      this.context.setTransform(1, 0, 0, 1, 0, 0)
-      this.context.scale(this.scale, this.scale)
-    }
-  }
-
   private detectHover(event: MouseEvent) {
-    let x = event.offsetX / this.scale
-    let y = event.offsetY / this.scale
+    let x = event.offsetX / this.scale.x
+    let y = event.offsetY / this.scale.x
 
     this.highlightedDriver = null
 
@@ -1068,10 +1043,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.svgTime.nativeElement.style.height = this.appHeight + "px"
     this.svgTime.nativeElement.style.width = "130px"
 
-    let svgName_width = this.appWidth + 130 + "px"
+    let svgName_width = this.appWidth + 150 + "px"
     this.svgName.nativeElement.style.top = "550px"
     this.svgName.nativeElement.style.height = this.appHeight + "px"
-    this.svgName.nativeElement.style.width = this.appWidth + 130 + "px"
+    this.svgName.nativeElement.style.width = this.appWidth + 150 + "px"
 
     let separator = document.createElementNS("http://www.w3.org/2000/svg", "rect")
 
@@ -1214,9 +1189,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private updateDiagram() {
     this.data = this.prepareData(this.data_original)
+    this.diaprop = new DiagramProperties()
     this.initBpprop()
-    this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1] + 50
-    this.calculateLinearFunction()
+    this.initDiaprop()
     this.drawSVG_Y_laptimeLabels()
     this.drawSVG_X_driverLabels()
   }
@@ -1294,11 +1269,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private handleMouseDown(event: MouseEvent) {
+
     event.preventDefault()
     event.stopPropagation()
 
-    this.startX = event.clientX - this.offsetX
-    this.startY = event.clientY - this.offsetY
+    this.startX = event.clientX - this.cameraOffset.x
+    this.startY = event.clientY - this.cameraOffset.y
+
     this.isDown = true
   }
 
@@ -1317,21 +1294,76 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     event.preventDefault()
     event.stopPropagation()
 
-    this.mouseX = event.clientX - this.startX
-    this.mouseY = event.clientY - this.startY
+    if (this.movingOutOfRenderingContext(event)) {
+      return;
+    }
 
-    let dx = this.mouseX - this.startX
-    let dy = this.mouseY - this.startY
+    this.cameraOffset.x = event.clientX - this.startX
+    this.cameraOffset.y = event.clientY - this.startY
 
-    this.startX = this.mouseX
-    this.startY = this.mouseY
+    this.applyScale()
 
-    this.netPanningX += dx
-    this.netPanningY += dy
+    this.drawSVG_Y_laptimeLabels()
+    this.drawSVG_X_driverLabels()
   }
 
+  private scaleCanvas(event: WheelEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+    let previousScale: xy = {x: this.scale.x, y: this.scale.y}
+    let direction = event.deltaY > 0 ? -1 : 1
 
+    this.scale.x = this.scale.x + this.scaleFactor * direction
+    this.scale.y = this.scale.y + this.scaleFactor * direction
 
+    this.label_scale = this.scale.y.toFixed(1)
+
+    this.scrollX += ((event.offsetX - this.cameraOffset.x) / previousScale.x) - ((event.offsetX - this.cameraOffset.x) / this.scale.x);
+    this.scrollY += ((event.offsetY - this.cameraOffset.y) / previousScale.y) - ((event.offsetY - this.cameraOffset.y) / this.scale.y);
+
+    this.applyScale()
+  }
+
+  private applyScale() {
+    this.canvas.nativeElement.width = this.appWidth
+    this.canvas.nativeElement.height = this.appHeight
+
+    this.context.setTransform(1, 0, 0, 1, this.cameraOffset.x, this.cameraOffset.y)
+    this.context.scale(this.scale.x, this.scale.y)
+
+    this.canvasAxis.nativeElement.width = 20
+    this.canvasAxis.nativeElement.height = this.appHeight
+
+    this.contextAxis.setTransform(1, 0, 0, 1, 0, this.cameraOffset.y)
+    this.contextAxis.scale(this.scale.x, this.scale.y)
+  }
+
+  private initDiaprop() {
+    this.diaprop.yAxisTicks_end = this.data.metadata.timeframe[1]
+    this.diaprop.calculateLinearFunction(this.data.metadata.median, this.appHeight)
+    this.diaprop.renderStart.y = this.convertSecondsToPixels(this.data.metadata.timeframe[1])
+    this.diaprop.renderEnd.y = this.convertSecondsToPixels(this.data.metadata.timeframe[0])
+
+    console.log(this.data.metadata.timeframe[0])
+  }
+
+  private movingOutOfRenderingContext(event: MouseEvent) {
+
+    let co_x = event.clientX - this.startX
+    let co_y = event.clientY - this.startY
+
+    // if (this.co_x > 0 && this.scale.x) {
+    //   return true
+    // }
+
+    return false
+  }
+
+  private calculateAbsolutePixels(event: MouseEvent) {
+      let x = this.bpprop.default.bp.prop.location - this.scrollX
+      console.log(x)
+
+  }
 }
 
 export class BoxplotProperties {
@@ -1349,9 +1381,6 @@ export class BoxplotProperties {
   }
 
   userDriver: Driver
-
-  lineafunction_m: number // calculated
-  linearfunction_t: number // calculated
 
   // default = carclass1
   default = {
@@ -2037,17 +2066,23 @@ export class BoxplotProperties {
 
 class DiagramProperties {
 
-  private static _instance: DiagramProperties
+  calculateLinearFunction(median: number, appHeight: number) {
+    let tickSpacing = this.fullTick_spacing
 
-  private constructor() {
+    let x1 = median
+    let y1 = appHeight / 2
+
+    this.lineafunction_m = -tickSpacing
+    this.linearfunction_t = y1 - (-tickSpacing * x1)
   }
 
-  static getInstance(): DiagramProperties {
-    if (!DiagramProperties._instance) {
-      DiagramProperties._instance = new DiagramProperties()
-    }
-    return DiagramProperties._instance
-  }
+  userDriver: Driver
+
+  lineafunction_m: number // calculated
+  linearfunction_t: number // calculated
+
+  renderStart: xy = {x: 0, y: 0}
+  renderEnd: xy = {x: 0, y: 0}
 
   yAxis_pos: number = 10
   yAxisTicks_start: number = 0
@@ -2166,6 +2201,11 @@ enum DetailType {
 
 export interface Option_BP {
   [type: string]: {label: string, checked: boolean}
+}
+
+interface xy {
+  x: number
+  y: number
 }
 
 
