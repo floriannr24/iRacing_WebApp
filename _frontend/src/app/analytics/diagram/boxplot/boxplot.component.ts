@@ -1064,11 +1064,15 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     })
 
     if (!this.bpprop.options['showMulticlass'].checked) {
-      return this.removeCarClasses(data)
+      data = this.removeCarClasses(data)
     }
 
     if(!this.bpprop.options['showDiscDisq'].checked) {
-      return this.removeDiscDisqDrivers(data)
+      data = this.removeDiscDisqDrivers(data)
+    }
+
+    if(this.bpprop.options['sortBySpeed'].checked) {
+      data = this.sortByMedian(data)
     }
 
     return data
@@ -1339,8 +1343,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.diaprop.calculateLinearFunction(this.data.metadata.median, this.appHeight)
     this.diaprop.renderStart.y = this.convertSecondsToPixels(this.data.metadata.timeframe[1])
     this.diaprop.renderEnd.y = this.convertSecondsToPixels(this.data.metadata.timeframe[0])
-
-    console.log(this.data.metadata.timeframe[0])
   }
 
   private movingOutOfRenderingContext(event: MouseEvent) {
@@ -1374,6 +1376,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       0 - this.cameraOffset.y / this.scale.y,
       this.contextAxis.canvas.width / this.scale.x,
       this.contextAxis.canvas.height / this.scale.y)
+  }
+
+  private sortByMedian(data: EventData) {
+    data.drivers.sort((a,b) => b.bpdata.median - a.bpdata.median).reverse()
+    return data
   }
 }
 
@@ -2070,7 +2077,7 @@ export class BoxplotProperties {
     showMean: {label: "Show mean", checked: false},
     showFasterSlower: {label: "Highlight faster / slower drivers", checked: false},
     showMulticlass: {label: "Show all car classes", checked: false},
-    showOrder: {label: "Sort drivers from fastest to slowest", checked: false}
+    sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false}
 
   }
 }
