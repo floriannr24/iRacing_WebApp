@@ -1056,6 +1056,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private prepareData(data: EventData) {
 
+    data = structuredClone(data)
+
     // set user driver in bpprop
     data.drivers.forEach(driver => {
       if (driver.name == this.bpprop.userDriver.name) {
@@ -1073,6 +1075,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     if(this.bpprop.options['sortBySpeed'].checked) {
       data = this.sortByMedian(data)
+      data = this.assignNewFinishPosition(data)
     }
 
     return data
@@ -1380,6 +1383,26 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private sortByMedian(data: EventData) {
     data.drivers.sort((a,b) => b.bpdata.median - a.bpdata.median).reverse()
+    return data
+  }
+
+  private assignNewFinishPosition(data: EventData) {
+
+    if(this.bpprop.options['showMulticlass'].checked) {
+      for (let i = 0; i < data.drivers.length; i++) {
+        let finishPos_orig = data.drivers[i].finish_position
+        data.drivers[i].finish_position = i+1 + " (" + finishPos_orig +")"
+      }
+
+    } else {
+
+      for (let i = 0; i < data.drivers.length; i++) {
+        let finishPosInClass_orig = data.drivers[i].finish_position_in_class
+        data.drivers[i].finish_position_in_class = i+1 + " (" + finishPosInClass_orig +")"
+      }
+
+    }
+
     return data
   }
 }
