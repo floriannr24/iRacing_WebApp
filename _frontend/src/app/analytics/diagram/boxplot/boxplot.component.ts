@@ -1534,22 +1534,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
     }
   }
-
-  private drawLapLabel_D(x_pos: number, y_pos: number, time: number, lapNr: number) {
-    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
-    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
-
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-
-    let time_str = this.convertTimeFormat(time)
-
-    if (this.highlightedLap == time) {
-      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-      this.label_detail_content = time_str + " (" + lapNr + ")"
-      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
-      this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
-    }
-  }
 }
 
 export class BoxplotProperties {
