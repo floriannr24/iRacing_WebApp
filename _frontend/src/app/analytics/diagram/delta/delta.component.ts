@@ -11,7 +11,7 @@ import {DataService} from "../../../_services/data.service";
 export class DeltaComponent implements AfterViewInit {
 
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>
-  @ViewChild('label_detail') label_detail: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail') label_detail: ElementRef<HTMLDivElement>
   label_scale = "1.0"
   show_label_detail: boolean
   label_detail_content: string

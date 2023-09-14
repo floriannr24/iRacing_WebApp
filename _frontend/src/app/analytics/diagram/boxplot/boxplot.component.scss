@@ -23,14 +23,41 @@
   }
 
 
-  .label_laptime {
+  .labelDetail {
+    display: flex;
     position: absolute;
     color: #FFFFFF;
     border-radius: 6px;
     border-style: solid;
     border-width: 2px;
-    padding: 2px 7px 3px 5px;
     box-shadow: 0 0 8px rgba(0, 0, 0, 0.68);
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    padding: 0 5px 0 5px;
+    overflow: hidden;
+
+    .labelDetail_time {
+      display: flex;
+      background: #1F262E;
+    }
+
+    .labelDetail_lap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+      width: 20px;
+      font-weight: bold;
+      text-align: center;
+      background: #fffb00;
+      margin-left: 5px;
+
+      .labelDetail_lap_content {
+        color: #333000;
+      }
+
+    }
 
   }
 

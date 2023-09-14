@@ -15,10 +15,14 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('canvasAxis') canvasAxis: ElementRef<HTMLCanvasElement>
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
   @ViewChild('svgName') svgName: ElementRef<SVGElement>
-  @ViewChild('label_detail') label_detail: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail') labelDetail: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetailTime') labelDetailTime: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetailLap') labelDetailLap: ElementRef<HTMLDivElement>
   label_scale = "1.0"
-  show_label_detail: boolean
-  label_detail_content: string
+  labelDetailTime_content: string
+  labelDetailLap_content: string
+  _showLabelDetail: boolean = false
+  _showLabelDetail_lapNr: boolean = false
   private stop$ = new Subject<void>()
   private context: CanvasRenderingContext2D | any
   private contextAxis: CanvasRenderingContext2D | any
@@ -790,10 +794,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
               this.highlightedDriver = this.data.drivers[i]
               this.highlightedDetailType = DetailType.LAP
               this.highlightedLap = laps[d].y
-              this.show_label_detail = true
+              this._showLabelDetail = true
+              this._showLabelDetail_lapNr = true
               break outerloop
             } else {
-              this.show_label_detail = false
+              this._showLabelDetail = false
+              this._showLabelDetail_lapNr = false
             }
           }
         }
@@ -803,10 +809,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
           if (x_mouse >= (mean.x - this.bpprop.default.mean.prop.radius_HITBOX) && x_mouse <= (mean.x + this.bpprop.default.mean.prop.radius_HITBOX) && y_mouse >= (mean.y - this.bpprop.default.mean.prop.radius_HITBOX) && y_mouse <= (mean.y + this.bpprop.default.mean.prop.radius_HITBOX)) {
             this.highlightedDriver = this.data.drivers[i]
             this.highlightedDetailType = DetailType.MEAN
-            this.show_label_detail = true
+            this._showLabelDetail = true
             break
           } else {
-            this.show_label_detail = false
+            this._showLabelDetail = false
           }
         }
 
@@ -814,50 +820,50 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         if (x_mouse >= median.x.start && x_mouse <= median.x.end && y_mouse >= median.y - this.bpprop.default.median.prop.lineThickness_HITBOX && y_mouse <= median.y + this.bpprop.default.median.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.MEDIAN
-          this.show_label_detail = true
+          this._showLabelDetail = true
           break
         } else {
-          this.show_label_detail = false
+          this._showLabelDetail = false
         }
 
         // whisker-top
         if (x_mouse >= whisker_top.x.start && x_mouse <= whisker_top.x.end && y_mouse >= whisker_top.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_top.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.WHISKER_TOP
-          this.show_label_detail = true
+          this._showLabelDetail = true
           break
         } else {
-          this.show_label_detail = false
+          this._showLabelDetail = false
         }
 
         //whisker-bottom
         if (x_mouse >= whisker_btm.x.start && x_mouse <= whisker_btm.x.end && y_mouse >= whisker_btm.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_btm.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.WHISKER_BOTTOM
-          this.show_label_detail = true
+          this._showLabelDetail = true
           break
         } else {
-          this.show_label_detail = false
+          this._showLabelDetail = false
         }
 
         //q3
         if (x_mouse >= q3.x.start && x_mouse <= q3.x.end && y_mouse >= q3.y - this.bpprop.default.q3.prop.lineThickness_HITBOX && y_mouse <= q3.y + this.bpprop.default.q3.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.Q3
-          this.show_label_detail = true
+          this._showLabelDetail = true
           break
         } else {
-          this.show_label_detail = false
+          this._showLabelDetail = false
         }
 
         //q1
         if (x_mouse >= q1.x.start && x_mouse <= q1.x.end && y_mouse >= q1.y - this.bpprop.default.q1.prop.lineThickness_HITBOX && y_mouse <= q1.y + this.bpprop.default.q1.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.Q1
-          this.show_label_detail = true
+          this._showLabelDetail = true
           break
         } else {
-          this.show_label_detail = false
+          this._showLabelDetail = false
         }
       }
 
@@ -1218,6 +1224,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
       if (this.driverSelected(element.driver) && this.driverRunning(element.driver)) {
 
+        if (!this._showLabelDetail_lapNr) {
+          this.labelDetail.nativeElement.style.padding = "0px 5px 0px 5px"
+        }
+
         if (this.highlightedDetailType == DetailType.MEDIAN) {
           this.drawMedianLabel_R(element)
         }
@@ -1233,6 +1243,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
 
       } else if (this.driverSelected(element.driver) && !this.driverRunning(element.driver)) {
+
+        if (!this._showLabelDetail_lapNr) {
+          this.labelDetail.nativeElement.style.padding = "0px 5px 0px 5px"
+        }
 
         if (this.highlightedDetailType == DetailType.MEDIAN) {
           this.drawMedianLabel_D(element)
@@ -1263,17 +1277,17 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.label_detail_content = time_str
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
+    this.labelDetailTime_content = time_str
 
-    this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.running.detail.line
-    this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.running.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.running.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.running.detail.bg
 
     if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
-      this.label_detail.nativeElement.style.borderColor = carclassProp.median.color.running.detail.line
-      this.label_detail.nativeElement.style.background = carclassProp.median.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = carclassProp.median.color.running.detail.line
+      this.labelDetail.nativeElement.style.background = carclassProp.median.color.running.detail.bg
     }
 
     if (this.bpprop.options['showFasterSlower'].checked) {
@@ -1281,24 +1295,24 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       let delta = element.driver.bpdata.median - this.bpprop.userDriver.bpdata.median
 
       if (delta > 0) {
-        this.label_detail_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
+        this.labelDetailTime_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
       } else if (delta < 0) {
-        this.label_detail_content = time_str + " (" + delta.toFixed(3).toString() + ")"
+        this.labelDetailTime_content = time_str + " (" + delta.toFixed(3).toString() + ")"
       } else {
-        this.label_detail_content = time_str
+        this.labelDetailTime_content = time_str
       }
 
       if (element.driver.bpdata.median > this.bpprop.userDriver.bpdata.median) {
-        this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.slower.detail.line
-        this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.slower.detail.bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.slower.detail.line
+        this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.slower.detail.bg
       } else {
-        this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.faster.detail.line
-        this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.faster.detail.bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.faster.detail.line
+        this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.faster.detail.bg
       }
 
       if (element.driver.name == this.bpprop.userDriver.name) {
-        this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.user.highlight.detail.line
-        this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.user.highlight.detail.bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.user.highlight.detail.line
+        this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.user.highlight.detail.bg
       }
     }
 
@@ -1318,11 +1332,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.label_detail_content = time_str
-    this.label_detail.nativeElement.style.borderColor = this.bpprop.default.median.color.disc.detail.line
-    this.label_detail.nativeElement.style.background = this.bpprop.default.median.color.disc.detail.bg
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
+    this.labelDetailTime_content = time_str
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.disc.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.disc.detail.bg
     this.context.stroke()
 
   }
@@ -1339,21 +1353,21 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-    this.label_detail_content = time_str
-    this.label_detail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
-    this.label_detail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
+    this.labelDetailTime_content = time_str
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
 
     if (this.bpprop.options['showFasterSlower'].checked) {
       let delta = (driver.bpdata.mean - this.bpprop.userDriver.bpdata.mean)
 
       if (delta > 0) {
-        this.label_detail_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
+        this.labelDetailTime_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
       } else if (delta < 0) {
-        this.label_detail_content = time_str + " (" + delta.toFixed(3).toString() + ")"
+        this.labelDetailTime_content = time_str + " (" + delta.toFixed(3).toString() + ")"
       } else {
-        this.label_detail_content = time_str
+        this.labelDetailTime_content = time_str
       }
     }
 
@@ -1383,17 +1397,17 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.label_detail_content = time_str
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
+    this.labelDetailTime_content = time_str
 
     if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
-      this.label_detail.nativeElement.style.borderColor = carclassProp.bp.color.running.detail.line
-      this.label_detail.nativeElement.style.background = carclassProp.bp.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = carclassProp.bp.color.running.detail.line
+      this.labelDetail.nativeElement.style.background = carclassProp.bp.color.running.detail.bg
     } else {
-      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.bp.color.running.detail.line
-      this.label_detail.nativeElement.style.background = this.bpprop.default.bp.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.bp.color.running.detail.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.default.bp.color.running.detail.bg
     }
 
     this.context.stroke()
@@ -1422,17 +1436,17 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
-    this.label_detail_content = time_str
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
+    this.labelDetailTime_content = time_str
 
     if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
-      this.label_detail.nativeElement.style.borderColor = carclassProp.whiskers.color.running.line
-      this.label_detail.nativeElement.style.background = carclassProp.whiskers.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = carclassProp.whiskers.color.running.line
+      this.labelDetail.nativeElement.style.background = carclassProp.whiskers.color.running.detail.bg
     } else {
-      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.running.line
-      this.label_detail.nativeElement.style.background = this.bpprop.default.whiskers.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.running.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.default.whiskers.color.running.detail.bg
     }
 
     this.context.stroke()
@@ -1451,11 +1465,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-    this.label_detail_content = time_str
-    this.label_detail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
-    this.label_detail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
+    this.labelDetailTime_content = time_str
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
     this.context.stroke()
 
   }
@@ -1481,11 +1495,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
-    this.label_detail_content = time_str
-    this.label_detail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.disc.detail.line
-    this.label_detail.nativeElement.style.background = this.bpprop.default.whiskers.color.disc.detail.bg
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
+    this.labelDetailTime_content = time_str
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.disc.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.default.whiskers.color.disc.detail.bg
     this.context.stroke()
   }
 
@@ -1510,11 +1524,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let time_str = this.convertTimeFormat(time)
 
     this.context.beginPath()
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-    this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.label_detail_content = time_str
-    this.label_detail.nativeElement.style.borderColor = this.bpprop.default.bp.color.disc.line
-    this.label_detail.nativeElement.style.background = this.bpprop.default.bp.color.disc.bg
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
+    this.labelDetailTime_content = time_str
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.bp.color.disc.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.default.bp.color.disc.bg
 
     this.context.stroke()
   }
@@ -1523,15 +1537,18 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
     y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
 
-    this.label_detail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
 
     let time_str = this.convertTimeFormat(time)
+    let lapNr_str = lapNr.toString()
 
     if (type == DetailType.LAP) {
-      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-      this.label_detail_content = time_str + " (" + lapNr + ")"
-      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
-      this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
+      this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
+      this.labelDetailTime_content = time_str
+      this.labelDetailLap_content = lapNr_str
+      this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
     }
   }
 }
