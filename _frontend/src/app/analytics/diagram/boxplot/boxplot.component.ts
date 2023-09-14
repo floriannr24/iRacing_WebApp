@@ -529,8 +529,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
       this.context.beginPath()
 
-      if (this.driverSelected(driver) && this.highlightedDetailType == lap_y) {
+      if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
         this.context.arc(lap_x, lap_y, this.bpprop.default.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+        this.drawLapLabel_R(lap_x, lap_y, DetailType.LAP, lap, i + 1)
       } else {
         this.context.arc(lap_x, lap_y, this.bpprop.default.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
       }
@@ -735,39 +736,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private convertSecondsToPixels(seconds: number) {
     return Math.round(this.diaprop.lineafunction_m * seconds + this.diaprop.linearfunction_t) + 0.5
-  }
-
-  private placeLabelDetail_Running(x_pos: number, y_pos: number, type: DetailType, time: number, driver: Driver, lapNr?: number) {
-
-    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
-    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
-
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-
-    let time_str = this.convertTimeFormat(time)
-
-    if (type == DetailType.LAP) {
-      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-      this.label_detail_content = time_str + " (" + lapNr + ")"
-      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
-      this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
-    }
-  }
-
-  private placeLabelDetail_DiscDisq(x_pos: number, y_pos: number, type: DetailType, time: number, lapNr?: number) {
-
-    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
-    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
-    this.label_detail.nativeElement.style.top = y_pos + "px"
-
-    let time_str = this.convertTimeFormat(time)
-
-    if (type == DetailType.LAP) {
-      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-      this.label_detail_content = time_str + " (" + lapNr + ")"
-      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
-      this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
-    }
   }
 
   private convertTimeFormat(time: number) {
@@ -1334,8 +1302,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     }
 
-
-
     this.context.stroke()
   }
 
@@ -1553,6 +1519,37 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.stroke()
   }
 
+  private drawLapLabel_R(x_pos: number, y_pos: number, type: number, time: number, lapNr: number) {
+    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
+    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
+
+    this.label_detail.nativeElement.style.top = y_pos + "px"
+
+    let time_str = this.convertTimeFormat(time)
+
+    if (type == DetailType.LAP) {
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail_content = time_str + " (" + lapNr + ")"
+      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
+      this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
+    }
+  }
+
+  private drawLapLabel_D(x_pos: number, y_pos: number, time: number, lapNr: number) {
+    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
+    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
+
+    this.label_detail.nativeElement.style.top = y_pos + "px"
+
+    let time_str = this.convertTimeFormat(time)
+
+    if (this.highlightedLap == time) {
+      this.label_detail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
+      this.label_detail_content = time_str + " (" + lapNr + ")"
+      this.label_detail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
+      this.label_detail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
+    }
+  }
 }
 
 export class BoxplotProperties {
