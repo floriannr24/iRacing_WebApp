@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
-import {iif, mergeWith, Subject, takeUntil} from "rxjs";
+import {Subject} from "rxjs";
 import {DataService} from "../../../_services/data.service";
 
 @Component({

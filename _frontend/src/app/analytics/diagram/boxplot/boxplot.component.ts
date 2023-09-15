@@ -249,8 +249,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       if (driver.laps.length > 0) {
 
         let bpelement = new BoxplotElement()
-        this.bpprop.default.bp.prop.location = this.bpprop.default.bp.prop.gap + i * (this.bpprop.default.bp.prop.width + this.bpprop.default.bp.prop.gap)
-        this.bpprop.default.bp.prop.middle = this.bpprop.default.bp.prop.location + (this.bpprop.default.bp.prop.width / 2)
+        this.bpprop.carclass1.bp.prop.location = this.bpprop.carclass1.bp.prop.gap + i * (this.bpprop.carclass1.bp.prop.width + this.bpprop.carclass1.bp.prop.gap)
+        this.bpprop.carclass1.bp.prop.middle = this.bpprop.carclass1.bp.prop.location + (this.bpprop.carclass1.bp.prop.width / 2)
 
         // original values (laptimes)
         let median = driver.bpdata.median
@@ -287,52 +287,52 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.setColor_Box(driver)
 
-    let q3_x_start = this.bpprop.default.bp.prop.location - this.scrollX
-    let q3_x_end = (this.bpprop.default.bp.prop.location + this.bpprop.default.bp.prop.width) - this.scrollX
+    let q3_x_start = this.bpprop.carclass1.bp.prop.location - this.scrollX
+    let q3_x_end = (this.bpprop.carclass1.bp.prop.location + this.bpprop.carclass1.bp.prop.width) - this.scrollX
     let q3_y = this.convertSecondsToPixels(q3) - this.scrollY
 
-    let q1_x_start = this.bpprop.default.bp.prop.location - this.scrollX
-    let q1_x_end = (this.bpprop.default.bp.prop.location + this.bpprop.default.bp.prop.width) - this.scrollX
+    let q1_x_start = this.bpprop.carclass1.bp.prop.location - this.scrollX
+    let q1_x_end = (this.bpprop.carclass1.bp.prop.location + this.bpprop.carclass1.bp.prop.width) - this.scrollX
     let q1_y = this.convertSecondsToPixels(q1) - this.scrollY
 
     let height = this.convertSecondsToPixels(q3) - this.convertSecondsToPixels(q1)
 
-    this.context.fillRect(q1_x_start, q1_y, this.bpprop.default.bp.prop.width, height)
+    this.context.fillRect(q1_x_start, q1_y, this.bpprop.carclass1.bp.prop.width, height)
 
     //top
     this.context.beginPath()
 
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.Q3)) {
-      this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_SELECT / this.scale.x
+      this.context.lineWidth = this.bpprop.carclass1.q3.prop.lineThickness_SELECT / this.scale.x
     } else {
-      this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_DEFAULT / this.scale.x
+      this.context.lineWidth = this.bpprop.carclass1.q3.prop.lineThickness_DEFAULT / this.scale.x
     }
 
     this.context.moveTo(q3_x_start, q3_y)
-    this.context.lineTo(q3_x_start + this.bpprop.default.bp.prop.width, q3_y)
+    this.context.lineTo(q3_x_start + this.bpprop.carclass1.bp.prop.width, q3_y)
     this.context.stroke()
 
     //right
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.q3.prop.lineThickness_DEFAULT / this.scale.x
-    this.context.moveTo(q1_x_start + this.bpprop.default.bp.prop.width, q1_y)
-    this.context.lineTo(q1_x_start + this.bpprop.default.bp.prop.width, q3_y)
+    this.context.lineWidth = this.bpprop.carclass1.q3.prop.lineThickness_DEFAULT / this.scale.x
+    this.context.moveTo(q1_x_start + this.bpprop.carclass1.bp.prop.width, q1_y)
+    this.context.lineTo(q1_x_start + this.bpprop.carclass1.bp.prop.width, q3_y)
     this.context.stroke()
 
     //bottom
     this.context.beginPath()
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.Q1)) {
-      this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_SELECT / this.scale.x
+      this.context.lineWidth = this.bpprop.carclass1.q1.prop.lineThickness_SELECT / this.scale.x
     } else {
-      this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_DEFAULT / this.scale.x
+      this.context.lineWidth = this.bpprop.carclass1.q1.prop.lineThickness_DEFAULT / this.scale.x
     }
     this.context.moveTo(q1_x_start, q1_y)
-    this.context.lineTo(q1_x_start + this.bpprop.default.bp.prop.width, q1_y)
+    this.context.lineTo(q1_x_start + this.bpprop.carclass1.bp.prop.width, q1_y)
     this.context.stroke()
 
     //left
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.q1.prop.lineThickness_DEFAULT  / this.scale.x
+    this.context.lineWidth = this.bpprop.carclass1.q1.prop.lineThickness_DEFAULT  / this.scale.x
     this.context.moveTo(q1_x_start, q1_y)
     this.context.lineTo(q1_x_start, q3_y)
     this.context.stroke()
@@ -360,18 +360,18 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.setColor_Median(driver)
 
-    let median_x_start = this.bpprop.default.bp.prop.location - this.scrollX
-    let median_x_end = this.bpprop.default.bp.prop.location + this.bpprop.default.median.prop.width - this.scrollX
+    let median_x_start = this.bpprop.carclass1.bp.prop.location - this.scrollX
+    let median_x_end = this.bpprop.carclass1.bp.prop.location + this.bpprop.carclass1.median.prop.width - this.scrollX
     let median_y = this.convertSecondsToPixels(median) - this.scrollY
 
     this.context.beginPath()
 
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.MEDIAN)) {
-      this.context.lineWidth = (this.bpprop.default.median.prop.lineThickness_SELECT) / this.scale.x
+      this.context.lineWidth = (this.bpprop.carclass1.median.prop.lineThickness_SELECT) / this.scale.x
       this.context.moveTo(median_x_start, median_y)
       this.context.lineTo(median_x_end, median_y)
     } else {
-      this.context.lineWidth = this.bpprop.default.median.prop.lineThickness_DEFAULT / this.scale.x
+      this.context.lineWidth = this.bpprop.carclass1.median.prop.lineThickness_DEFAULT / this.scale.x
       this.context.moveTo(median_x_start, median_y)
       this.context.lineTo(median_x_end, median_y)
     }
@@ -391,15 +391,15 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.setColor_Mean()
 
-    let mean_x = this.bpprop.default.bp.prop.middle - this.scrollX
+    let mean_x = this.bpprop.carclass1.bp.prop.middle - this.scrollX
     let mean_y = this.convertSecondsToPixels(mean) - this.scrollY
 
     this.context.beginPath()
 
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.MEAN)) {
-      this.context.arc(mean_x, mean_y, this.bpprop.default.mean.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+      this.context.arc(mean_x, mean_y, this.bpprop.carclass1.mean.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
     } else {
-      this.context.arc(mean_x, mean_y, this.bpprop.default.mean.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+      this.context.arc(mean_x, mean_y, this.bpprop.carclass1.mean.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
     }
 
     this.context.fill()
@@ -416,25 +416,25 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //line to whisker top
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
-    this.context.moveTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(q3) - this.scrollY)
-    this.context.lineTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(whisker_top) - this.scrollY)
+    this.context.lineWidth = this.bpprop.carclass1.whiskers.prop.lineThickness_DEFAULT / this.scale.x
+    this.context.moveTo(this.bpprop.carclass1.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(q3) - this.scrollY)
+    this.context.lineTo(this.bpprop.carclass1.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(whisker_top) - this.scrollY)
     this.context.stroke()
 
     // whisker top
-    let top_x_start = this.bpprop.default.bp.prop.middle - this.bpprop.default.whiskers.prop.width / 2 - this.scrollX
-    let top_x_end = this.bpprop.default.bp.prop.middle + this.bpprop.default.whiskers.prop.width / 2 - this.scrollX
+    let top_x_start = this.bpprop.carclass1.bp.prop.middle - this.bpprop.carclass1.whiskers.prop.width / 2 - this.scrollX
+    let top_x_end = this.bpprop.carclass1.bp.prop.middle + this.bpprop.carclass1.whiskers.prop.width / 2 - this.scrollX
     let top_y = this.convertSecondsToPixels(whisker_top) - this.scrollY
 
     // on-hover (whisker top)
     this.context.beginPath()
 
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.WHISKER_TOP)) {
-      this.context.lineWidth = (this.bpprop.default.whiskers.prop.lineThickness_SELECT) / this.scale.x
+      this.context.lineWidth = (this.bpprop.carclass1.whiskers.prop.lineThickness_SELECT) / this.scale.x
       this.context.moveTo(top_x_start, top_y)
       this.context.lineTo(top_x_end, top_y)
     } else {
-      this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
+      this.context.lineWidth = this.bpprop.carclass1.whiskers.prop.lineThickness_DEFAULT / this.scale.x
       this.context.moveTo(top_x_start, top_y)
       this.context.lineTo(top_x_end, top_y)
     }
@@ -442,14 +442,14 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //line to whisker bottom
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
-    this.context.moveTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(q1) - this.scrollY)
-    this.context.lineTo(this.bpprop.default.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(whisker_bottom) - this.scrollY)
+    this.context.lineWidth = this.bpprop.carclass1.whiskers.prop.lineThickness_DEFAULT / this.scale.x
+    this.context.moveTo(this.bpprop.carclass1.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(q1) - this.scrollY)
+    this.context.lineTo(this.bpprop.carclass1.bp.prop.middle - this.scrollX, this.convertSecondsToPixels(whisker_bottom) - this.scrollY)
     this.context.stroke()
 
     // whisker bottom
-    let bottom_x_start = this.bpprop.default.bp.prop.middle - this.bpprop.default.whiskers.prop.width / 2 - this.scrollX
-    let bottom_x_end = this.bpprop.default.bp.prop.middle + this.bpprop.default.whiskers.prop.width / 2 - this.scrollX
+    let bottom_x_start = this.bpprop.carclass1.bp.prop.middle - this.bpprop.carclass1.whiskers.prop.width / 2 - this.scrollX
+    let bottom_x_end = this.bpprop.carclass1.bp.prop.middle + this.bpprop.carclass1.whiskers.prop.width / 2 - this.scrollX
     let bottom_y = this.convertSecondsToPixels(whisker_bottom) - this.scrollY
 
     this.context.beginPath()
@@ -457,12 +457,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     // on-hover (whisker bottom)
     if (this.driverSelected(driver) && this.dataTypeHighlighted(DetailType.WHISKER_BOTTOM)) {
 
-      this.context.lineWidth = (this.bpprop.default.whiskers.prop.lineThickness_SELECT) / this.scale.x
+      this.context.lineWidth = (this.bpprop.carclass1.whiskers.prop.lineThickness_SELECT) / this.scale.x
       this.context.moveTo(bottom_x_start, bottom_y)
       this.context.lineTo(bottom_x_end, bottom_y)
 
     } else {
-      this.context.lineWidth = this.bpprop.default.whiskers.prop.lineThickness_DEFAULT / this.scale.x
+      this.context.lineWidth = this.bpprop.carclass1.whiskers.prop.lineThickness_DEFAULT / this.scale.x
       this.context.moveTo(bottom_x_start, bottom_y)
       this.context.lineTo(bottom_x_end, bottom_y)
     }
@@ -495,12 +495,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     fliers_top.forEach(flier => {
 
-      let flier_x = this.bpprop.default.bp.prop.middle - this.scrollX
+      let flier_x = this.bpprop.carclass1.bp.prop.middle - this.scrollX
       let flier_y = this.convertSecondsToPixels(flier) - this.scrollY
 
       this.context.beginPath()
-      this.context.lineWidth = this.bpprop.default.fliers.lineThickness
-      this.context.arc(flier_x, flier_y, this.bpprop.default.fliers.radius, 0, (Math.PI / 180) * 360)
+      this.context.lineWidth = this.bpprop.carclass1.fliers.lineThickness
+      this.context.arc(flier_x, flier_y, this.bpprop.carclass1.fliers.radius, 0, (Math.PI / 180) * 360)
       this.context.stroke()
 
       fliersArray_top.push({x: flier_x, y: flier_y})
@@ -509,12 +509,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     fliers_bottom.forEach(flier => {
 
-      let flier_x = this.bpprop.default.bp.prop.middle - this.scrollX
+      let flier_x = this.bpprop.carclass1.bp.prop.middle - this.scrollX
       let flier_y = this.convertSecondsToPixels(flier) - this.scrollY
 
       this.context.beginPath()
-      this.context.lineWidth = this.bpprop.default.fliers.lineThickness
-      this.context.arc(flier_x, flier_y, this.bpprop.default.fliers.radius, 0, (Math.PI / 180) * 360)
+      this.context.lineWidth = this.bpprop.carclass1.fliers.lineThickness
+      this.context.arc(flier_x, flier_y, this.bpprop.carclass1.fliers.radius, 0, (Math.PI / 180) * 360)
       this.context.stroke()
 
       fliersArray_bottom.push({x: flier_x, y: flier_y})
@@ -528,19 +528,19 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let lapsArray: Array<Lap> = []
 
     for (const [i, lap] of laps.entries()) {
-      let lap_x = (this.bpprop.default.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
+      let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
       let lap_y = this.convertSecondsToPixels(lap) - this.scrollY
 
       this.context.beginPath()
 
       if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
-        this.context.arc(lap_x, lap_y, this.bpprop.default.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
         this.drawLapLabel_R(lap_x, lap_y, DetailType.LAP, lap, i + 1)
       } else {
-        this.context.arc(lap_x, lap_y, this.bpprop.default.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
       }
 
-      this.context.fillStyle = this.bpprop.default.laps.color.line
+      this.context.fillStyle = this.bpprop.carclass1.laps.color.line
       this.context.fill()
 
       lapsArray.push({x: lap_x, y: lap_y})
@@ -674,13 +674,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private calc_xPosition(i: number) {
 
-    let bp_width = this.bpprop.default.bp.prop.width
+    let bp_width = this.bpprop.carclass1.bp.prop.width
 
-    while (this.canvas.nativeElement.width < this.bpprop.default.bp.prop.gap + (this.data.drivers.length) * (bp_width + this.bpprop.default.bp.prop.gap)) {
+    while (this.canvas.nativeElement.width < this.bpprop.carclass1.bp.prop.gap + (this.data.drivers.length) * (bp_width + this.bpprop.carclass1.bp.prop.gap)) {
       bp_width = bp_width - 0.1
     }
 
-    let bp_location = this.diaprop.yAxisBgWidth + this.bpprop.default.bp.prop.gap + i * (bp_width + this.bpprop.default.bp.prop.gap)
+    let bp_location = this.diaprop.yAxisBgWidth + this.bpprop.carclass1.bp.prop.gap + i * (bp_width + this.bpprop.carclass1.bp.prop.gap)
     let bp_middle = (bp_location + (bp_width / 2) - this.scrollX) * this.scale.x
 
     return bp_middle + 130 + this.cameraOffset.x;
@@ -702,7 +702,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     driver_name.setAttribute("text-rendering", "geometricPrecision")
     driver_name.textContent = driver.name
 
-    if (driver.name == this.bpprop.userDriver.name) {
+    if (driver.name == this.diaprop.userDriver.name) {
       driver_name.setAttribute("font-weight", "bold")
       driver_name.setAttribute("fill", "white")
     }
@@ -730,7 +730,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       driver_finishPosition.textContent = driver.finish_position_in_class.toString()
     }
 
-    if (driver.name == this.bpprop.userDriver.name) {
+    if (driver.name == this.diaprop.userDriver.name) {
       driver_finishPosition.setAttribute("font-weight", "bold")
       driver_finishPosition.setAttribute("fill", "white")
     }
@@ -756,14 +756,14 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private calculateBoxplotWidth() {
 
-    // use default boxplot width (=200px) and subtract -0.1 from it until the array of boxplots (incl gaps between) fits into the canvas
-    while (this.canvas.nativeElement.width < this.bpprop.default.bp.prop.gap + this.data.drivers.length * (this.bpprop.default.bp.prop.width + this.bpprop.default.bp.prop.gap)) {
-      this.bpprop.default.bp.prop.width = this.bpprop.default.bp.prop.width - 0.1
+    // use carclass1 boxplot width (=200px) and subtract -0.1 from it until the array of boxplots (incl gaps between) fits into the canvas
+    while (this.canvas.nativeElement.width < this.bpprop.carclass1.bp.prop.gap + this.data.drivers.length * (this.bpprop.carclass1.bp.prop.width + this.bpprop.carclass1.bp.prop.gap)) {
+      this.bpprop.carclass1.bp.prop.width = this.bpprop.carclass1.bp.prop.width - 0.1
     }
 
     // set median and whisker width accordingly
-    this.bpprop.default.median.prop.width = this.bpprop.default.bp.prop.width
-    this.bpprop.default.whiskers.prop.width = this.bpprop.default.bp.prop.width * 0.6
+    this.bpprop.carclass1.median.prop.width = this.bpprop.carclass1.bp.prop.width
+    this.bpprop.carclass1.whiskers.prop.width = this.bpprop.carclass1.bp.prop.width * 0.6
   }
 
   private detectHover(event: MouseEvent) {
@@ -790,7 +790,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         //laps
         if (this.bpprop.options['showIndividualLaps'].checked) {
           for (let d = laps.length - 1, lap; lap = laps[d]; d--) {
-            if (x_mouse >= (lap.x - this.bpprop.default.laps.prop.radius_HITBOX) && x_mouse <= lap.x + this.bpprop.default.laps.prop.radius_HITBOX && y_mouse >= (lap.y - this.bpprop.default.laps.prop.radius_HITBOX) && y_mouse <= (lap.y + this.bpprop.default.laps.prop.radius_HITBOX)) {
+            if (x_mouse >= (lap.x - this.bpprop.carclass1.laps.prop.radius_HITBOX) && x_mouse <= lap.x + this.bpprop.carclass1.laps.prop.radius_HITBOX && y_mouse >= (lap.y - this.bpprop.carclass1.laps.prop.radius_HITBOX) && y_mouse <= (lap.y + this.bpprop.carclass1.laps.prop.radius_HITBOX)) {
               this.highlightedDriver = this.data.drivers[i]
               this.highlightedDetailType = DetailType.LAP
               this.highlightedLap = laps[d].y
@@ -806,7 +806,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         // mean
         if (this.bpprop.options['showMean'].checked) {
-          if (x_mouse >= (mean.x - this.bpprop.default.mean.prop.radius_HITBOX) && x_mouse <= (mean.x + this.bpprop.default.mean.prop.radius_HITBOX) && y_mouse >= (mean.y - this.bpprop.default.mean.prop.radius_HITBOX) && y_mouse <= (mean.y + this.bpprop.default.mean.prop.radius_HITBOX)) {
+          if (x_mouse >= (mean.x - this.bpprop.carclass1.mean.prop.radius_HITBOX) && x_mouse <= (mean.x + this.bpprop.carclass1.mean.prop.radius_HITBOX) && y_mouse >= (mean.y - this.bpprop.carclass1.mean.prop.radius_HITBOX) && y_mouse <= (mean.y + this.bpprop.carclass1.mean.prop.radius_HITBOX)) {
             this.highlightedDriver = this.data.drivers[i]
             this.highlightedDetailType = DetailType.MEAN
             this._showLabelDetail = true
@@ -817,7 +817,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         // median
-        if (x_mouse >= median.x.start && x_mouse <= median.x.end && y_mouse >= median.y - this.bpprop.default.median.prop.lineThickness_HITBOX && y_mouse <= median.y + this.bpprop.default.median.prop.lineThickness_HITBOX) {
+        if (x_mouse >= median.x.start && x_mouse <= median.x.end && y_mouse >= median.y - this.bpprop.carclass1.median.prop.lineThickness_HITBOX && y_mouse <= median.y + this.bpprop.carclass1.median.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.MEDIAN
           this._showLabelDetail = true
@@ -827,7 +827,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         // whisker-top
-        if (x_mouse >= whisker_top.x.start && x_mouse <= whisker_top.x.end && y_mouse >= whisker_top.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_top.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
+        if (x_mouse >= whisker_top.x.start && x_mouse <= whisker_top.x.end && y_mouse >= whisker_top.y - this.bpprop.carclass1.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_top.y + this.bpprop.carclass1.whiskers.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.WHISKER_TOP
           this._showLabelDetail = true
@@ -837,7 +837,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         //whisker-bottom
-        if (x_mouse >= whisker_btm.x.start && x_mouse <= whisker_btm.x.end && y_mouse >= whisker_btm.y - this.bpprop.default.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_btm.y + this.bpprop.default.whiskers.prop.lineThickness_HITBOX) {
+        if (x_mouse >= whisker_btm.x.start && x_mouse <= whisker_btm.x.end && y_mouse >= whisker_btm.y - this.bpprop.carclass1.whiskers.prop.lineThickness_HITBOX && y_mouse <= whisker_btm.y + this.bpprop.carclass1.whiskers.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.WHISKER_BOTTOM
           this._showLabelDetail = true
@@ -847,7 +847,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         //q3
-        if (x_mouse >= q3.x.start && x_mouse <= q3.x.end && y_mouse >= q3.y - this.bpprop.default.q3.prop.lineThickness_HITBOX && y_mouse <= q3.y + this.bpprop.default.q3.prop.lineThickness_HITBOX) {
+        if (x_mouse >= q3.x.start && x_mouse <= q3.x.end && y_mouse >= q3.y - this.bpprop.carclass1.q3.prop.lineThickness_HITBOX && y_mouse <= q3.y + this.bpprop.carclass1.q3.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.Q3
           this._showLabelDetail = true
@@ -857,7 +857,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         //q1
-        if (x_mouse >= q1.x.start && x_mouse <= q1.x.end && y_mouse >= q1.y - this.bpprop.default.q1.prop.lineThickness_HITBOX && y_mouse <= q1.y + this.bpprop.default.q1.prop.lineThickness_HITBOX) {
+        if (x_mouse >= q1.x.start && x_mouse <= q1.x.end && y_mouse >= q1.y - this.bpprop.carclass1.q1.prop.lineThickness_HITBOX && y_mouse <= q1.y + this.bpprop.carclass1.q1.prop.lineThickness_HITBOX) {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.Q1
           this._showLabelDetail = true
@@ -894,8 +894,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // set user driver in bpprop
     data.drivers.forEach(driver => {
-      if (driver.name == this.bpprop.userDriver.name) {
-        this.bpprop.userDriver = driver
+      if (driver.name == this.diaprop.userDriver.name) {
+        this.diaprop.userDriver = driver
       }
     })
 
@@ -945,13 +945,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private setColor_Box(driver: Driver) {
 
-    if (driver.name == this.bpprop.userDriver.name) {
-      this.context.fillStyle = this.bpprop.default.bp.color.user.bg
-      this.context.strokeStyle = this.bpprop.default.bp.color.user.line
+    if (driver.name == this.diaprop.userDriver.name) {
+      this.context.fillStyle = this.bpprop.carclass1.bp.color.user.bg
+      this.context.strokeStyle = this.bpprop.carclass1.bp.color.user.line
     } else {
-      if (driver.car_class_id == this.bpprop.userDriver.car_class_id) {
-        this.context.fillStyle = this.bpprop.default.bp.color.running.bg
-        this.context.strokeStyle = this.bpprop.default.bp.color.running.line
+      if (driver.car_class_id == this.diaprop.userDriver.car_class_id) {
+        this.context.fillStyle = this.bpprop.carclass1.bp.color.running.bg
+        this.context.strokeStyle = this.bpprop.carclass1.bp.color.running.line
       } else {
         let carclassProp = this.setBprop_carclass(driver)
         this.context.fillStyle = carclassProp.bp.color.running.bg
@@ -960,22 +960,22 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if (driver.result_status == "Disconnected" || driver.result_status == "Disqualified") {
-      this.context.fillStyle = this.bpprop.default.bp.color.disc.bg
-      this.context.strokeStyle = this.bpprop.default.bp.color.disc.line
+      this.context.fillStyle = this.bpprop.carclass1.bp.color.disc.bg
+      this.context.strokeStyle = this.bpprop.carclass1.bp.color.disc.line
     }
   }
 
   private setColor_Median(driver: Driver) {
 
-    // default median color
-    this.context.strokeStyle = this.bpprop.default.median.color.running.line
+    // carclass1 median color
+    this.context.strokeStyle = this.bpprop.carclass1.median.color.running.line
 
     // username
-    if (driver.name == this.bpprop.userDriver.name) {
-      this.context.strokeStyle = this.bpprop.default.median.color.user.line
+    if (driver.name == this.diaprop.userDriver.name) {
+      this.context.strokeStyle = this.bpprop.carclass1.median.color.user.line
     } else {
-      if (driver.car_class_id == this.bpprop.userDriver.car_class_id) {
-        this.context.strokeStyle = this.bpprop.default.median.color.running.line
+      if (driver.car_class_id == this.diaprop.userDriver.car_class_id) {
+        this.context.strokeStyle = this.bpprop.carclass1.median.color.running.line
       } else {
         let carclassProp = this.setBprop_carclass(driver)
         this.context.strokeStyle = carclassProp.median.color.running.line
@@ -984,35 +984,35 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // faster drivers = red / slower name = green / user name = yellow
     if (this.bpprop.options['showFasterSlower'].checked) {
-      if (driver.bpdata.median > this.bpprop.userDriver.bpdata.median) {
-        this.context.strokeStyle = this.bpprop.default.median.color.slower.line
+      if (driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
+        this.context.strokeStyle = this.bpprop.carclass1.median.color.slower.line
       }
-      if (driver.bpdata.median < this.bpprop.userDriver.bpdata.median) {
-        this.context.strokeStyle = this.bpprop.default.median.color.faster.line
+      if (driver.bpdata.median < this.diaprop.userDriver.bpdata.median) {
+        this.context.strokeStyle = this.bpprop.carclass1.median.color.faster.line
       }
-      if (driver.name == this.bpprop.userDriver.name) {
-        this.context.strokeStyle = this.bpprop.default.median.color.user.highlight.line
+      if (driver.name == this.diaprop.userDriver.name) {
+        this.context.strokeStyle = this.bpprop.carclass1.median.color.user.highlight.line
       }
     }
 
     // disc, disq = grey
     if (driver.result_status == "Disconnected" || driver.result_status == "Disqualified") {
-      this.context.strokeStyle = this.bpprop.default.median.color.disc.line
+      this.context.strokeStyle = this.bpprop.carclass1.median.color.disc.line
     }
   }
 
   private setColor_Mean() {
-    this.context.fillStyle = this.bpprop.default.mean.color.line
+    this.context.fillStyle = this.bpprop.carclass1.mean.color.line
   }
 
   private setColor_Whiskers(driver: Driver) {
 
     if (driver.result_status == "Disconnected" || driver.result_status == "Disqualified") {
-      this.context.strokeStyle = this.bpprop.default.whiskers.color.disc.line
-    } else if (driver.name == this.bpprop.userDriver.name) {
-      this.context.strokeStyle = this.bpprop.default.whiskers.color.user.line
-    } else if (driver.car_class_id == this.bpprop.userDriver.car_class_id) {
-      this.context.strokeStyle = this.bpprop.default.whiskers.color.running.line
+      this.context.strokeStyle = this.bpprop.carclass1.whiskers.color.disc.line
+    } else if (driver.name == this.diaprop.userDriver.name) {
+      this.context.strokeStyle = this.bpprop.carclass1.whiskers.color.user.line
+    } else if (driver.car_class_id == this.diaprop.userDriver.car_class_id) {
+      this.context.strokeStyle = this.bpprop.carclass1.whiskers.color.running.line
     } else {
       let carclassProp = this.setBprop_carclass(driver)
       this.context.strokeStyle = carclassProp.whiskers.color.running.line
@@ -1021,7 +1021,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private setColor_Fliers() {
-    this.context.strokeStyle = this.bpprop.default.fliers.color
+    this.context.strokeStyle = this.bpprop.carclass1.fliers.color
   }
 
   private updateDiagram() {
@@ -1036,11 +1036,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private initBpprop() {
 
     // reset bp-width
-    this.bpprop.default.bp.prop.width = 200
+    this.bpprop.carclass1.bp.prop.width = 200
 
     // if multiclass: for each car-class, assign a specific property-object (= color scheme)
     if (this.bpprop.options['showMulticlass'].checked && this.data.metadata.carclasses.length > 1) {
-      let listWithoutUserCarclass = this.data.metadata.carclasses.filter(item => item !== this.bpprop.userDriver.car_class_id)
+      let listWithoutUserCarclass = this.data.metadata.carclasses.filter(item => item !== this.diaprop.userDriver.car_class_id)
       let listOfCarclassProps = [this.bpprop.carclass2, this.bpprop.carclass3, this.bpprop.carclass4, this.bpprop.carclass5]
 
             while (listWithoutUserCarclass.length < listOfCarclassProps.length) {
@@ -1080,7 +1080,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let carClassID: number = 0
 
     for (let i = 0; i < data.drivers.length; i++) {
-      if (data.drivers[i].name == this.bpprop.userDriver.name) {
+      if (data.drivers[i].name == this.diaprop.userDriver.name) {
         carClassID = data.drivers[i].car_class_id
 
       }
@@ -1095,7 +1095,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       case this.bpprop.carclass3.carclass_id: return this.bpprop.carclass3
       case this.bpprop.carclass4.carclass_id: return this.bpprop.carclass4
       case this.bpprop.carclass5.carclass_id: return this.bpprop.carclass5
-      default: return this.bpprop.default
+      default: return this.bpprop.carclass1
     }
   }
 
@@ -1281,10 +1281,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetailTime_content = time_str
 
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.running.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.running.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.running.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.running.detail.bg
 
-    if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
+    if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
       this.labelDetail.nativeElement.style.borderColor = carclassProp.median.color.running.detail.line
       this.labelDetail.nativeElement.style.background = carclassProp.median.color.running.detail.bg
@@ -1292,7 +1292,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     if (this.bpprop.options['showFasterSlower'].checked) {
 
-      let delta = element.driver.bpdata.median - this.bpprop.userDriver.bpdata.median
+      let delta = element.driver.bpdata.median - this.diaprop.userDriver.bpdata.median
 
       if (delta > 0) {
         this.labelDetailTime_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
@@ -1302,17 +1302,17 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         this.labelDetailTime_content = time_str
       }
 
-      if (element.driver.bpdata.median > this.bpprop.userDriver.bpdata.median) {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.slower.detail.line
-        this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.slower.detail.bg
+      if (element.driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.slower.detail.line
+        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.slower.detail.bg
       } else {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.faster.detail.line
-        this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.faster.detail.bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.faster.detail.line
+        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.faster.detail.bg
       }
 
-      if (element.driver.name == this.bpprop.userDriver.name) {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.user.highlight.detail.line
-        this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.user.highlight.detail.bg
+      if (element.driver.name == this.diaprop.userDriver.name) {
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.user.highlight.detail.line
+        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.user.highlight.detail.bg
       }
     }
 
@@ -1335,8 +1335,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetailTime_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.median.color.disc.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.default.median.color.disc.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.disc.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.disc.detail.bg
     this.context.stroke()
 
   }
@@ -1356,11 +1356,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
     this.labelDetailTime_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.mean.color.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.mean.color.detail.bg
 
     if (this.bpprop.options['showFasterSlower'].checked) {
-      let delta = (driver.bpdata.mean - this.bpprop.userDriver.bpdata.mean)
+      let delta = (driver.bpdata.mean - this.diaprop.userDriver.bpdata.mean)
 
       if (delta > 0) {
         this.labelDetailTime_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
@@ -1401,13 +1401,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetailTime_content = time_str
 
-    if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
+    if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
       this.labelDetail.nativeElement.style.borderColor = carclassProp.bp.color.running.detail.line
       this.labelDetail.nativeElement.style.background = carclassProp.bp.color.running.detail.bg
     } else {
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.bp.color.running.detail.line
-      this.labelDetail.nativeElement.style.background = this.bpprop.default.bp.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp.color.running.detail.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp.color.running.detail.bg
     }
 
     this.context.stroke()
@@ -1440,13 +1440,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
     this.labelDetailTime_content = time_str
 
-    if (this.bpprop.options['showMulticlass'].checked && this.bpprop.userDriver.car_class_id != driver.car_class_id) {
+    if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
       this.labelDetail.nativeElement.style.borderColor = carclassProp.whiskers.color.running.line
       this.labelDetail.nativeElement.style.background = carclassProp.whiskers.color.running.detail.bg
     } else {
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.running.line
-      this.labelDetail.nativeElement.style.background = this.bpprop.default.whiskers.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whiskers.color.running.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.whiskers.color.running.detail.bg
     }
 
     this.context.stroke()
@@ -1468,8 +1468,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
     this.labelDetailTime_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.mean.color.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.default.mean.color.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.mean.color.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.mean.color.detail.bg
     this.context.stroke()
 
   }
@@ -1498,8 +1498,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
     this.labelDetailTime_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.whiskers.color.disc.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.default.whiskers.color.disc.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whiskers.color.disc.detail.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.whiskers.color.disc.detail.bg
     this.context.stroke()
   }
 
@@ -1527,8 +1527,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetailTime_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.bp.color.disc.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.default.bp.color.disc.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp.color.disc.line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp.color.disc.bg
 
     this.context.stroke()
   }
@@ -1547,8 +1547,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.labelDetailTime_content = time_str
       this.labelDetailLap_content = lapNr_str
       this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.default.laps.color.detail.line
-      this.labelDetail.nativeElement.style.background = this.bpprop.default.laps.color.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.detail.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.detail.bg
     }
   }
 }
@@ -1567,10 +1567,8 @@ export class BoxplotProperties {
     return BoxplotProperties._instance
   }
 
-  userDriver: Driver
-
-  // default = carclass1
-  default = {
+  // carclass1 as default
+  carclass1 = {
     carclass_id: 0, // calculated
     bp: {
       color: {
