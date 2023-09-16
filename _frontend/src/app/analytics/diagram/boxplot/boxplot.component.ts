@@ -2,6 +2,7 @@ import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, V
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
 import {Subject, takeUntil} from "rxjs";
+import {Account} from "../../../settings/settings.component";
 
 @Component({
   selector: 'app-boxplot',
@@ -33,7 +34,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private data_original: EventData = new EventData()
   private data: EventData = new EventData()
   private bpprop: BoxplotProperties
-  private diaprop: DiagramProperties = new DiagramProperties()
+  private diaprop: DiagramProperties = new DiagramProperties(this.dataService)
   private highlightedDriver: Driver | null
   private highlightedDetailType: DetailType
 
@@ -1026,7 +1027,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private updateDiagram() {
     this.data = this.prepareData(this.data_original)
-    this.diaprop = new DiagramProperties()
+    this.diaprop = new DiagramProperties(this.dataService)
     this.initBpprop()
     this.initDiaprop()
     this.drawSVG_Y_laptimeLabels()
@@ -1324,7 +1325,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let x_pos = element.median.x.end
     let y_pos = element.median.y
     let time = element.driver.bpdata.median
-    let driver = element.driver
 
     x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
     y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
@@ -1457,7 +1457,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let x_pos = element.mean.x
     let y_pos = element.mean.y
     let time = element.driver.bpdata.mean
-    let driver = element.driver
 
     x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
     y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
@@ -2250,6 +2249,11 @@ export class BoxplotProperties {
 }
 
 class DiagramProperties {
+
+  constructor(private dataService: DataService) {
+    this.userDriver = new Driver()
+    this.dataService.mainAcc.pipe().subscribe(driver => this.userDriver.name = driver?.name!)
+  }
 
   calculateLinearFunction(median: number, appHeight: number) {
     let tickSpacing = this.fullTick_spacing

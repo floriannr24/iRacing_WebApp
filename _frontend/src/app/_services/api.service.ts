@@ -72,6 +72,9 @@ export class Event {
 
 export class Driver {
 
+  constructor() {
+  }
+
   name: string | null = ""
   id: number = 0
   finish_position: number | string = 1

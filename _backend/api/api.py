@@ -44,4 +44,4 @@ def getSubsessionInfo(subsession_id: int):
 def getAccountInfo(cust_id: int):
     return Driver(session).get_AccountInfo(cust_id)
 
-getAccountInfo(817320)
+getBoxplotData(63531467)

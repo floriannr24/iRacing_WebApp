@@ -1,4 +1,3 @@
-
 import statistics
 
 import numpy as np
@@ -32,14 +31,8 @@ class Boxplot:
                 "median": None,
                 "carclasses": self.findCarclasses(self.iRacing_results)
             },
-            "drivers": []
+            "drivers": self.addDriverInfo(unique_drivers)
         }
-
-        for driver in unique_drivers:
-            output = self.collectInfo(driver)
-            output = self.deleteInvalidLaptimes(output)
-            output = self.caclulateStatistics(output)
-            dictionary = self.addToDictionary(dictionary, output)
 
         dictionary = self.caclulateTimeframe(dictionary)
         dictionary = self.calculateMedian(dictionary)
@@ -116,9 +109,14 @@ class Boxplot:
             "result_status": self.set_resultStatus(driver_id),
             "laps_completed": self.set_lapsCompleted(list_of_positions),
             "laps": self.set_laps(driver_id),
+            "incidents": self.set_incidents(driver_id),
             "car_class_id": self.set_carClass(driver_id)["id"],
-            "car_class_name": self.set_carClass(driver_id)["name"]
+            "car_class_name": self.set_carClass(driver_id)["name"],
+            "personal_best": self.set_fastestPersonalLap(driver_id),
+            "fastest_lap": self.set_ifDriverSetFastestLapInSession(driver_id)
         }
+
+        print(intDict["laps"])
 
         return intDict
 
@@ -139,7 +137,6 @@ class Boxplot:
         for data in self.iRacing_results["session_results"][2]["results"]:
             if driver_id == data["cust_id"]:
                 return data["reason_out"]
-
 
     def extractLaptimes(self, all_laptimes, raceCompleted):
 
@@ -188,8 +185,7 @@ class Boxplot:
                 if lap_number > 0:
                     lap_time = session_time1 - session_time0
                     session_time0 = session_time1
-                    lap_time = self.convertTimeformatToSeconds(lap_time)
-                    laps.append(lap_time)
+                    laps.append(self.convertTimeformatToSeconds(lap_time))
 
         return laps
 
@@ -197,7 +193,7 @@ class Boxplot:
         output["laps"] = [value for value in output["laps"] if value != -1 if value is not None]
         return output
 
-    def caclulateStatistics(self, output):
+    def caclulateBoxplotData(self, output):
 
         output["bpdata"] = {
             "median": None,
@@ -223,10 +219,6 @@ class Boxplot:
             output["bpdata"]["laps_rndFactors"] = self.calc_lapsRndmFactors(fliers_top, fliers_bottom, output["laps"])
 
         return output
-
-    def addToDictionary(self, dictionary, output):
-        dictionary["drivers"].append(output)
-        return dictionary
 
     def caclulateTimeframe(self, dictionary):
 
@@ -353,3 +345,56 @@ class Boxplot:
         unique_cc_list.sort()
 
         return unique_cc_list
+
+    def addDriverInfo(self, unique_drivers):
+
+        driverArray = []
+
+        for driver in unique_drivers:
+            output = self.collectInfo(driver)
+            #output = self.deleteInvalidLaptimes(output)
+            output = self.caclulateBoxplotData(output)
+            driverArray.append(output)
+
+        return driverArray
+
+    def set_personalBestLap(self, driver_id):
+        pass
+
+    def set_ifDriverSetFastestLapInSession(self, driver_id):
+        return True if self.findUserWithFastestLap(driver_id) else False
+
+    def findUserWithFastestLap(self, driver_id):
+        for driverlap in self.iRacing_lapdata:
+            if driverlap["cust_id"] == driver_id and driverlap["fastest_lap"]:
+                return True
+
+    def set_fastestPersonalLap(self, driver_id):
+        session_time0 = 0
+
+        for i, record in enumerate(self.iRacing_lapdata):
+
+            if record["cust_id"] == driver_id:
+
+                lap_number = record["lap_number"]
+                session_time1 = record["session_time"]
+
+                if lap_number == 0:
+                    session_time0 = record["session_time"]
+
+                if lap_number > 0:
+                    lap_time = session_time1 - session_time0
+                    session_time0 = session_time1
+                    if record["incident"] == False and record["personal_best_lap"] == True:
+                        return self.convertTimeformatToSeconds(lap_time)
+
+    def findFastestLap(self, driver_id):
+        pass
+
+    def set_incidents(self, driver_id):
+        laps = []
+        for i, record in enumerate(self.iRacing_lapdata):
+            if record["cust_id"] == driver_id:
+                laps.append(
+                    {"lap": record["lap_number"] - 1, "incidents": record["incident"], "events": record["lap_events"]})
+        return laps

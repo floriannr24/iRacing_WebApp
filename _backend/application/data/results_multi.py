@@ -1,5 +1,4 @@
 import requests
-from aiohttp import ClientSession
 
 class ResultsMulti:
 
