@@ -1,8 +1,9 @@
 import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
-import {Subject, takeUntil} from "rxjs";
+import {Subject, take, takeUntil} from "rxjs";
 import {Account} from "../../../settings/settings.component";
+import {readableStreamLikeToAsyncGenerator} from "rxjs/internal/util/isReadableStreamLike";
 
 @Component({
   selector: 'app-boxplot',
@@ -30,11 +31,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private appWidth: number
   private appHeight: number
 
+  private cust_id: number
   private data_live: BoxplotElement[]
   private data_original: EventData = new EventData()
   private data: EventData = new EventData()
   private bpprop: BoxplotProperties
-  private diaprop: DiagramProperties = new DiagramProperties(this.dataService)
+  private diaprop: DiagramProperties = new DiagramProperties()
   private highlightedDriver: Driver | null
   private highlightedDetailType: DetailType
 
@@ -52,6 +54,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    // user-id
+    this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.cust_id = acc?.custId!)
+
     // new bpprop
     this.dataService.boxplotProperties.pipe(takeUntil(this.stop$)).subscribe(bpprop => {
       this.bpprop = bpprop
@@ -271,9 +276,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         bpelement.fliers = this.drawFliers(fliers_top, fliers_bottom)
         bpelement.driver = driver
 
-        if (this.bpprop.options['showIndividualLaps'].checked) {
-          bpelement.laps = this.drawLaps(driver.laps, driver)
-        }
+        let subOption_indLaps = this.bpprop.options['showIndividualLaps'].suboptions!
+
+        // if (this.bpprop.options['showIndividualLaps'].checked) {
+        //   bpelement.laps = this.drawLaps(driver)
+        // }
 
         if (this.bpprop.options['showMean'].checked) {
           bpelement.mean = this.drawMean(mean, driver)
@@ -524,28 +531,19 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     return {top: fliersArray_top, bottom: fliersArray_bottom}
   }
 
-  private drawLaps(laps: Array<number>, driver: Driver) {
+  private drawLaps(driver: Driver, subOption?: { [p: string]: { label: string; checked: boolean } }) {
 
     let lapsArray: Array<Lap> = []
+    let lapXY: Lap
 
-    for (const [i, lap] of laps.entries()) {
-      let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
-      let lap_y = this.convertSecondsToPixels(lap) - this.scrollY
-
-      this.context.beginPath()
-
-      if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
-        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-        this.drawLapLabel_R(lap_x, lap_y, DetailType.LAP, lap, i + 1)
-      } else {
-        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+    if (subOption != undefined) {
+      if (subOption["showIncidents"].checked) {
+        this.drawLaps_Incident(driver, bpoption.showIncidents)
       }
-
-      this.context.fillStyle = this.bpprop.carclass1.laps.color.line
-      this.context.fill()
-
-      lapsArray.push({x: lap_x, y: lap_y})
     }
+
+    this.drawLaps_All(driver, lapsArray)
+
     return lapsArray
   }
 
@@ -893,12 +891,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     data = structuredClone(data)
 
-    // set user driver in bpprop
-    data.drivers.forEach(driver => {
-      if (driver.name == this.diaprop.userDriver.name) {
-        this.diaprop.userDriver = driver
+    // set user driver in diaprop
+    for (let i = 0; i < data.drivers.length; i++) {
+      if (this.cust_id == data.drivers[i].id) {
+        this.diaprop.userDriver = data.drivers[i]
       }
-    })
+    }
 
     if (!this.bpprop.options['showMulticlass'].checked) {
       data = this.removeCarClasses(data)
@@ -968,7 +966,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private setColor_Median(driver: Driver) {
 
-    // carclass1 median color
+    // default median color
     this.context.strokeStyle = this.bpprop.carclass1.median.color.running.line
 
     // username
@@ -985,6 +983,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // faster drivers = red / slower name = green / user name = yellow
     if (this.bpprop.options['showFasterSlower'].checked) {
+
       if (driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
         this.context.strokeStyle = this.bpprop.carclass1.median.color.slower.line
       }
@@ -1026,8 +1025,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private updateDiagram() {
+    this.diaprop = new DiagramProperties()
     this.data = this.prepareData(this.data_original)
-    this.diaprop = new DiagramProperties(this.dataService)
     this.initBpprop()
     this.initDiaprop()
     this.drawSVG_Y_laptimeLabels()
@@ -1177,6 +1176,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.diaprop.calculateLinearFunction(this.data.metadata.median, this.appHeight)
     this.diaprop.renderStart.y = this.convertSecondsToPixels(this.data.metadata.timeframe[1])
     this.diaprop.renderEnd.y = this.convertSecondsToPixels(this.data.metadata.timeframe[0])
+    this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(id => this.cust_id = id?.custId!)
+    this.diaprop.userDriver = this.findUserDriver(this.cust_id)
   }
 
   private clearCanvas() {
@@ -1228,7 +1229,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         if (!this._showLabelDetail_lapNr) {
           this.labelDetail.nativeElement.style.padding = "0px 5px 0px 5px"
         }
-
         if (this.highlightedDetailType == DetailType.MEDIAN) {
           this.drawMedianLabel_R(element)
         }
@@ -1546,9 +1546,66 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.labelDetailTime_content = time_str
       this.labelDetailLap_content = lapNr_str
       this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.detail.line
-      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.normal.detail.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.normal.detail.bg
     }
+  }
+
+  private drawLaps_Incident(driver: Driver, showIncidents: bpoption) {
+
+    console.log(driver.laps.entries())
+
+    for (const [i, lap] of driver.laps.entries()) {
+      let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
+      let lap_y = this.convertSecondsToPixels(lap) - this.scrollY
+
+      this.context.beginPath()
+
+      // if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+      //   this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+      //   this.drawLapLabel_R(lap_x, lap_y, DetailType.LAP, lap, i + 1)
+      // } else {
+        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+      // }
+
+      this.context.fillStyle = this.bpprop.carclass1.laps.color.normal.line
+      this.context.fill()
+
+      return {x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: false}
+    }
+
+    return {x: null, y: null, fastestPersonal: false, fastestOverall: false, incident: false}
+  }
+
+  private drawLaps_All(driver: Driver, lapsArray: Array<Lap>) {
+
+    for (const [i, lap] of driver.laps.entries()) {
+      let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
+      let lap_y = this.convertSecondsToPixels(lap) - this.scrollY
+
+      this.context.beginPath()
+
+      if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+        this.drawLapLabel_R(lap_x, lap_y, DetailType.LAP, lap, i + 1)
+      } else {
+        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+      }
+
+      this.context.fillStyle = this.bpprop.carclass1.laps.color.normal.line
+      this.context.fill()
+
+      lapsArray.push({x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: false})
+    }
+  }
+
+  private findUserDriver(id: number) {
+    for (let i = 0; i < this.data_original.drivers.length; i++) {
+      if (id == this.data_original.drivers[i].id) {
+        return this.data_original.drivers[i]
+      }
+    }
+    return new Driver()
   }
 }
 
@@ -1713,11 +1770,28 @@ export class BoxplotProperties {
     },
     laps: {
       color: {
-        line: "#fffb00",
-        detail: {
+        normal: {
           line: "#fffb00",
-          bg: "#4d4900"
-        }
+          detail: {
+            line: "#fffb00",
+            bg: "#4d4900"
+          }
+
+        },
+        fastest: {
+          line: "#f700ff",
+          detail: {
+            line: "#fffb00",
+            bg: "#4d4900"
+          }
+        },
+        incident: {
+          line: "#ff7300",
+          detail: {
+            line: "#fffb00",
+            bg: "#4d4900"
+          }
+        },
       },
       prop: {
         radius_DEFAULT: 2,
@@ -2239,33 +2313,29 @@ export class BoxplotProperties {
 
   options: Option_BP = {
     showDiscDisq: {label: "Show disconnected / disqualified drivers", checked: false},
-    showIndividualLaps: {label: "Show individual laps", checked: false},
+    showIndividualLaps: {label: "Show individual laps", checked: false, suboptions: {
+        showFastestLapOverall: {"label": "Overall fastest lap //", checked: false},
+        showAllFastestLaps: {"label": "Fastest lap per driver // OR", checked: false},
+        showIncidents: {"label": "Laps with incidents", checked: false}
+      }},
     showMean: {label: "Show mean", checked: false},
     showFasterSlower: {label: "Highlight faster / slower drivers", checked: false},
     showMulticlass: {label: "Show all car classes", checked: false},
     sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false}
-
   }
 }
 
 class DiagramProperties {
 
-  constructor(private dataService: DataService) {
-    this.userDriver = new Driver()
-    this.dataService.mainAcc.pipe().subscribe(driver => this.userDriver.name = driver?.name!)
-  }
-
   calculateLinearFunction(median: number, appHeight: number) {
-    let tickSpacing = this.fullTick_spacing
-
     let x1 = median
     let y1 = appHeight / 2
 
-    this.lineafunction_m = -tickSpacing
-    this.linearfunction_t = y1 - (-tickSpacing * x1)
+    this.lineafunction_m = -this.fullTick_spacing
+    this.linearfunction_t = y1 - (-this.fullTick_spacing * x1)
   }
 
-  userDriver: Driver
+  userDriver: Driver = new Driver()
 
   lineafunction_m: number // calculated
   linearfunction_t: number // calculated
@@ -2376,6 +2446,10 @@ interface Fliers {
 interface Lap {
   x: number
   y: number
+  fastestPersonal: boolean
+  fastestOverall: boolean
+  incident: boolean
+
 }
 
 enum DetailType {
@@ -2389,18 +2463,25 @@ enum DetailType {
 }
 
 export interface Option_BP {
-  [type: string]: {label: string, checked: boolean}
+  [type: string]: {label: string, checked: boolean,
+    suboptions?:
+      {[type: string]: {label: string, checked: boolean}}
+  }
+}
+
+export enum bpoption {
+  showDiscDisq,
+  showIndividualLaps ,
+  showFastestLapOverall,
+  showAllFastestLaps,
+  showIncidents,
+  showMean,
+  showFasterSlower,
+  showMulticlass,
+  sortBySpeed
 }
 
 interface xy {
   x: number
   y: number
 }
-
-
-
-
-
-
-
-

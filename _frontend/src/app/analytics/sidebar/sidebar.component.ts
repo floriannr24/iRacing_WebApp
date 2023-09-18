@@ -2,7 +2,7 @@ import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core
 import {DataService} from "../../_services/data.service";
 import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
 import {Subscription} from "rxjs";
-import {LocalstorageService} from "../../_services/localstorage.service";
+import {LocalStorageItem, LocalstorageService} from "../../_services/localstorage.service";
 
 @Component({
   selector: 'app-sidebar',
@@ -19,6 +19,7 @@ export class SidebarComponent implements OnInit, OnDestroy{
   errorTag_text: string
   _showMenu: boolean = false
   _showSettings: boolean = false
+  _showSub: boolean = true
   modes: Mode[] = [
     new Mode(ModeType.Boxplot),
     new Mode(ModeType.Delta),
@@ -31,7 +32,7 @@ export class SidebarComponent implements OnInit, OnDestroy{
 
   ngOnInit() {
     try {
-      this.bpprop = this.localstorageService.load("bpprop")
+      this.bpprop = this.localstorageService.load("")
     } catch (e) {
       this.bpprop = BoxplotProperties.getInstance()
     }
@@ -48,21 +49,42 @@ export class SidebarComponent implements OnInit, OnDestroy{
     this._showMenu = !this._showMenu
   }
 
-  onOptionsChange(id: string, value: boolean, type: string) {
+  onOptionsChange(master: string, value: boolean, type: string) {
     if (type == "opt_bp") {
-      this.setBoxplotProperties(id, value)
+      this.setProperties(master, value)
       this.localstorageService.save("bpprop",this.bpprop)
       this.dataService.changeBpprop(this.bpprop)
     }
   }
 
-  private setBoxplotProperties(optKey: string, value: boolean) {
+  onSubOptionsChange(master: string, sub: string, value: boolean, type: string) {
+    if (type == "opt_bp") {
+      this.setSubProperties(master, sub, value)
+      this.localstorageService.save("bpprop",this.bpprop)
+      this.dataService.changeBpprop(this.bpprop)
+    }
+  }
+
+  private setProperties(optKey: string, value: boolean) {
     for (let bpKey in this.bpprop.options) {
       if (bpKey == optKey) {
         this.bpprop.options[bpKey].checked = value
       }
     }
   }
+
+  private setSubProperties(masterKey:  string, subKey: string, value: boolean) {
+    for (let firstKey in this.bpprop.options) {
+      if (firstKey == masterKey) {
+        for (let secondkey in this.bpprop.options[firstKey].suboptions) {
+          if (secondkey == subKey) {
+            this.bpprop.options[firstKey].suboptions![secondkey].checked = value
+          }
+        }
+      }
+    }
+  }
+
 
   private loadOptionsFromBprop() {
 
@@ -88,6 +110,10 @@ export class SidebarComponent implements OnInit, OnDestroy{
     this.dataService.changeMode(mode)
   }
     protected readonly ModeType = ModeType;
+
+  showSub() {
+    this._showSub = !this._showSub
+  }
 }
 
 export enum ModeType {

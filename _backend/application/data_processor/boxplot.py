@@ -116,8 +116,6 @@ class Boxplot:
             "fastest_lap": self.set_ifDriverSetFastestLapInSession(driver_id)
         }
 
-        print(intDict["laps"])
-
         return intDict
 
     def list_of_positions(self, driver_id):

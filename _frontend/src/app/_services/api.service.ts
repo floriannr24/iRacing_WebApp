@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnDestroy} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable, Subscription} from "rxjs";
 import {DataService} from "./data.service";
@@ -8,7 +8,7 @@ import {Account} from "../settings/settings.component";
   providedIn: 'root'
 })
 
-export class APIService {
+export class APIService implements OnDestroy{
   private custidSubscription: Subscription
   private custId: number
 
@@ -82,8 +82,11 @@ export class Driver {
   result_status: string = "Running"
   laps_completed: number = 10
   laps: number[] = new Array<number>(10)
+  incidents: [{lap: number, incidents: boolean, events: string[]}]
   car_class_id: number = 0
   car_class_name: string = ""
+  personal_best: number
+  fastest_lap: boolean
   bpdata: BoxplotData = new BoxplotData()
 }
 

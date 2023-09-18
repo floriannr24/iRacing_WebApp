@@ -174,50 +174,103 @@ $grid-box-bg: #212b33;
       display: grid;
       grid-template-areas: "column1";
 
-      .column1 {
-        grid-area: column1;
+      .ul-first {
+        list-style-type: none;
+        padding: 0;
+      }
 
-        .cbContainer {
-          margin-top: 4px;
-          padding-top: 4px;
-          padding-bottom: 5px;
-          padding-left: 5px;
-          display: flex;
-          font-size: 11pt;
+      .ul-second {
+        list-style-type: none;
+        padding-left: 20px
+      }
 
-          &:hover {
-            background: #212b33;
-            border-radius: 4px;
-          }
+      .cbContainer_main {
+        margin-top: 4px;
+        padding-top: 4px;
+        padding-bottom: 5px;
+        padding-left: 5px;
+        display: flex;
+        font-size: 11pt;
 
-          &:hover input ~ .checkmark {
-            border-color: #2196f3;
-          }
+        &:hover {
+          background: #212b33;
+          border-radius: 4px;
+        }
 
-          input:checked ~ .checkmark {
-            background-color: #2196F3;
-            border-color: #14568c;
-          }
+        &:hover input ~ .checkmark {
+          border-color: #2196f3;
+        }
 
-          input{
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-          }
+        input:checked ~ .checkmark {
+          background-color: #2196F3;
+          border-color: #14568c;
+        }
 
-          .checkmark {
-            top: 0;
-            left: 0;
-            height: 16px;
-            width: 16px;
-            background-color: rgba(0, 0, 0, 0);
-            margin-right: 5px;
-            border-radius: 3px;
-            border: 2px solid rgba(105, 114, 125, 0.6);
-            box-sizing: border-box;
-          }
+        label {
+          background: rgba(153, 255, 120, 0);
+        }
+      }
+
+      .checkmark {
+        top: 0;
+        left: 0;
+        height: 16px;
+        width: 16px;
+        background-color: rgba(0, 0, 0, 0);
+        margin-right: 5px;
+        border-radius: 3px;
+        border: 2px solid rgba(105, 114, 125, 0.6);
+        box-sizing: border-box;
+      }
+
+      input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+      }
+
+      .cbContainer_sub {
+        margin-top: 4px;
+        padding-top: 4px;
+        padding-bottom: 5px;
+        padding-left: 5px;
+        display: flex;
+        font-size: 11pt;
+
+        &:hover {
+          background: #212b33;
+          border-radius: 4px;
+        }
+
+        &:hover input ~ .checkmark {
+          border-color: #2196f3;
+        }
+
+        input:checked ~ .checkmark {
+          background-color: #2196F3;
+          border-color: #14568c;
+        }
+
+        input{
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+          height: 0;
+          width: 0;
+        }
+
+        .checkmark {
+          top: 0;
+          left: 0;
+          height: 16px;
+          width: 16px;
+          background-color: rgba(0, 0, 0, 0);
+          margin-right: 5px;
+          border-radius: 3px;
+          border: 2px solid rgba(105, 114, 125, 0.6);
+          box-sizing: border-box;
         }
       }
     }
