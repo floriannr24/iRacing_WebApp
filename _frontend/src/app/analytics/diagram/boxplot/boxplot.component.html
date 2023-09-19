@@ -3,9 +3,9 @@
   <canvas class="canvasAxis" #canvasAxis (mousemove)="mouseMove($event)"></canvas>
   <canvas class="canvas" #canvas (mousemove)="mouseMove($event)"></canvas>
   <div class="labelDetail" #labelDetail *ngIf="_showLabelDetail">
-    <div class="LabelDetail_time" #labelDetailTime>{{labelDetailTime_content}}</div>
-    <div class="labelDetail_lap" #labelDetailLap *ngIf="_showLabelDetail_lapNr">
-      <div class="labelDetail_lap_content">{{labelDetailLap_content}}</div>
+    <div class="LabelDetail_time" #labelDetail_time>{{labelDetail_time_content}}</div>
+    <div class="labelDetail_lapBg" #labelDetail_lapBg *ngIf="_showLabelDetail_lapNr">
+      <div class="labelDetail_lapText" #labelDetail_lapText >{{labelDetail_lap_content}}</div>
     </div>
   </div>
 

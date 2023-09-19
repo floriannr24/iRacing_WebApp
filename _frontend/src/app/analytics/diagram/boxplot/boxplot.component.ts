@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
-import {Subject, take, takeUntil} from "rxjs";
+import {ignoreElements, Subject, take, takeUntil} from "rxjs";
 import {Account} from "../../../settings/settings.component";
 import {readableStreamLikeToAsyncGenerator} from "rxjs/internal/util/isReadableStreamLike";
 
@@ -18,11 +18,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
   @ViewChild('svgName') svgName: ElementRef<SVGElement>
   @ViewChild('labelDetail') labelDetail: ElementRef<HTMLDivElement>
-  @ViewChild('labelDetailTime') labelDetailTime: ElementRef<HTMLDivElement>
-  @ViewChild('labelDetailLap') labelDetailLap: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail_time') labelDetail_time: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail_lapBg') labelDetail_lapBg: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail_lapText') labelDetail_lapText: ElementRef<HTMLDivElement>
   label_scale = "1.0"
-  labelDetailTime_content: string
-  labelDetailLap_content: string
+  labelDetail_time_content: string
+  labelDetail_lap_content: string
   _showLabelDetail: boolean = false
   _showLabelDetail_lapNr: boolean = false
   private stop$ = new Subject<void>()
@@ -276,11 +277,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         bpelement.fliers = this.drawFliers(fliers_top, fliers_bottom)
         bpelement.driver = driver
 
-        let subOption_indLaps = this.bpprop.options['showIndividualLaps'].suboptions!
-
-        // if (this.bpprop.options['showIndividualLaps'].checked) {
-        //   bpelement.laps = this.drawLaps(driver)
-        // }
+        bpelement.laps = this.drawLaps(driver)
 
         if (this.bpprop.options['showMean'].checked) {
           bpelement.mean = this.drawMean(mean, driver)
@@ -531,20 +528,22 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     return {top: fliersArray_top, bottom: fliersArray_bottom}
   }
 
-  private drawLaps(driver: Driver, subOption?: { [p: string]: { label: string; checked: boolean } }) {
+  private drawLaps(driver: Driver) {
 
-    let lapsArray: Array<Lap> = []
-    let lapXY: Lap
+    let liveLaps: Array<Lap> = []
+    let subOption = this.bpprop.options['showIndividualLaps'].suboptions!
+
+    if (this.bpprop.options["showIndividualLaps"].checked) {
+      this.drawLaps_All(driver, liveLaps)
+    }
 
     if (subOption != undefined) {
       if (subOption["showIncidents"].checked) {
-        this.drawLaps_Incident(driver, bpoption.showIncidents)
+        this.drawLaps_Incident(driver, liveLaps)
       }
     }
 
-    this.drawLaps_All(driver, lapsArray)
-
-    return lapsArray
+    return liveLaps
   }
 
   private drawSVG_Y_laptimeLabels() {
@@ -787,7 +786,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         let driver = element.driver
 
         //laps
-        if (this.bpprop.options['showIndividualLaps'].checked) {
+        if (this.anyLapOptionChecked()) {
           for (let d = laps.length - 1, lap; lap = laps[d]; d--) {
             if (x_mouse >= (lap.x - this.bpprop.carclass1.laps.prop.radius_HITBOX) && x_mouse <= lap.x + this.bpprop.carclass1.laps.prop.radius_HITBOX && y_mouse >= (lap.y - this.bpprop.carclass1.laps.prop.radius_HITBOX) && y_mouse <= (lap.y + this.bpprop.carclass1.laps.prop.radius_HITBOX)) {
               this.highlightedDriver = this.data.drivers[i]
@@ -1280,7 +1279,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
 
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.running.detail.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.running.detail.bg
@@ -1296,11 +1295,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       let delta = element.driver.bpdata.median - this.diaprop.userDriver.bpdata.median
 
       if (delta > 0) {
-        this.labelDetailTime_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
+        this.labelDetail_time_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
       } else if (delta < 0) {
-        this.labelDetailTime_content = time_str + " (" + delta.toFixed(3).toString() + ")"
+        this.labelDetail_time_content = time_str + " (" + delta.toFixed(3).toString() + ")"
       } else {
-        this.labelDetailTime_content = time_str
+        this.labelDetail_time_content = time_str
       }
 
       if (element.driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
@@ -1334,7 +1333,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.disc.detail.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.disc.detail.bg
     this.context.stroke()
@@ -1355,7 +1354,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.mean.color.detail.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.mean.color.detail.bg
 
@@ -1363,11 +1362,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       let delta = (driver.bpdata.mean - this.diaprop.userDriver.bpdata.mean)
 
       if (delta > 0) {
-        this.labelDetailTime_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
+        this.labelDetail_time_content = time_str + " (" + "+" + delta.toFixed(3).toString() + ")"
       } else if (delta < 0) {
-        this.labelDetailTime_content = time_str + " (" + delta.toFixed(3).toString() + ")"
+        this.labelDetail_time_content = time_str + " (" + delta.toFixed(3).toString() + ")"
       } else {
-        this.labelDetailTime_content = time_str
+        this.labelDetail_time_content = time_str
       }
     }
 
@@ -1399,7 +1398,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
 
     if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
@@ -1438,7 +1437,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
 
     if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
@@ -1466,7 +1465,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.mean.color.detail.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.mean.color.detail.bg
     this.context.stroke()
@@ -1496,7 +1495,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whiskers.color.disc.detail.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.whiskers.color.disc.detail.bg
     this.context.stroke()
@@ -1525,14 +1524,14 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.beginPath()
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
-    this.labelDetailTime_content = time_str
+    this.labelDetail_time_content = time_str
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp.color.disc.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp.color.disc.bg
 
     this.context.stroke()
   }
 
-  private drawLapLabel_R(x_pos: number, y_pos: number, type: number, time: number, lapNr: number) {
+  private drawLapLabel_Incident(x_pos: number, y_pos: number, type: number, time: number, lapNr: number) {
     x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
     y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
 
@@ -1543,51 +1542,54 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     if (type == DetailType.LAP) {
       this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
-      this.labelDetailTime_content = time_str
-      this.labelDetailLap_content = lapNr_str
+      this.labelDetail_time_content = time_str
+      this.labelDetail_lap_content = lapNr_str
       this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.normal.detail.line
-      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.normal.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.incident.detail.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.incident.detail.bg
+      this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.carclass1.laps.color.incident.detail.line
+      this.labelDetail_lapText.nativeElement.style.color = this.bpprop.carclass1.laps.color.incident.detail.bg
     }
   }
 
-  private drawLaps_Incident(driver: Driver, showIncidents: bpoption) {
+  private drawLaps_Incident(driver: Driver, liveLaps: Array<Lap>) {
 
-    console.log(driver.laps.entries())
+    for (const [i, time] of driver.laps.entries()) {
 
-    for (const [i, lap] of driver.laps.entries()) {
-      let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
-      let lap_y = this.convertSecondsToPixels(lap) - this.scrollY
+      if (driver.incidents[i+1].incidents) {
 
-      this.context.beginPath()
+        let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
+        let lap_y = this.convertSecondsToPixels(time) - this.scrollY
 
-      // if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
-      //   this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-      //   this.drawLapLabel_R(lap_x, lap_y, DetailType.LAP, lap, i + 1)
-      // } else {
-        this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
-      // }
+        this.context.beginPath()
 
-      this.context.fillStyle = this.bpprop.carclass1.laps.color.normal.line
-      this.context.fill()
+        if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+          this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+          this.drawLapLabel_Incident(lap_x, lap_y, DetailType.LAP, time, i + 1)
+        } else {
+          this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+        }
 
-      return {x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: false}
+        this.context.fillStyle = this.bpprop.carclass1.laps.color.incident.line
+        this.context.fill()
+
+        liveLaps.push({x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: true})
+
+      }
     }
-
-    return {x: null, y: null, fastestPersonal: false, fastestOverall: false, incident: false}
   }
 
   private drawLaps_All(driver: Driver, lapsArray: Array<Lap>) {
 
-    for (const [i, lap] of driver.laps.entries()) {
+    for (const [i, time] of driver.laps.entries()) {
       let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
-      let lap_y = this.convertSecondsToPixels(lap) - this.scrollY
+      let lap_y = this.convertSecondsToPixels(time) - this.scrollY
 
       this.context.beginPath()
 
       if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
         this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-        this.drawLapLabel_R(lap_x, lap_y, DetailType.LAP, lap, i + 1)
+        this.drawLapLabel_RunningAll(lap_x, lap_y, DetailType.LAP, time, i + 1)
       } else {
         this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
       }
@@ -1607,7 +1609,33 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     return new Driver()
   }
+
+  private drawLapLabel_RunningAll(x_pos: number, y_pos: number, type: DetailType, time: number, lapNr: number) {
+    x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
+    y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
+
+    this.labelDetail.nativeElement.style.top = y_pos + "px"
+
+    let time_str = this.convertTimeFormat(time)
+    let lapNr_str = lapNr.toString()
+
+    if (type == DetailType.LAP) {
+      this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
+      this.labelDetail_time_content = time_str
+      this.labelDetail_lap_content = lapNr_str
+      this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.normal.detail.line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.normal.detail.bg
+      this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.carclass1.laps.color.normal.detail.line
+      this.labelDetail_lapText.nativeElement.style.color = this.bpprop.carclass1.laps.color.normal.detail.bg
+    }
+  }
+
+  private anyLapOptionChecked() {
+    return this.bpprop.options["showIndividualLaps"].checked || this.bpprop.options["showIndividualLaps"].suboptions!["showIncidents"].checked;
+  }
 }
+
 
 export class BoxplotProperties {
 
@@ -1786,10 +1814,10 @@ export class BoxplotProperties {
           }
         },
         incident: {
-          line: "#ff7300",
+          line: "#ff7d16",
           detail: {
-            line: "#fffb00",
-            bg: "#4d4900"
+            line: "#ff7d16",
+            bg: "#4d2607"
           }
         },
       },

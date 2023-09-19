@@ -42,7 +42,7 @@
       background: #1F262E;
     }
 
-    .labelDetail_lap {
+    .labelDetail_lapBg {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -50,11 +50,9 @@
       width: 20px;
       font-weight: bold;
       text-align: center;
-      background: #fffb00;
       margin-left: 5px;
 
-      .labelDetail_lap_content {
-        color: #333000;
+      .labelDetail_lapText {
       }
 
     }
