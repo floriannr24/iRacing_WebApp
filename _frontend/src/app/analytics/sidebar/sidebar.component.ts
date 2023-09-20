@@ -1,6 +1,6 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../_services/data.service";
-import {BoxplotProperties, Option_BP} from "../diagram/boxplot/boxplot.component";
+import {BoxplotProperties, OptionsBoxplot} from "../diagram/boxplot/boxplot.component";
 import {Subscription} from "rxjs";
 import {LocalStorageItem, LocalstorageService} from "../../_services/localstorage.service";
 
@@ -9,12 +9,12 @@ import {LocalStorageItem, LocalstorageService} from "../../_services/localstorag
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
 })
-export class SidebarComponent implements OnInit, OnDestroy{
+export class SidebarComponent implements OnInit, OnDestroy {
 
   @ViewChild('errorTag') errorTag: ElementRef<HTMLDivElement>
   private subscription: Subscription;
   bpprop: BoxplotProperties
-  options: Option_BP
+  options!: OptionsBoxplot
   showError: boolean = false
   errorTag_text: string
   _showMenu: boolean = false
@@ -65,36 +65,38 @@ export class SidebarComponent implements OnInit, OnDestroy{
     }
   }
 
-  private setProperties(optKey: string, value: boolean) {
-    for (let bpKey in this.bpprop.options) {
-      if (bpKey == optKey) {
-        this.bpprop.options[bpKey].checked = value
+  private setProperties(firstKey: string, value: boolean) {
+    for (const [k, v] of Object.entries(this.bpprop.options)) {
+      if (firstKey == k) {
+        v.checked = value
       }
     }
   }
 
-  private setSubProperties(masterKey:  string, subKey: string, value: boolean) {
-    for (let firstKey in this.bpprop.options) {
-      if (firstKey == masterKey) {
-        for (let secondkey in this.bpprop.options[firstKey].suboptions) {
-          if (secondkey == subKey) {
-            this.bpprop.options[firstKey].suboptions![secondkey].checked = value
+  private setSubProperties(firstKey:  string, secondKey: string, value: boolean) {
+
+    for (const [k1,v1] of Object.entries(this.bpprop.options)) {
+      if (firstKey == k1) {
+        for (const [k2,v2] of Object.entries(v1.suboptions!)) {
+          if (secondKey == k2) {
+            v2.checked = value
           }
         }
       }
     }
   }
 
-
   private loadOptionsFromBprop() {
-
-    for (let optKey in this.options) {
-      for (let bpropKey in this.bpprop.options) {
-        if (optKey == bpropKey) {
-          this.options[optKey].checked = this.bpprop.options[bpropKey].checked
-        }
-      }
-    }
+  //   for (const [key, value] of Object.entries(this.options)) {
+  //   }
+  //
+  //   for (let optKey in this.options) {
+  //     for (let bpropKey in this.bpprop.options) {
+  //       if (optKey == bpropKey) {
+  //         this.options[optKey].checked = this.bpprop.options[bpropKey].checked
+  //       }
+  //     }
+  //   }
   }
 
   private initOptions() {
@@ -103,7 +105,6 @@ export class SidebarComponent implements OnInit, OnDestroy{
 
   showDiagramSettings() {
     this._showSettings = !this._showSettings
-
   }
 
   selectMode(mode: Mode) {

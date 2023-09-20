@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
-import {Driver, EventData} from "../../../_services/api.service";
+import {BoxplotData, Driver, EventData} from "../../../_services/api.service";
 import {ignoreElements, Subject, take, takeUntil} from "rxjs";
 import {Account} from "../../../settings/settings.component";
 import {readableStreamLikeToAsyncGenerator} from "rxjs/internal/util/isReadableStreamLike";
@@ -275,9 +275,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         bpelement.Q3 = this.drawBox(q1, q3, driver).Q3
         bpelement.median = this.drawMedian(median, driver)
         bpelement.fliers = this.drawFliers(fliers_top, fliers_bottom)
-        bpelement.driver = driver
-
         bpelement.laps = this.drawLaps(driver)
+        bpelement.driver = driver
 
         if (this.bpprop.options['showMean'].checked) {
           bpelement.mean = this.drawMean(mean, driver)
@@ -337,7 +336,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     //left
     this.context.beginPath()
-    this.context.lineWidth = this.bpprop.carclass1.q1.prop.lineThickness_DEFAULT  / this.scale.x
+    this.context.lineWidth = this.bpprop.carclass1.q1.prop.lineThickness_DEFAULT / this.scale.x
     this.context.moveTo(q1_x_start, q1_y)
     this.context.lineTo(q1_x_start, q3_y)
     this.context.stroke()
@@ -534,13 +533,15 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let subOption = this.bpprop.options['showIndividualLaps'].suboptions!
 
     if (this.bpprop.options["showIndividualLaps"].checked) {
-      this.drawLaps_All(driver, liveLaps)
+      liveLaps = this.drawLaps_All(driver)
     }
 
-    if (subOption != undefined) {
-      if (subOption["showIncidents"].checked) {
-        this.drawLaps_Incident(driver, liveLaps)
-      }
+    if (subOption.showIncidents!.checked) {
+      liveLaps = this.drawLaps_Incident(driver)
+    }
+
+    if (driver.name == "Florian Niedermeier2") {
+      console.log(liveLaps.length)
     }
 
     return liveLaps
@@ -1552,7 +1553,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private drawLaps_Incident(driver: Driver, liveLaps: Array<Lap>) {
+  private drawLaps_Incident(driver: Driver) {
+
+    let liveLaps: Array<Lap> = []
 
     for (const [i, time] of driver.laps.entries()) {
 
@@ -1577,9 +1580,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
       }
     }
+
+    return liveLaps
   }
 
-  private drawLaps_All(driver: Driver, lapsArray: Array<Lap>) {
+  private drawLaps_All(driver: Driver) {
+
+    let liveLaps: Array<Lap> = []
 
     for (const [i, time] of driver.laps.entries()) {
       let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
@@ -1597,8 +1604,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.context.fillStyle = this.bpprop.carclass1.laps.color.normal.line
       this.context.fill()
 
-      lapsArray.push({x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: false})
+      liveLaps.push({x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: false})
     }
+
+    return liveLaps
   }
 
   private findUserDriver(id: number) {
@@ -1632,7 +1641,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private anyLapOptionChecked() {
-    return this.bpprop.options["showIndividualLaps"].checked || this.bpprop.options["showIndividualLaps"].suboptions!["showIncidents"].checked;
+    return this.bpprop.options.showIndividualLaps.checked || this.bpprop.options.showIndividualLaps.suboptions!.showIncidents!.checked;
   }
 }
 
@@ -2339,10 +2348,11 @@ export class BoxplotProperties {
     },
   }
 
-  options: Option_BP = {
-    showDiscDisq: {label: "Show disconnected / disqualified drivers", checked: false},
-    showIndividualLaps: {label: "Show individual laps", checked: false, suboptions: {
-        showFastestLapOverall: {"label": "Overall fastest lap //", checked: false},
+  options: OptionsBoxplot = {
+    showDiscDisq: {checked: false, label: "Show disconnected / disqualified drivers"},
+    showIndividualLaps: {checked: false, label: "Show individual laps",
+      suboptions: {
+        showFastestLapOverall: {label: "Overall fastest lap //", checked: false},
         showAllFastestLaps: {"label": "Fastest lap per driver // OR", checked: false},
         showIncidents: {"label": "Laps with incidents", checked: false}
       }},
@@ -2352,6 +2362,25 @@ export class BoxplotProperties {
     sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false}
   }
 }
+
+export type OptionsBoxplot = Record<OptionName, OptionEntry>
+type OptionName =
+  | "showDiscDisq"
+  | "showIndividualLaps"
+  | "showMean"
+  | "showFasterSlower"
+  | "showMulticlass"
+  | "sortBySpeed"
+
+type SuboptionName =
+  | "showAllFastestLaps"
+  | "showIncidents"
+  | "showFastestLapOverall"
+
+type OptionEntry = {
+  label: string,
+  checked: boolean,
+  suboptions?: Partial<Record<SuboptionName, { label: string, checked: boolean }>> }
 
 class DiagramProperties {
 
@@ -2488,25 +2517,6 @@ enum DetailType {
   WHISKER_BOTTOM,
   Q1,
   Q3
-}
-
-export interface Option_BP {
-  [type: string]: {label: string, checked: boolean,
-    suboptions?:
-      {[type: string]: {label: string, checked: boolean}}
-  }
-}
-
-export enum bpoption {
-  showDiscDisq,
-  showIndividualLaps ,
-  showFastestLapOverall,
-  showAllFastestLaps,
-  showIncidents,
-  showMean,
-  showFasterSlower,
-  showMulticlass,
-  sortBySpeed
 }
 
 interface xy {

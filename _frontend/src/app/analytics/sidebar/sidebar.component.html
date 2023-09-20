@@ -122,24 +122,18 @@
                 <li *ngFor="let sub of opt.value.suboptions | keyvalue">
 
                   <div class="cbContainer_sub">
-                  <input type="checkbox" id={{sub.key}} [checked]="sub.value.checked" #bp_sub (change)="onSubOptionsChange(opt.key, sub.key, bp_sub.checked, 'opt_bp')">
-                  <span class="checkmark"></span><label for={{sub.key}}>{{sub.value.label}}</label>
+                  <input type="checkbox" id={{sub.key}} [checked]="sub.value?.checked" #bp_sub (change)="onSubOptionsChange(opt.key, sub!.key, bp_sub.checked, 'opt_bp')">
+                  <span class="checkmark"></span><label for={{sub.key}}>{{sub.value?.label}}</label>
                   </div>
                 </li>
               </ul>
 
             </li>
+
           </ul>
-
         </div>
-
-
-
-
       </div>
-
     </div>
-
   </div>
 
   <div class="footer" (click)="showDiagramSettings()">
