@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../_services/data.service";
 import {BoxplotProperties, OptionsBoxplot} from "../diagram/boxplot/boxplot.component";
 import {Subscription} from "rxjs";
@@ -52,7 +52,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   onOptionsChange(master: string, value: boolean, type: string) {
     if (type == "opt_bp") {
       this.setProperties(master, value)
-      this.localstorageService.save("bpprop",this.bpprop)
+      this.localstorageService.save(LocalStorageItem.bpprop, this.bpprop)
       this.dataService.changeBpprop(this.bpprop)
     }
   }
@@ -60,7 +60,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   onSubOptionsChange(master: string, sub: string, value: boolean, type: string) {
     if (type == "opt_bp") {
       this.setSubProperties(master, sub, value)
-      this.localstorageService.save("bpprop",this.bpprop)
+      this.localstorageService.save(LocalStorageItem.bpprop, this.bpprop)
       this.dataService.changeBpprop(this.bpprop)
     }
   }

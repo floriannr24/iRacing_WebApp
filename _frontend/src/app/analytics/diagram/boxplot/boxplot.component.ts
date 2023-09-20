@@ -530,9 +530,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private drawLaps(driver: Driver) {
 
     let liveLaps: Array<Lap> = []
-    let subOption = this.bpprop.options['showIndividualLaps'].suboptions!
+    let subOption = this.bpprop.options.showIndividualLaps.suboptions!
 
-    if (this.bpprop.options["showIndividualLaps"].checked) {
+    if (this.bpprop.options.showIndividualLaps.checked) {
       liveLaps = this.drawLaps_All(driver)
     }
 
@@ -723,7 +723,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     driver_finishPosition.setAttribute("font-size", this.diaprop.driverPositionLabel_fontSize + "px")
     driver_finishPosition.setAttribute("text-rendering", "geometricPrecision")
 
-    if (this.bpprop.options["showMulticlass"].checked) {
+    if (this.bpprop.options.showMulticlass.checked) {
       driver_finishPosition.textContent = driver.finish_position.toString()
     } else {
       driver_finishPosition.textContent = driver.finish_position_in_class.toString()
@@ -804,7 +804,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         // mean
-        if (this.bpprop.options['showMean'].checked) {
+        if (this.bpprop.options.showMean.checked) {
           if (x_mouse >= (mean.x - this.bpprop.carclass1.mean.prop.radius_HITBOX) && x_mouse <= (mean.x + this.bpprop.carclass1.mean.prop.radius_HITBOX) && y_mouse >= (mean.y - this.bpprop.carclass1.mean.prop.radius_HITBOX) && y_mouse <= (mean.y + this.bpprop.carclass1.mean.prop.radius_HITBOX)) {
             this.highlightedDriver = this.data.drivers[i]
             this.highlightedDetailType = DetailType.MEAN
@@ -898,15 +898,15 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     }
 
-    if (!this.bpprop.options['showMulticlass'].checked) {
+    if (!this.bpprop.options.showMulticlass.checked) {
       data = this.removeCarClasses(data)
     }
 
-    if(!this.bpprop.options['showDiscDisq'].checked) {
+    if(!this.bpprop.options.showDiscDisq.checked) {
       data = this.removeDiscDisqDrivers(data)
     }
 
-    if(this.bpprop.options['sortBySpeed'].checked) {
+    if(this.bpprop.options.sortBySpeed.checked) {
       data = this.sortByMedian(data)
       data = this.assignNewFinishPosition(data)
     }
@@ -1039,7 +1039,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.bpprop.carclass1.bp.prop.width = 200
 
     // if multiclass: for each car-class, assign a specific property-object (= color scheme)
-    if (this.bpprop.options['showMulticlass'].checked && this.data.metadata.carclasses.length > 1) {
+    if (this.bpprop.options.showMulticlass.checked && this.data.metadata.carclasses.length > 1) {
       let listWithoutUserCarclass = this.data.metadata.carclasses.filter(item => item !== this.diaprop.userDriver.car_class_id)
       let listOfCarclassProps = [this.bpprop.carclass2, this.bpprop.carclass3, this.bpprop.carclass4, this.bpprop.carclass5]
 
@@ -1068,7 +1068,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let data_new = structuredClone(data)
     data_new.drivers = drivers_new
 
-    if (this.bpprop.options["showDiscDisq"].checked) {
+    if (this.bpprop.options.showDiscDisq.checked) {
       return data_new
     } else {
       return this.removeDiscDisqDrivers(data_new)
@@ -1285,13 +1285,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.running.detail.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.running.detail.bg
 
-    if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
+    if (this.bpprop.options.showMulticlass.checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
       this.labelDetail.nativeElement.style.borderColor = carclassProp.median.color.running.detail.line
       this.labelDetail.nativeElement.style.background = carclassProp.median.color.running.detail.bg
     }
 
-    if (this.bpprop.options['showFasterSlower'].checked) {
+    if (this.bpprop.options.showFasterSlower.checked) {
 
       let delta = element.driver.bpdata.median - this.diaprop.userDriver.bpdata.median
 
@@ -1359,7 +1359,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.mean.color.detail.line
     this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.mean.color.detail.bg
 
-    if (this.bpprop.options['showFasterSlower'].checked) {
+    if (this.bpprop.options.showFasterSlower.checked) {
       let delta = (driver.bpdata.mean - this.diaprop.userDriver.bpdata.mean)
 
       if (delta > 0) {
@@ -1401,7 +1401,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetail_time_content = time_str
 
-    if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
+    if (this.bpprop.options.showMulticlass.checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
       this.labelDetail.nativeElement.style.borderColor = carclassProp.bp.color.running.detail.line
       this.labelDetail.nativeElement.style.background = carclassProp.bp.color.running.detail.bg
@@ -1440,7 +1440,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
     this.labelDetail_time_content = time_str
 
-    if (this.bpprop.options['showMulticlass'].checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
+    if (this.bpprop.options.showMulticlass.checked && this.diaprop.userDriver.car_class_id != driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
       this.labelDetail.nativeElement.style.borderColor = carclassProp.whiskers.color.running.line
       this.labelDetail.nativeElement.style.background = carclassProp.whiskers.color.running.detail.bg
