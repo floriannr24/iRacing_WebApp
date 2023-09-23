@@ -529,7 +529,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     let combinedLaps: Array<LapCombined> = this.combineLapInformation(driver)
 
-    let liveLaps: Array<LapLive> = []
+    let liveLaps: Array<LapLive>
     let liveLaps_Inc: Array<LapLive> = []
     let liveLaps_PB: Array<LapLive> = []
     let liveLaps_FO: Array<LapLive> = []
