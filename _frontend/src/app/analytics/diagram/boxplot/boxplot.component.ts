@@ -529,19 +529,31 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private drawLaps(driver: Driver) {
 
-    let liveLaps: Array<Lap> = []
+    let combinedLaps: Array<LapCombined> = this.combineLapInformation(driver)
+
+    let liveLaps: Array<LapLive> = []
+    let liveLaps_All: Array<LapLive> = []
+    let liveLaps_Inc: Array<LapLive> = []
+    let liveLaps_PB: Array<LapLive> = []
+    let liveLaps_FO: Array<LapLive> = []
     let subOption = this.bpprop.options.showIndividualLaps.suboptions!
 
-    if (this.bpprop.options.showIndividualLaps.checked) {
-      liveLaps = this.drawLaps_All(driver)
-    }
-
     if (subOption.showIncidents!.checked) {
-      liveLaps = this.drawLaps_Incident(driver)
+      liveLaps_Inc = this.drawLaps_Incident(driver, combinedLaps)
     }
 
-    if (driver.name == "Florian Niedermeier2") {
-      console.log(liveLaps.length)
+    if (subOption.showPersonalBestLaps!.checked) {
+      liveLaps_PB = this.drawLaps_PB(driver, combinedLaps)
+    }
+
+    if (subOption.showFastestLapOverall!.checked) {
+      liveLaps_FO = this.drawLaps_FO(driver, combinedLaps)
+    }
+
+    liveLaps = [...liveLaps_Inc, ...liveLaps_PB, ...liveLaps_FO]
+
+    if (this.bpprop.options.showIndividualLaps.checked) {
+      liveLaps = this.drawLaps_All(driver, combinedLaps, liveLaps)
     }
 
     return liveLaps
@@ -1553,22 +1565,22 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private drawLaps_Incident(driver: Driver) {
+  private drawLaps_Incident(driver: Driver, combinedLaps: LapCombined[]) {
 
-    let liveLaps: Array<Lap> = []
+    let liveLaps: Array<LapLive> = []
 
-    for (const [i, time] of driver.laps.entries()) {
+    for (let i = 0; i < combinedLaps.length; i++) {
 
-      if (driver.incidents[i+1].incidents) {
+      if (combinedLaps[i].incident) {
 
         let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
-        let lap_y = this.convertSecondsToPixels(time) - this.scrollY
+        let lap_y = this.convertSecondsToPixels(combinedLaps[i].time) - this.scrollY
 
         this.context.beginPath()
 
         if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-          this.drawLapLabel_Incident(lap_x, lap_y, DetailType.LAP, time, i + 1)
+          this.drawLapLabel_Incident(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
         } else {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
         }
@@ -1576,27 +1588,34 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         this.context.fillStyle = this.bpprop.carclass1.laps.color.incident.line
         this.context.fill()
 
-        liveLaps.push({x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: true})
-
+        liveLaps.push({
+          x: lap_x,
+          y: lap_y,
+          lapNr: combinedLaps[i].lapNr,
+          fastestPersonal: combinedLaps[i].fastestPersonal,
+          fastestOverall: combinedLaps[i].fastestOverall,
+          incident: combinedLaps[i].incident}
+        )
       }
     }
-
     return liveLaps
   }
 
-  private drawLaps_All(driver: Driver) {
+  private drawLaps_All(driver: Driver, combinedLaps: LapCombined[], lapsAlreadyDrawn: LapLive[]) {
 
-    let liveLaps: Array<Lap> = []
+    let liveLaps: LapLive[] = []
+    let remainingLapsToDraw: LapCombined[] = this.excludeLaps(combinedLaps, lapsAlreadyDrawn)
 
-    for (const [i, time] of driver.laps.entries()) {
-      let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
-      let lap_y = this.convertSecondsToPixels(time) - this.scrollY
+    for (let i = 0; i < remainingLapsToDraw.length; i++) {
+
+      let lap_x = (this.bpprop.carclass1.bp.prop.middle + remainingLapsToDraw[i].rndFactpr) - this.scrollX
+      let lap_y = this.convertSecondsToPixels(combinedLaps[i].time) - this.scrollY
 
       this.context.beginPath()
 
       if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
         this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-        this.drawLapLabel_RunningAll(lap_x, lap_y, DetailType.LAP, time, i + 1)
+        this.drawLapLabel_RunningAll(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
       } else {
         this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
       }
@@ -1604,7 +1623,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.context.fillStyle = this.bpprop.carclass1.laps.color.normal.line
       this.context.fill()
 
-      liveLaps.push({x: lap_x, y: lap_y, fastestPersonal: false, fastestOverall: false, incident: false})
+      liveLaps.push({
+        x: lap_x,
+        y: lap_y,
+        lapNr: combinedLaps[i].lapNr,
+        fastestPersonal: combinedLaps[i].fastestPersonal,
+        fastestOverall: combinedLaps[i].fastestOverall,
+        incident: combinedLaps[i].incident})
     }
 
     return liveLaps
@@ -1642,6 +1667,124 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private anyLapOptionChecked() {
     return this.bpprop.options.showIndividualLaps.checked || this.bpprop.options.showIndividualLaps.suboptions!.showIncidents!.checked;
+  }
+
+  private combineLapInformation(driver: Driver) {
+    // combines all info about a lap (lapNr, FO, FPB, I) into one object
+
+    let combinedlaps: Array<LapCombined> = []
+
+    for (let i = 0; i < driver.laps.length; i++) {
+      combinedlaps.push({
+        time: driver.laps[i],
+        lapNr: i+1,
+        rndFactpr: driver.bpdata.laps_rndFactors[i],
+        fastestPersonal: driver.laps[i]==driver.personal_best,
+        fastestOverall: (driver.laps[i]==driver.personal_best) && (driver.fastest_lap),
+        incident: driver.incidents[i+1].incidents,
+
+      }
+      )
+    }
+
+    return combinedlaps
+  }
+
+  private drawLaps_PB(driver: Driver, combinedLaps: LapCombined[]) {
+
+    let liveLaps: Array<LapLive> = []
+
+    for (let i = 0; i < combinedLaps.length; i++) {
+
+      if (combinedLaps[i].fastestPersonal) {
+
+        let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
+        let lap_y = this.convertSecondsToPixels(combinedLaps[i].time) - this.scrollY
+
+        this.context.beginPath()
+
+        if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+          this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+          this.drawLapLabel_PB(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
+        } else {
+          this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+        }
+
+        this.context.fillStyle = this.bpprop.carclass1.laps.color.fastest.line
+        this.context.fill()
+
+        liveLaps.push({
+          x: lap_x,
+          y: lap_y,
+          lapNr: combinedLaps[i].lapNr,
+          fastestPersonal: combinedLaps[i].fastestPersonal,
+          fastestOverall: combinedLaps[i].fastestOverall,
+          incident: combinedLaps[i].incident}
+        )
+      }
+    }
+    return liveLaps
+  }
+
+  private drawLaps_FO(driver: Driver, combinedLaps: Array<LapCombined>) {
+
+    let liveLaps: Array<LapLive> = []
+
+    for (let i = 0; i < combinedLaps.length; i++) {
+
+      if (combinedLaps[i].fastestOverall) {
+
+        let lap_x = (this.bpprop.carclass1.bp.prop.middle + driver.bpdata.laps_rndFactors[i]) - this.scrollX
+        let lap_y = this.convertSecondsToPixels(combinedLaps[i].time) - this.scrollY
+
+        this.context.beginPath()
+
+        if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+          this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
+          this.drawLapLabel_FO(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
+        } else {
+          this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
+        }
+
+        this.context.fillStyle = this.bpprop.carclass1.laps.color.incident.line
+        this.context.fill()
+
+        liveLaps.push({
+          x: lap_x,
+          y: lap_y,
+          lapNr: combinedLaps[i].lapNr,
+          fastestPersonal: combinedLaps[i].fastestPersonal,
+          fastestOverall: combinedLaps[i].fastestOverall,
+          incident: combinedLaps[i].incident}
+        )
+      }
+    }
+    return liveLaps
+  }
+
+  private drawLapLabel_FO(lap_x: number, lap_y: number, LAP: DetailType, time: number, lapNr: number) {
+
+  }
+
+  private drawLapLabel_PB(lap_x: number, lap_y: number, LAP: DetailType, time: number, lapNr: number) {
+
+  }
+
+  private combineLaps(liveLaps_Inc: Array<LapLive>, liveLaps_PB: Array<LapLive>, liveLap_FO: Array<LapLive>) {
+  }
+
+  private excludeLaps(combinedLaps: LapCombined[], lapsAlreadyDrawn: LapLive[]) {
+
+    lapsAlreadyDrawn = lapsAlreadyDrawn.sort((a,b) => a.lapNr - b.lapNr)
+
+    for (let c = 0; c < combinedLaps.length; c++) {
+      for (let l = 0; l < lapsAlreadyDrawn.length; l++) {
+        if (combinedLaps[c].lapNr ==  lapsAlreadyDrawn[l].lapNr) {
+          combinedLaps.splice(c, 1)
+        }
+      }
+    }
+    return combinedLaps;
   }
 }
 
@@ -1816,7 +1959,7 @@ export class BoxplotProperties {
 
         },
         fastest: {
-          line: "#f700ff",
+          line: "#f73bff",
           detail: {
             line: "#fffb00",
             bg: "#4d4900"
@@ -2353,7 +2496,7 @@ export class BoxplotProperties {
     showIndividualLaps: {checked: false, label: "Show individual laps",
       suboptions: {
         showFastestLapOverall: {label: "Overall fastest lap //", checked: false},
-        showAllFastestLaps: {"label": "Fastest lap per driver // OR", checked: false},
+        showPersonalBestLaps: {"label": "Fastest lap per driver // OR", checked: false},
         showIncidents: {"label": "Laps with incidents", checked: false}
       }},
     showMean: {label: "Show mean", checked: false},
@@ -2373,7 +2516,7 @@ type OptionName =
   | "sortBySpeed"
 
 type SuboptionName =
-  | "showAllFastestLaps"
+  | "showPersonalBestLaps"
   | "showIncidents"
   | "showFastestLapOverall"
 
@@ -2492,7 +2635,7 @@ class BoxplotElement {
     bottom: Array<Fliers>
   }
 
-  laps: Array<Lap>
+  laps: Array<LapLive>
 }
 
 interface Fliers {
@@ -2500,9 +2643,19 @@ interface Fliers {
   y: number
 }
 
-interface Lap {
+interface LapLive {
   x: number
   y: number
+  lapNr: number
+  fastestPersonal: boolean
+  fastestOverall: boolean
+  incident: boolean
+}
+
+interface LapCombined {
+  time: number
+  lapNr: number
+  rndFactpr: number
   fastestPersonal: boolean
   fastestOverall: boolean
   incident: boolean

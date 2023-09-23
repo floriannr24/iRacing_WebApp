@@ -54,11 +54,11 @@ export class DataService {
   }
 
   private init_bpprop() {
-    try {
-      return this.localStorage.load<any>("bpprop")
-    } catch (e) {
+    // try {
+    //   return this.localStorage.load<any>("bpprop")
+    // } catch (e) {
       return this.loadDefaultBpprop()
-    }
+    // }
   }
 
   private loadDefaultBpprop() {
