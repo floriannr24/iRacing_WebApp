@@ -1,9 +1,7 @@
 import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../../_services/data.service";
-import {BoxplotData, Driver, EventData} from "../../../_services/api.service";
-import {ignoreElements, Subject, take, takeUntil} from "rxjs";
-import {Account} from "../../../settings/settings.component";
-import {readableStreamLikeToAsyncGenerator} from "rxjs/internal/util/isReadableStreamLike";
+import {Driver, EventData} from "../../../_services/api.service";
+import {Subject,takeUntil} from "rxjs";
 
 @Component({
   selector: 'app-boxplot',
@@ -532,7 +530,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let combinedLaps: Array<LapCombined> = this.combineLapInformation(driver)
 
     let liveLaps: Array<LapLive> = []
-    let liveLaps_All: Array<LapLive> = []
     let liveLaps_Inc: Array<LapLive> = []
     let liveLaps_PB: Array<LapLive> = []
     let liveLaps_FO: Array<LapLive> = []
@@ -1768,9 +1765,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private drawLapLabel_PB(lap_x: number, lap_y: number, LAP: DetailType, time: number, lapNr: number) {
 
-  }
-
-  private combineLaps(liveLaps_Inc: Array<LapLive>, liveLaps_PB: Array<LapLive>, liveLap_FO: Array<LapLive>) {
   }
 
   private excludeLaps(combinedLaps: LapCombined[], lapsAlreadyDrawn: LapLive[]) {
