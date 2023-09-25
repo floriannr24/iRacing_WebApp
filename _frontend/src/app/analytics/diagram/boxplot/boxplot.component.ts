@@ -1207,12 +1207,22 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private sortByMedian(data: EventData) {
     data.drivers.sort((a,b) => b.bpdata.median - a.bpdata.median).reverse()
+
+    let nullDrivers: Driver[] = []
+
+    for (let i = 0; i < data.drivers.length; i++) {
+      if (data.drivers[i].bpdata.median == null) {
+         nullDrivers.push(data.drivers.splice(0,1)[0])
+      }
+    }
+
+    data.drivers = [...data.drivers, ...nullDrivers]
     return data
   }
 
   private assignNewFinishPosition(data: EventData) {
 
-    if(this.bpprop.options['showMulticlass'].checked) {
+    if(this.bpprop.options.showMulticlass.checked) {
       for (let i = 0; i < data.drivers.length; i++) {
         let finishPos_orig = data.drivers[i].finish_position
         data.drivers[i].finish_position = i+1 + " (" + finishPos_orig +")"
