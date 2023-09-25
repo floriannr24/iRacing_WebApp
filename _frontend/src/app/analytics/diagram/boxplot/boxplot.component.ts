@@ -47,7 +47,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private startX: number
   private startY: number
   private cameraOffset: xy = {x: 0, y: 0}
-  private highlightedLap: number
+  private highlightedLap: LapHighlighted = {x: null, y: null}
 
   constructor(private app: ElementRef, private dataService: DataService) {
   }
@@ -801,11 +801,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
             if (x_mouse >= (lap.x - this.bpprop.carclass1.laps.prop.radius_HITBOX) && x_mouse <= lap.x + this.bpprop.carclass1.laps.prop.radius_HITBOX && y_mouse >= (lap.y - this.bpprop.carclass1.laps.prop.radius_HITBOX) && y_mouse <= (lap.y + this.bpprop.carclass1.laps.prop.radius_HITBOX)) {
               this.highlightedDriver = this.data.drivers[i]
               this.highlightedDetailType = DetailType.LAP
-              this.highlightedLap = laps[d].y
+              this.highlightedLap = {x: laps[d].x, y:laps[d].y}
               this._showLabelDetail = true
               this._showLabelDetail_lapNr = true
               break outerloop
             } else {
+              this.highlightedLap = {x: null, y: null}
               this._showLabelDetail = false
               this._showLabelDetail_lapNr = false
             }
@@ -869,12 +870,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.Q1
           this._showLabelDetail = true
+          console.log("q1")
           break
         } else {
           this._showLabelDetail = false
         }
       }
-
   }
 
   private initSVGs() {
@@ -1238,6 +1239,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         if (!this._showLabelDetail_lapNr) {
           this.labelDetail.nativeElement.style.padding = "0px 5px 0px 5px"
         }
+
         if (this.highlightedDetailType == DetailType.MEDIAN) {
           this.drawMedianLabel_R(element)
         }
@@ -1250,7 +1252,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.highlightedDetailType == DetailType.WHISKER_TOP || this.highlightedDetailType == DetailType.WHISKER_BOTTOM) {
           this.drawWhiskerLabel_R(element)
         }
-
 
       } else if (this.driverSelected(element.driver) && !this.driverRunning(element.driver)) {
 
@@ -1576,7 +1577,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.context.beginPath()
 
-        if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+        if (this.driverSelected(driver) && this.highlightedLap.x == lap_x && this.highlightedLap.y == lap_y) {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
           this.drawLapLabel_Incident(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
         } else {
@@ -1611,7 +1612,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
       this.context.beginPath()
 
-      if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+      if (this.driverSelected(driver) && this.highlightedLap.x == lap_x && this.highlightedLap.y == lap_y) {
         this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
         this.drawLapLabel_RunningAll(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
       } else {
@@ -1701,7 +1702,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.context.beginPath()
 
-        if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+        if (this.driverSelected(driver) && this.highlightedLap.x == lap_x && this.highlightedLap.y == lap_y) {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
           this.drawLapLabel_PB(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
         } else {
@@ -1737,7 +1738,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.context.beginPath()
 
-        if (this.driverSelected(driver) && this.highlightedLap == lap_y) {
+        if (this.driverSelected(driver) && this.highlightedLap.x == lap_x && this.highlightedLap.y == lap_y) {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
           this.drawLapLabel_FO(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
         } else {
@@ -2670,4 +2671,9 @@ enum DetailType {
 interface xy {
   x: number
   y: number
+}
+
+interface LapHighlighted {
+  x: number | null
+  y: number | null
 }
