@@ -276,7 +276,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         bpelement.laps = this.drawLaps(driver)
         bpelement.driver = driver
 
-        if (this.bpprop.options['showMean'].checked) {
+        if (this.bpprop.options.showMean.checked) {
           bpelement.mean = this.drawMean(mean, driver)
         }
 
@@ -1542,6 +1542,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private drawLapLabel_Incident(x_pos: number, y_pos: number, type: number, time: number, lapNr: number) {
+
     x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
     y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
 
@@ -1629,7 +1630,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         incident: combinedLaps[i].incident})
     }
 
-    return liveLaps
+    return [...liveLaps, ...lapsAlreadyDrawn].sort((a,b) => a.lapNr - b.lapNr)
   }
 
   private findUserDriver(id: number) {
