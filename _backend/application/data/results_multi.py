@@ -12,6 +12,8 @@ class ResultsMulti:
 
         intDict = {}
 
+        print(intDict)
+
         intDict["series_name"] = iRacingData["series_name"]
         intDict["track"] = iRacingData["track"]
         intDict["weather"] = iRacingData["weather"]

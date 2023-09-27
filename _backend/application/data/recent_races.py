@@ -1,6 +1,8 @@
 
 import requests
 
+from _backend.application.sessionbuilder.session_builder import checkAvailability
+
 
 class RecentRaces:
 
@@ -8,6 +10,10 @@ class RecentRaces:
         self.session = session
 
     def get_RecentRaces(self, cust_id):
+
+        response = checkAvailability(self.session)
+        if not response["available"]:
+            return response
 
         data = self.requestRecentRaces(cust_id)
 

@@ -2,13 +2,12 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable, Subscription} from "rxjs";
 import {DataService} from "./data.service";
-import {Account} from "../settings/settings.component";
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class APIService implements OnDestroy{
+export class APIService implements OnDestroy {
   private custidSubscription: Subscription
   private custId: number
 
@@ -71,7 +70,6 @@ export class Event {
 }
 
 export class Driver {
-
   constructor() {
   }
 
@@ -110,7 +108,7 @@ export class EventData {
   constructor() {
     this.metadata = {
       subsession_id: 0,
-      laps_completed: 0,
+      laps: 0,
       timeframe: [70,110],
       median: 90,
       carclasses: [0]
@@ -120,7 +118,7 @@ export class EventData {
 
 export interface Metadata {
     subsession_id: number,
-    laps_completed: number,
+    laps: number,
     timeframe: number[],
     median: number
     carclasses: number[]

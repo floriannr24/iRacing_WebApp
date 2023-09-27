@@ -13,7 +13,8 @@ class SessionBuilder:
 
     def getCredentials(self):
         return json.load(
-            open("C:/Users/FSX-P/IdeaProjects/iRacing_WebApp/_backend/application/sessionbuilder/files/credentials.json"))
+            open(
+                "C:/Users/FSX-P/IdeaProjects/iRacing_WebApp/_backend/application/sessionbuilder/files/credentials.json"))
 
     def encode_pw(self):
         username = self.credentials["email"]
@@ -51,3 +52,22 @@ class SessionBuilder:
         else:
             print('[session_builder] loading saved cookies')
             self.session.cookies.load(cookie_File)
+
+
+def checkAvailability(session):
+
+    response = session.get('https://members-ng.iracing.com/data')
+    responseCode = response.status_code
+
+    if responseCode == 503:
+        return {
+            "available": False,
+            "code": responseCode,
+            "text": response.json()["error"]
+                }
+    else:
+        return {
+            "available": True,
+            "code": "",
+            "text": ""
+        }

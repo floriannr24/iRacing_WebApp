@@ -40,7 +40,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
     this.options = this.initOptions()
     this.dataService.mode.pipe(takeUntil(this.stop$)).subscribe(mode => this.selectedMode = mode)
-    this.laps = this.dataService.analyticsData.pipe(map(aD => aD.metadata.laps_completed))
+    this.laps = this.dataService.analyticsData.pipe(map(aD => aD.metadata.laps))
     this.loadOptionsFromBprop()
   }
 

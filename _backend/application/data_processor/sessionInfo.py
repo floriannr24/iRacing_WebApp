@@ -1,6 +1,8 @@
 import statistics
 from _backend.application.data.results_multi import ResultsMulti
 from _backend.application.data.subsession_Info import SubsessionInfo
+from _backend.application.sessionbuilder.session_builder import checkAvailability
+
 
 class SessionInfo:
 
@@ -11,6 +13,10 @@ class SessionInfo:
         self.iRacing_subsessionInfo = None
 
     def get_SessionInfo_Data(self, subsession_id):
+
+        response = checkAvailability(self.session)
+        if not response["available"]:
+            return response
 
         self.subsession_id = subsession_id
         cust_id = 817320

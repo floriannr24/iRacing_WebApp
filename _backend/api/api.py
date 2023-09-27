@@ -30,7 +30,6 @@ app.add_middleware(
 def getRecentRaces(cust_id: int):
     return RecentRaces(session).get_RecentRaces(cust_id)
 
-
 @app.get("/data/boxplot/{subsession_id}")
 def getBoxplotData(subsession_id: int):
     return Boxplot(session).get_Boxplot_Data(subsession_id)
@@ -44,4 +43,4 @@ def getSubsessionInfo(subsession_id: int):
 def getAccountInfo(cust_id: int):
     return Driver(session).get_AccountInfo(cust_id)
 
-getBoxplotData(63531467)
+# getBoxplotData(63531467)

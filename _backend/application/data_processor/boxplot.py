@@ -1,9 +1,8 @@
 import statistics
-
 import numpy as np
-
 from _backend.application.data.laps_multi import LapsMulti
 from _backend.application.data.results_multi import ResultsMulti
+from _backend.application.sessionbuilder.session_builder import checkAvailability
 
 
 class Boxplot:
@@ -14,6 +13,10 @@ class Boxplot:
         self.iRacing_results = None
 
     def get_Boxplot_Data(self, subsession_id):
+
+        response = checkAvailability(self.session)
+        if not response["available"]:
+            return response
 
         self.subsession_id = subsession_id
 
@@ -26,7 +29,7 @@ class Boxplot:
         dictionary = {
             "metadata": {
                 "subsession_id": self.subsession_id,
-                "laps_completed": [],
+                "laps": self.numberOfLapsInEvent(),
                 "timeframe": [],
                 "median": None,
                 "carclasses": self.findCarclasses(self.iRacing_results)
@@ -396,3 +399,7 @@ class Boxplot:
                 laps.append(
                     {"lap": record["lap_number"] - 1, "incidents": record["incident"], "events": record["lap_events"]})
         return laps
+
+    def numberOfLapsInEvent(self):
+
+        pass
