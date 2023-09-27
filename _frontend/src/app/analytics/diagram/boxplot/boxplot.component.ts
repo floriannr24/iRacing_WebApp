@@ -19,11 +19,16 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild('labelDetail_time') labelDetail_time: ElementRef<HTMLDivElement>
   @ViewChild('labelDetail_lapBg') labelDetail_lapBg: ElementRef<HTMLDivElement>
   @ViewChild('labelDetail_lapText') labelDetail_lapText: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail_incBg') labelDetail_incBg: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail_incText') labelDetail_incText: ElementRef<HTMLDivElement>
+  @ViewChild('labelDetail_inc') labelDetail_inc: ElementRef<HTMLDivElement>
   label_scale = "1.0"
   labelDetail_time_content: string
   labelDetail_lap_content: string
+  labelDetail_inc_content: string
   _showLabelDetail: boolean = false
   _showLabelDetail_lapNr: boolean = false
+  _showLabelDetail_inc: boolean = false
   private stop$ = new Subject<void>()
   private context: CanvasRenderingContext2D | any
   private contextAxis: CanvasRenderingContext2D | any
@@ -48,6 +53,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private startY: number
   private cameraOffset: xy = {x: 0, y: 0}
   private highlightedLap: LapHighlighted = {x: null, y: null}
+
 
   constructor(private app: ElementRef, private dataService: DataService) {
   }
@@ -553,6 +559,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       liveLaps = this.drawLaps_All(driver, combinedLaps, liveLaps)
     }
 
+
+
     return liveLaps
   }
 
@@ -804,11 +812,15 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
               this.highlightedLap = {x: laps[d].x, y:laps[d].y}
               this._showLabelDetail = true
               this._showLabelDetail_lapNr = true
+              if (laps[d].incident && this.bpprop.options.showIndividualLaps.suboptions?.showIncidents?.checked) {
+                this._showLabelDetail_inc = true
+              }
               break outerloop
             } else {
               this.highlightedLap = {x: null, y: null}
               this._showLabelDetail = false
               this._showLabelDetail_lapNr = false
+              this._showLabelDetail_inc = false
             }
           }
         }
@@ -870,7 +882,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
           this.highlightedDriver = this.data.drivers[i]
           this.highlightedDetailType = DetailType.Q1
           this._showLabelDetail = true
-          console.log("q1")
           break
         } else {
           this._showLabelDetail = false
@@ -1552,17 +1563,21 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.context.stroke()
   }
 
-  private drawLapLabel_Incident(x_pos: number, y_pos: number, type: number, time: number, lapNr: number) {
+  private drawLapLabel_Incident(x_pos: number, y_pos: number, type: number, time: number, lapNr: number, incEvents: Array<string>) {
 
     x_pos = x_pos * this.scale.x + 150 + this.cameraOffset.x
     y_pos = y_pos * this.scale.y - 15 + this.cameraOffset.y
 
     this.labelDetail.nativeElement.style.top = y_pos + "px"
+    this.labelDetail_inc.nativeElement.style.top = y_pos + "px"
 
     let time_str = this.convertTimeFormat(time)
     let lapNr_str = lapNr.toString()
+    let incEvents_str = this.buildIncEventsString(incEvents)
 
     if (type == DetailType.LAP) {
+
+      //main incident label styling
       this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
       this.labelDetail_time_content = time_str
       this.labelDetail_lap_content = lapNr_str
@@ -1571,6 +1586,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.incident.detail.bg
       this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.carclass1.laps.color.incident.detail.line
       this.labelDetail_lapText.nativeElement.style.color = this.bpprop.carclass1.laps.color.incident.detail.bg
+
+      //incident events label styling
+      this.labelDetail_inc_content = incEvents_str
+      this.labelDetail_inc.nativeElement.style.left = x_pos + 80 + this.diaprop.laptime_detail_dot_gap + "px"
+      this.labelDetail_inc.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.incident.detail.line
+      this.labelDetail_inc.nativeElement.style.background = this.bpprop.carclass1.laps.color.incident.detail.bg
     }
   }
 
@@ -1589,7 +1610,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         if (this.driverSelected(driver) && this.highlightedLap.x == lap_x && this.highlightedLap.y == lap_y) {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-          this.drawLapLabel_Incident(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
+          this.drawLapLabel_Incident(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr, combinedLaps[i].incidentEvents)
         } else {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
         }
@@ -1675,7 +1696,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private anyLapOptionChecked() {
-    return this.bpprop.options.showIndividualLaps.checked || this.bpprop.options.showIndividualLaps.suboptions!.showIncidents!.checked;
+
+    let optionLaps = this.bpprop.options.showIndividualLaps
+
+    return optionLaps.checked ||
+      optionLaps.suboptions?.showIncidents?.checked ||
+      optionLaps.suboptions?.showPersonalBestLaps?.checked ||
+      optionLaps.suboptions?.showFastestLapOverall?.checked
   }
 
   private combineLapInformation(driver: Driver) {
@@ -1691,7 +1718,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         fastestPersonal: driver.laps[i]==driver.personal_best,
         fastestOverall: (driver.laps[i]==driver.personal_best) && (driver.fastest_lap),
         incident: driver.incidents[i+1].incidents,
-
+        incidentEvents: driver.incidents[i+1].events,
       }
       )
     }
@@ -1714,7 +1741,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         if (this.driverSelected(driver) && this.highlightedLap.x == lap_x && this.highlightedLap.y == lap_y) {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-          this.drawLapLabel_PB(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
+          this.drawLapLabel_Fastest(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
         } else {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
         }
@@ -1750,12 +1777,12 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
         if (this.driverSelected(driver) && this.highlightedLap.x == lap_x && this.highlightedLap.y == lap_y) {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_SELECT, 0, (Math.PI / 180) * 360)
-          this.drawLapLabel_FO(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
+          this.drawLapLabel_Fastest(lap_x, lap_y, DetailType.LAP, combinedLaps[i].time, combinedLaps[i].lapNr)
         } else {
           this.context.arc(lap_x, lap_y, this.bpprop.carclass1.laps.prop.radius_DEFAULT, 0, (Math.PI / 180) * 360)
         }
 
-        this.context.fillStyle = this.bpprop.carclass1.laps.color.incident.line
+        this.context.fillStyle = this.bpprop.carclass1.laps.color.fastest.line
         this.context.fill()
 
         liveLaps.push({
@@ -1771,12 +1798,25 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     return liveLaps
   }
 
-  private drawLapLabel_FO(lap_x: number, lap_y: number, LAP: DetailType, time: number, lapNr: number) {
+  private drawLapLabel_Fastest(lap_x: number, lap_y: number, type: DetailType, time: number, lapNr: number) {
+      lap_x = lap_x * this.scale.x + 150 + this.cameraOffset.x
+      lap_y = lap_y * this.scale.y - 15 + this.cameraOffset.y
 
-  }
+      this.labelDetail.nativeElement.style.top = lap_y + "px"
 
-  private drawLapLabel_PB(lap_x: number, lap_y: number, LAP: DetailType, time: number, lapNr: number) {
+      let time_str = this.convertTimeFormat(time)
+      let lapNr_str = lapNr.toString()
 
+      if (type == DetailType.LAP) {
+        this.labelDetail.nativeElement.style.left = lap_x + this.diaprop.laptime_detail_dot_gap + "px"
+        this.labelDetail_time_content = time_str
+        this.labelDetail_lap_content = lapNr_str
+        this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps.color.fastest.detail.line
+        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps.color.fastest.detail.bg
+        this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.carclass1.laps.color.fastest.detail.line
+        this.labelDetail_lapText.nativeElement.style.color = this.bpprop.carclass1.laps.color.fastest.detail.bg
+      }
   }
 
   private excludeLaps(combinedLaps: LapCombined[], lapsAlreadyDrawn: LapLive[]) {
@@ -1791,6 +1831,20 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     }
     return combinedLaps;
+  }
+
+  private buildIncEventsString(incEvents: Array<string>) {
+
+    let string = ""
+
+    for (let i = 0; i < incEvents.length; i++) {
+      string = string + incEvents[i]
+      if (i != incEvents.length-1) {
+        string = string + ", "
+      }
+    }
+
+    return string
   }
 }
 
@@ -1967,8 +2021,8 @@ export class BoxplotProperties {
         fastest: {
           line: "#f73bff",
           detail: {
-            line: "#fffb00",
-            bg: "#4d4900"
+            line: "#f73bff",
+            bg: "#4b124d"
           }
         },
         incident: {
@@ -2501,14 +2555,15 @@ export class BoxplotProperties {
     showDiscDisq: {checked: false, label: "Show disconnected / disqualified drivers"},
     showIndividualLaps: {checked: false, label: "Show individual laps",
       suboptions: {
-        showFastestLapOverall: {label: "Overall fastest lap //", checked: false},
-        showPersonalBestLaps: {"label": "Fastest lap per driver // OR", checked: false},
+        showFastestLapOverall: {label: "Fastest overall //", checked: false},
+        showPersonalBestLaps: {"label": "Personal best // OR", checked: false},
         showIncidents: {"label": "Laps with incidents", checked: false}
       }},
     showMean: {label: "Show mean", checked: false},
     showFasterSlower: {label: "Highlight faster / slower drivers", checked: false},
     showMulticlass: {label: "Show all car classes", checked: false},
     sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false}
+
   }
 }
 
@@ -2665,6 +2720,7 @@ interface LapCombined {
   fastestPersonal: boolean
   fastestOverall: boolean
   incident: boolean
+  incidentEvents: Array<string>
 
 }
 

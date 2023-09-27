@@ -59,6 +59,21 @@
 
   }
 
+  .labelDetail_inc {
+    display: flex;
+    position: absolute;
+    color: #FFFFFF;
+    border-radius: 6px;
+    border-style: solid;
+    border-width: 2px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.68);
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    padding: 0 5px 0 15px;
+    overflow: hidden;
+  }
+
   .label_zoom {
     position: absolute;
     z-index: 2;

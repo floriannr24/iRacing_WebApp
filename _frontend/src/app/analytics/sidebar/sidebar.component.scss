@@ -41,7 +41,7 @@ $grid-box-bg: #212b33;
             "time     time    time     sof     sof"
             "series   series  series  series  series"
             "track    track   track   track   track"
-            "start    finish  finish  finish  finish";
+            "start    finish  laps  laps  laps";
 
           grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
           font-size: 10pt;
@@ -93,6 +93,15 @@ $grid-box-bg: #212b33;
               margin-left: 2px;
             }
 
+          }
+
+          .laps {
+            grid-area: laps;
+            margin-left: 18px;
+
+            span {
+              margin-left: 2px;
+            }
           }
         }
       }

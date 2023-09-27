@@ -1,8 +1,9 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../_services/data.service";
 import {BoxplotProperties, OptionsBoxplot} from "../diagram/boxplot/boxplot.component";
-import {Subscription} from "rxjs";
+import {map, Observable, Subject, Subscription, takeUntil} from "rxjs";
 import {LocalStorageItem, LocalstorageService} from "../../_services/localstorage.service";
+import {EventData} from "../../_services/api.service";
 
 @Component({
   selector: 'app-sidebar',
@@ -12,7 +13,7 @@ import {LocalStorageItem, LocalstorageService} from "../../_services/localstorag
 export class SidebarComponent implements OnInit, OnDestroy {
 
   @ViewChild('errorTag') errorTag: ElementRef<HTMLDivElement>
-  private subscription: Subscription;
+  stop$ = new Subject<void>()
   bpprop: BoxplotProperties
   options!: OptionsBoxplot
   showError: boolean = false
@@ -26,6 +27,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     new Mode(ModeType.Positions)
   ]
   selectedMode: Mode
+  laps: Observable<number>;
 
   constructor(public dataService: DataService, private localstorageService: LocalstorageService) {
   }
@@ -37,12 +39,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.bpprop = BoxplotProperties.getInstance()
     }
     this.options = this.initOptions()
-    this.subscription = this.dataService.mode.subscribe(mode => this.selectedMode = mode)
+    this.dataService.mode.pipe(takeUntil(this.stop$)).subscribe(mode => this.selectedMode = mode)
+    this.laps = this.dataService.analyticsData.pipe(map(aD => aD.metadata.laps_completed))
     this.loadOptionsFromBprop()
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe()
+    this.stop$.next()
+    this.stop$.complete()
   }
 
   showMenu() {

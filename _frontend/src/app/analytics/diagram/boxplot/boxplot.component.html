@@ -2,12 +2,18 @@
   <svg class="svgTime" #svgTime></svg>
   <canvas class="canvasAxis" #canvasAxis (mousemove)="mouseMove($event)"></canvas>
   <canvas class="canvas" #canvas (mousemove)="mouseMove($event)"></canvas>
+
+  <div class="labelDetail_inc" #labelDetail_inc *ngIf="_showLabelDetail_inc">
+    <div class="labelDetail_incText" #labelDetail_incText >{{labelDetail_inc_content}}</div>
+  </div>
+
   <div class="labelDetail" #labelDetail *ngIf="_showLabelDetail">
     <div class="LabelDetail_time" #labelDetail_time>{{labelDetail_time_content}}</div>
     <div class="labelDetail_lapBg" #labelDetail_lapBg *ngIf="_showLabelDetail_lapNr">
       <div class="labelDetail_lapText" #labelDetail_lapText >{{labelDetail_lap_content}}</div>
     </div>
   </div>
+
 
   <div class="label_zoom">{{label_scale}}x</div>
   <svg class="svgName" #svgName></svg>
