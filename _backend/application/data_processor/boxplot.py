@@ -31,7 +31,7 @@ class Boxplot:
         dictionary = {
             "metadata": {
                 "subsession_id": self.subsession_id,
-                "laps": self.numberOfLapsInEvent(),
+                "laps": None,
                 "timeframe": [],
                 "median": None,
                 "carclasses": self.findCarclasses(self.iRacing_results)
@@ -43,6 +43,7 @@ class Boxplot:
         dictionary = self.calculateMedian(dictionary)
         dictionary = self.sortDictionary(dictionary)
         dictionary = self.removePositionsForDiscDisq(dictionary)
+        dictionary = self.numberOfLapsInEvent(dictionary)
 
         return {
             "response": response1["response"],
@@ -405,6 +406,19 @@ class Boxplot:
                     {"lap": record["lap_number"] - 1, "incidents": record["incident"], "events": record["lap_events"]})
         return laps
 
-    def numberOfLapsInEvent(self):
+    def numberOfLapsInEvent(self, dict):
+        # depends on class
 
-        pass
+        dict["metadata"]["laps"] = {}
+        carclasses = dict["metadata"]["carclasses"]
+
+        for cclass in carclasses:
+            cclass_laps = self.lapsOfCarclass(cclass, dict)
+            dict["metadata"]["laps"][str(cclass)] = cclass_laps
+
+        return dict
+
+    def lapsOfCarclass(self, cclass, dict):
+        for driver in dict["drivers"]:
+            if driver["car_class_id"] == cclass and driver["finish_position_in_class"] == 1:
+                return len(driver["laps"])
