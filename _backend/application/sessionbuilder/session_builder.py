@@ -54,20 +54,5 @@ class SessionBuilder:
             self.session.cookies.load(cookie_File)
 
 
-def checkAvailability(session):
-
-    response = session.get('https://members-ng.iracing.com/data')
-    responseCode = response.status_code
-
-    if responseCode == 503:
-        return {
-            "available": False,
-            "code": responseCode,
-            "text": response.json()["error"]
-                }
-    else:
-        return {
-            "available": True,
-            "code": "",
-            "text": ""
-        }
+def responseIsValid(response):
+    return response.status_code == 200

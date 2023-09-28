@@ -1,7 +1,7 @@
 import statistics
-from _backend.application.data.results_multi import ResultsMulti
-from _backend.application.data.subsession_Info import SubsessionInfo
-from _backend.application.sessionbuilder.session_builder import checkAvailability
+from _backend.application.data.results_multi import requestResultsMulti
+from _backend.application.data.subsession_Info import requestSessionInfo
+from _backend.application.sessionbuilder.session_builder import responseIsValid
 
 
 class SessionInfo:
@@ -14,15 +14,17 @@ class SessionInfo:
 
     def get_SessionInfo_Data(self, subsession_id):
 
-        response = checkAvailability(self.session)
-        if not response["available"]:
-            return response
-
         self.subsession_id = subsession_id
         cust_id = 817320
 
-        self.iRacing_results = ResultsMulti().requestResultsMulti(self.subsession_id, self.session)
-        self.iRacing_subsessionInfo = SubsessionInfo().requestSessionInfo(self.subsession_id, self.session)
+        response1 = requestResultsMulti(self.subsession_id, self.session)
+        response2 = requestSessionInfo(self.subsession_id, self.session)
+
+        if not responseIsValid(response1["response"]):
+            return response1
+
+        self.iRacing_results = response1["data"]
+        self.iRacing_subsessionInfo = response2["data"]
 
         exportDict = {
             "session_start_time": self.get_session_start_time(),
@@ -35,7 +37,10 @@ class SessionInfo:
             "track_name": self.get_track_name()
         }
 
-        return exportDict
+        return {
+            "response": response1["response"],
+            "data": exportDict
+        }
 
     def get_finish_position(self, cust_id):
         for data in self.iRacing_results["session_results"][2]["results"]:

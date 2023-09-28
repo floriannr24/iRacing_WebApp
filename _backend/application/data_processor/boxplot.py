@@ -1,9 +1,8 @@
 import statistics
 import numpy as np
-from _backend.application.data.laps_multi import LapsMulti
-from _backend.application.data.results_multi import ResultsMulti
-from _backend.application.sessionbuilder.session_builder import checkAvailability
-
+from _backend.application.data.laps_multi import requestLapsMulti
+from _backend.application.data.results_multi import requestResultsMulti
+from _backend.application.sessionbuilder.session_builder import responseIsValid
 
 class Boxplot:
     def __init__(self, session):
@@ -14,15 +13,18 @@ class Boxplot:
 
     def get_Boxplot_Data(self, subsession_id):
 
-        response = checkAvailability(self.session)
-        if not response["available"]:
-            return response
-
         self.subsession_id = subsession_id
 
         # get session application.data from iRacingAPI
-        self.iRacing_lapdata = LapsMulti().requestLapsMulti(self.subsession_id, self.session)
-        self.iRacing_results = ResultsMulti().requestResultsMulti(self.subsession_id, self.session)
+        response1 = requestLapsMulti(self.subsession_id, self.session)
+        response2 = requestResultsMulti(self.subsession_id, self.session)
+
+        # abort action if response is not 200
+        if not responseIsValid(response1["response"]):
+            return response1
+
+        self.iRacing_lapdata = response1["data"]
+        self.iRacing_results = response2["data"]
 
         unique_drivers = self.findUniqueDrivers(self.iRacing_lapdata)
 
@@ -42,7 +44,10 @@ class Boxplot:
         dictionary = self.sortDictionary(dictionary)
         dictionary = self.removePositionsForDiscDisq(dictionary)
 
-        return dictionary
+        return {
+            "response": response1["response"],
+            "data": dictionary
+        }
 
     def searchUsersCarClass(self, id):
 
@@ -353,7 +358,7 @@ class Boxplot:
 
         for driver in unique_drivers:
             output = self.collectInfo(driver)
-            #output = self.deleteInvalidLaptimes(output)
+            # output = self.deleteInvalidLaptimes(output)
             output = self.caclulateBoxplotData(output)
             driverArray.append(output)
 

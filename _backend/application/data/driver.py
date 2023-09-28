@@ -1,6 +1,6 @@
 import requests
 
-from _backend.application.sessionbuilder.session_builder import checkAvailability
+from _backend.application.sessionbuilder.session_builder import responseIsValid
 
 
 class Driver:
@@ -16,20 +16,14 @@ class Driver:
         response = requests.get(response["link"])
         response = response.json()[0]
 
-        print(response)
-
         self.cust_id = response["cust_id"]
         self.licenses = response["licenses"]
 
     def get_AccountInfo(self, cust_id):
 
-        response = checkAvailability(self.session)
-        if not response["available"]:
-            return response
-
-        response = self.session.get('https://members-ng.iracing.com/data/member/get', params={"cust_ids": cust_id})
-        response = response.json()
-        response = requests.get(response["link"])
-        response = response.json()
-        return response["members"][0]["display_name"]
+        data = self.session.get('https://members-ng.iracing.com/data/member/get', params={"cust_ids": cust_id})
+        data = data.json()
+        data = data.get(data["link"])
+        data = data.json()
+        return data["members"][0]["display_name"]
 

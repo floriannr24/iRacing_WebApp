@@ -1,11 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status, Response
 from fastapi.middleware.cors import CORSMiddleware
-
 from _backend.application.data.driver import Driver
 from _backend.application.data.recent_races import RecentRaces
 from _backend.application.data_processor.boxplot import Boxplot
 from _backend.application.data_processor.sessionInfo import SessionInfo
-from _backend.application.sessionbuilder.session_builder import SessionBuilder
+from _backend.application.sessionbuilder.session_builder import SessionBuilder, responseIsValid
 
 app = FastAPI()
 
@@ -26,20 +25,34 @@ app.add_middleware(
 )
 
 
-@app.get("/data/recentRaces/{cust_id}")
-def getRecentRaces(cust_id: int):
+@app.get("/data/recentRaces/{cust_id}", status_code=status.HTTP_200_OK)
+def getRecentRaces(cust_id: int, response: Response):
     return RecentRaces(session).get_RecentRaces(cust_id)
 
-@app.get("/data/boxplot/{subsession_id}")
-def getBoxplotData(subsession_id: int):
-    return Boxplot(session).get_Boxplot_Data(subsession_id)
+
+@app.get("/data/boxplot/{subsession_id}", status_code=status.HTTP_200_OK)
+def getBoxplotData(subsession_id: int, response: Response):
+    responseData = Boxplot(session).get_Boxplot_Data(subsession_id)
+
+    if responseIsValid(responseData["response"]):
+        return responseData["data"]
+    else:
+        response.status_code = responseData["response"].status_code
+        return
 
 
-@app.get("/data/subsessionInfo/{subsession_id}")
-def getSubsessionInfo(subsession_id: int):
-    return SessionInfo(session).get_SessionInfo_Data(subsession_id)
+@app.get("/data/subsessionInfo/{subsession_id}", status_code=status.HTTP_200_OK)
+def getSubsessionInfo(subsession_id: int, response: Response):
+    responseData = SessionInfo(session).get_SessionInfo_Data(subsession_id)
 
-@app.get("/accountInfo/{cust_id}")
+    if responseIsValid(responseData["response"]):
+        return responseData["data"]
+    else:
+        response.status_code = responseData["response"].status_code
+        return
+
+
+@app.get("/accountInfo/{cust_id}", status_code=status.HTTP_200_OK)
 def getAccountInfo(cust_id: int):
     return Driver(session).get_AccountInfo(cust_id)
 

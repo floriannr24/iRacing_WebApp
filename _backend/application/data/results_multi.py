@@ -1,27 +1,31 @@
 import requests
-
-class ResultsMulti:
-
-    def requestResultsMulti(self, subsession, session):
-
-        # iRacingAPI
-        iRacingData = session.get('https://members-ng.iracing.com/data/results/get',
-                                       params={"subsession_id": subsession, "simsession_number": "0"})
-
-        iRacingData = requests.get(iRacingData.json()["link"]).json()
-
-        intDict = {}
-
-        print(intDict)
-
-        intDict["series_name"] = iRacingData["series_name"]
-        intDict["track"] = iRacingData["track"]
-        intDict["weather"] = iRacingData["weather"]
-        intDict["session_results"] = iRacingData["session_results"]
-
-        iRacingData = intDict
-
-        return iRacingData
+from _backend.application.sessionbuilder.session_builder import responseIsValid
 
 
+def requestResultsMulti(subsession, session):
+    # iRacingAPI
+    response = session.get('https://members-ng.iracing.com/data/results/get',
+                           params={"subsession_id": subsession, "simsession_number": "0"})
 
+    # check if iRacing API is up and subsessionId is valid
+    if not responseIsValid(response):
+        return {
+            "response": response,
+            "data": None
+        }
+
+    iRacingData = requests.get(response.json()["link"]).json()
+
+    intDict = {
+        "series_name": iRacingData["series_name"],
+        "track": iRacingData["track"],
+        "weather": iRacingData["weather"],
+        "session_results": iRacingData["session_results"]
+    }
+
+    iRacingData = intDict
+
+    return {
+        "response": response,
+        "data": iRacingData
+    }
