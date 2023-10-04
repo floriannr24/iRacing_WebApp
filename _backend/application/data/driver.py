@@ -20,10 +20,8 @@ class Driver:
         self.licenses = response["licenses"]
 
     def get_AccountInfo(self, cust_id):
-
-        data = self.session.get('https://members-ng.iracing.com/data/member/get', params={"cust_ids": cust_id})
-        data = data.json()
-        data = data.get(data["link"])
-        data = data.json()
+        response = self.session.get('https://members-ng.iracing.com/data/member/get', params={"cust_ids": cust_id}).json()
+        responseLink = self.session.get(response["link"])
+        data = responseLink.json()
         return data["members"][0]["display_name"]
 
