@@ -1,5 +1,4 @@
 import requests
-
 from _backend.application.sessionbuilder.session_builder import responseIsValid
 
 
@@ -20,8 +19,30 @@ class Driver:
         self.licenses = response["licenses"]
 
     def get_AccountInfo(self, cust_id):
-        response = self.session.get('https://members-ng.iracing.com/data/member/get', params={"cust_ids": cust_id}).json()
-        responseLink = self.session.get(response["link"])
+        response = self.session.get('https://members-ng.iracing.com/data/member/get', params={"cust_ids": cust_id})
+
+        # check if iRacing API is up
+        if not responseIsValid(response):
+            return {
+                "response": response,
+                "data": None
+            }
+
+        responseLink = self.session.get(response.json()["link"])
+        print(responseLink.json())
         data = responseLink.json()
-        return data["members"][0]["display_name"]
+
+        # if no user was found for cust_id
+        if len(data["members"]) == 0:
+            response.status_code = 400
+            return {
+                "response": response,
+                "data": ""
+            }
+
+        return {
+            "response": response,
+            "data": data["members"][0]["display_name"]
+        }
+
 

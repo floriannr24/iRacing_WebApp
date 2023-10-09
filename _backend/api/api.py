@@ -27,7 +27,13 @@ app.add_middleware(
 
 @app.get("/data/recentRaces/{cust_id}", status_code=status.HTTP_200_OK)
 def getRecentRaces(cust_id: int, response: Response):
-    return RecentRaces(session).get_RecentRaces(cust_id)
+    responseData = RecentRaces(session).get_RecentRaces(cust_id)
+
+    if responseIsValid(responseData["response"]):
+        return responseData["data"]
+    else:
+        response.status_code = responseData["response"].status_code
+        return
 
 
 @app.get("/data/boxplot/{subsession_id}", status_code=status.HTTP_200_OK)
@@ -53,7 +59,13 @@ def getSubsessionInfo(subsession_id: int, response: Response):
 
 
 @app.get("/accountInfo/{cust_id}", status_code=status.HTTP_200_OK)
-def getAccountInfo(cust_id: int):
-    return Driver(session).get_AccountInfo(cust_id)
+def getAccountInfo(cust_id: int, response: Response):
+    responseData = Driver(session).get_AccountInfo(cust_id)
+
+    if responseIsValid(responseData["response"]):
+        return responseData["data"]
+    else:
+        response.status_code = responseData["response"].status_code
+        return
 
 # getBoxplotData(63531467)

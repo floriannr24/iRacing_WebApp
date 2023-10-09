@@ -11,11 +11,14 @@ class RecentRaces:
 
     def get_RecentRaces(self, cust_id):
 
-        data = self.requestRecentRaces(cust_id)
+        response = self.requestRecentRaces(cust_id)
+
+        if not responseIsValid(response["response"]):
+            return response
 
         exportDict = []
 
-        for element in data:
+        for element in response["data"]:
             intdict = {
                 "session_start_time": element["session_start_time"],
                 "series_name": element["series_name"],
@@ -29,18 +32,29 @@ class RecentRaces:
 
             exportDict.append(intdict)
 
-        return exportDict
+        return {
+            "response": response["response"],
+            "data": exportDict
+        }
 
     def requestRecentRaces(self, cust_id):
 
         # iRacingAPI
-        data = self.session.get('https://members-ng.iracing.com/data/stats/member_recent_races',
+        response = self.session.get('https://members-ng.iracing.com/data/stats/member_recent_races',
                                 params={'cust_id': cust_id})
-        data = data.json()
-        data = requests.get(data["link"]).json()
-        data = data["races"]
 
-        return data
+        if not responseIsValid(response):
+            return {
+                "response": response,
+                "data": None
+            }
+
+        data = requests.get(response.json()["link"]).json()
+
+        return {
+            "response": response,
+            "data": data["races"]
+        }
 
     # def get_finish_position(self, subsession_id, cust_id):
     #
