@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, V
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
 import {Subject,takeUntil} from "rxjs";
-import {Account, Accounts} from "../../../settings/settings.component";
+import {Account} from "../../../settings/settings.component";
 
 @Component({
   selector: 'app-boxplot',
