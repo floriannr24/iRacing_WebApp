@@ -2,6 +2,7 @@ import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, V
 import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
 import {Subject,takeUntil} from "rxjs";
+import {Account, Accounts} from "../../../settings/settings.component";
 
 @Component({
   selector: 'app-boxplot',
@@ -36,6 +37,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private appHeight: number
 
   private cust_id: number
+  private associatedAccounts: Account[]
   private data_live: BoxplotElement[]
   private data_original: EventData = new EventData()
   private data: EventData = new EventData()
@@ -61,6 +63,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit() {
     // user-id
     this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.cust_id = acc?.custId!)
+
+    // partner accounts
+    this.dataService.otherAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.associatedAccounts = acc)
 
     // new bpprop
     this.dataService.boxplotProperties.pipe(takeUntil(this.stop$)).subscribe(bpprop => {
@@ -259,6 +264,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
       if (driver.laps.length > 0) {
 
+        if (this.bpprop.options.showConnAccounts.checked) {
+          driver.driverIsAssociated = this.checkIfDriverIsAssociated(driver)
+        }
+
         let bpelement = new BoxplotElement()
         this.bpprop.carclass1.bp.prop.location = this.bpprop.carclass1.bp.prop.gap + i * (this.bpprop.carclass1.bp.prop.width + this.bpprop.carclass1.bp.prop.gap)
         this.bpprop.carclass1.bp.prop.middle = this.bpprop.carclass1.bp.prop.location + (this.bpprop.carclass1.bp.prop.width / 2)
@@ -273,10 +282,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         let fliers_top = driver.bpdata.fliers_top
         let fliers_bottom = driver.bpdata.fliers_bottom
 
-        // calculated values (pixels)
+        // calculated values on canvas (pixels)
         bpelement.whiskers = this.drawWhiskers(q1, whisker_bottom, q3, whisker_top, driver)
-        bpelement.Q1 = this.drawBox(q1, q3, driver).Q1
-        bpelement.Q3 = this.drawBox(q1, q3, driver).Q3
+        let quartile = this.drawBox(q1, q3, driver)
+        bpelement.Q1 = quartile.Q1
+        bpelement.Q3 = quartile.Q3
         bpelement.median = this.drawMedian(median, driver)
         bpelement.fliers = this.drawFliers(fliers_top, fliers_bottom)
         bpelement.laps = this.drawLaps(driver)
@@ -965,7 +975,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private setColor_Box(driver: Driver) {
 
-    if (driver.name == this.diaprop.userDriver.name) {
+    if (driver.name == this.diaprop.userDriver.name || driver.driverIsAssociated && this.bpprop.options.showConnAccounts) {
       this.context.fillStyle = this.bpprop.carclass1.bp.color.user.bg
       this.context.strokeStyle = this.bpprop.carclass1.bp.color.user.line
     } else {
@@ -1199,16 +1209,19 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.diaprop.renderEnd.y = this.convertSecondsToPixels(this.data.metadata.timeframe[0])
     this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(id => this.cust_id = id?.custId!)
     this.diaprop.userDriver = this.findUserDriver(this.cust_id)
+    this.diaprop.associatedDrivers = this.findAssociatedDrivers(this.associatedAccounts)
   }
 
   private clearCanvas() {
 
+    // clearing boxplot-canvas
     this.context.clearRect(
       0 - this.cameraOffset.x / this.scale.x,
       0 - this.cameraOffset.y / this.scale.y,
       this.context.canvas.width / this.scale.x,
       this.context.canvas.height / this.scale.y)
 
+    //clearing yAxis-canvas
     this.contextAxis.clearRect(
       0,
       0 - this.cameraOffset.y / this.scale.y,
@@ -1846,6 +1859,29 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     return string
   }
+
+  private findAssociatedDrivers(associatedAccounts: Account[]) {
+
+    let drivers: Driver[] = []
+
+    for (let i = 0; i < associatedAccounts.length; i++) {
+      for (let j = 0; j < this.data_original.drivers.length; j++) {
+        if (associatedAccounts[i].custId == this.data_original.drivers[j].id) {
+          drivers.push(this.data_original.drivers[j])
+        }
+      }
+    }
+    return drivers
+  }
+
+  private checkIfDriverIsAssociated(driver: Driver) {
+    for (let i = 0; i < this.diaprop.associatedDrivers.length; i++) {
+      if (driver.id == this.diaprop.associatedDrivers[i].id) {
+        return true
+      }
+    }
+    return false
+  }
 }
 
 
@@ -1876,6 +1912,24 @@ export class BoxplotProperties {
             line: "#1a88ff"
           }
         },
+        disc: {
+          bg: "rgba(77,77,77,0.4)",
+          line: "#999999",
+          detail: {
+            bg: "rgb(51,51,51)",
+            line: "#999999",
+          }
+        },
+        user: {
+          bg: "rgba(166,206,255,0.2)",
+          line: "#a6cfff",
+          detail: {
+            bg: "#d000ff",
+            line: "#d000ff"
+          }
+        },
+      },
+      color_friend: {
         disc: {
           bg: "rgba(77,77,77,0.4)",
           line: "#999999",
@@ -2552,18 +2606,18 @@ export class BoxplotProperties {
   }
 
   options: OptionsBoxplot = {
-    showDiscDisq: {checked: false, label: "Show disconnected / disqualified drivers"},
-    showIndividualLaps: {checked: false, label: "Show individual laps",
+    showDiscDisq: {label: "Show disconnected / disqualified drivers", checked: false, available: true},
+    showIndividualLaps: {label: "Show individual laps", checked: false, available: true,
       suboptions: {
-        showFastestLapOverall: {label: "Fastest overall //", checked: false},
-        showPersonalBestLaps: {"label": "Personal best // OR", checked: false},
-        showIncidents: {"label": "Laps with incidents", checked: false}
+        showFastestLapOverall: {label: "Fastest overall //", checked: false },
+        showPersonalBestLaps: {"label": "Personal best // OR", checked: false },
+        showIncidents: {"label": "Laps with incidents", checked: false }
       }},
-    showMean: {label: "Show mean", checked: false},
-    showFasterSlower: {label: "Highlight faster / slower drivers", checked: false},
-    showMulticlass: {label: "Show all car classes", checked: false},
-    sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false}
-
+    showMean: {label: "Show mean", checked: false, available: true},
+    showFasterSlower: {label: "Highlight faster / slower drivers", checked: false, available: true},
+    showMulticlass: {label: "Show all car classes", checked: false, available: true},
+    sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false, available: true},
+    showConnAccounts: {label: "Show connected accounts", checked: false, available: true}
   }
 }
 
@@ -2575,6 +2629,7 @@ type OptionName =
   | "showFasterSlower"
   | "showMulticlass"
   | "sortBySpeed"
+  | "showConnAccounts"
 
 type SuboptionName =
   | "showPersonalBestLaps"
@@ -2584,7 +2639,9 @@ type SuboptionName =
 type OptionEntry = {
   label: string,
   checked: boolean,
-  suboptions?: Partial<Record<SuboptionName, { label: string, checked: boolean }>> }
+  available: true
+  suboptions?: Partial<Record<SuboptionName, { label: string, checked: boolean } >>,
+}
 
 class DiagramProperties {
 
@@ -2597,6 +2654,7 @@ class DiagramProperties {
   }
 
   userDriver: Driver = new Driver()
+  associatedDrivers: Driver[]
 
   lineafunction_m: number // calculated
   linearfunction_t: number // calculated
