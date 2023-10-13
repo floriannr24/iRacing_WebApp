@@ -86,7 +86,7 @@ export class Driver {
   personal_best: number
   fastest_lap: boolean
   bpdata: BoxplotData = new BoxplotData()
-  driverIsAssociated: boolean
+  isAssociated: boolean
 }
 
 export class BoxplotData {

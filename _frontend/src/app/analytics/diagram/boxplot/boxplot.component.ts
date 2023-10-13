@@ -36,7 +36,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private appWidth: number
   private appHeight: number
 
-  private cust_id: number
+  private mainAccount: Account
   private associatedAccounts: Account[]
   private data_live: BoxplotElement[]
   private data_original: EventData = new EventData()
@@ -62,7 +62,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnInit() {
     // user-id
-    this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.cust_id = acc?.custId!)
+    this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.mainAccount = acc!)
 
     // partner accounts
     this.dataService.otherAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.associatedAccounts = acc)
@@ -265,7 +265,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       if (driver.laps.length > 0) {
 
         if (this.bpprop.options.showConnAccounts.checked) {
-          driver.driverIsAssociated = this.checkIfDriverIsAssociated(driver)
+          driver.isAssociated = this.checkIfDriverIsAssociated(driver)
         }
 
         let bpelement = new BoxplotElement()
@@ -303,8 +303,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private drawBox(q1: number, q3: number, driver: Driver) {
 
-    this.setColor_Box(driver)
-
     let q3_x_start = this.bpprop.carclass1.bp.prop.location - this.scrollX
     let q3_x_end = (this.bpprop.carclass1.bp.prop.location + this.bpprop.carclass1.bp.prop.width) - this.scrollX
     let q3_y = this.convertSecondsToPixels(q3) - this.scrollY
@@ -314,6 +312,28 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let q1_y = this.convertSecondsToPixels(q1) - this.scrollY
 
     let height = this.convertSecondsToPixels(q3) - this.convertSecondsToPixels(q1)
+
+    // pattern for associated driver
+    if (this.bpprop.options.showConnAccounts.checked && driver.isAssociated) {
+
+      this.context.strokeStyle = this.bpprop.carclass1.bp.color_friend.user.line
+
+      let numberOfDiagonalLines = this.calculateNumberOfDiagonalLines(height, this.diaprop.boxplotDiagonalLineSpace)
+      let q1_x_cut = this.calculateCuttingPointWithQ1(numberOfDiagonalLines, q1_y, height, q1_x_start, q1_x_end)
+
+      for (let i = 1; i < numberOfDiagonalLines-1; i++) {
+        this.context.beginPath()
+        this.context.moveTo(q3_x_start, q3_y + this.diaprop.boxplotDiagonalLineSpace*i)
+        this.context.lineTo(q3_x_start + this.bpprop.carclass1.bp.prop.width, q3_y + this.diaprop.boxplotDiagonalLineSpace*(i-1))
+        this.context.stroke()
+      }
+      this.context.beginPath()
+      this.context.moveTo(q1_x_cut, q1_y)
+      this.context.lineTo(q3_x_start + this.bpprop.carclass1.bp.prop.width, q3_y + this.diaprop.boxplotDiagonalLineSpace*(numberOfDiagonalLines-2))
+      this.context.stroke()
+    }
+
+    this.setColor_Box(driver)
 
     this.context.fillRect(q1_x_start, q1_y, this.bpprop.carclass1.bp.prop.width, height)
 
@@ -765,7 +785,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private convertSecondsToPixels(seconds: number) {
-    return Math.round(this.diaprop.lineafunction_m * seconds + this.diaprop.linearfunction_t) + 0.5
+    return Math.round(this.diaprop.linearFunction_m * seconds + this.diaprop.linearFunction_t) + 0.5
   }
 
   private convertTimeFormat(time: number) {
@@ -924,7 +944,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // set user driver in diaprop
     for (let i = 0; i < data.drivers.length; i++) {
-      if (this.cust_id == data.drivers[i].id) {
+      if (this.mainAccount.custId == data.drivers[i].id) {
         this.diaprop.userDriver = data.drivers[i]
       }
     }
@@ -975,7 +995,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private setColor_Box(driver: Driver) {
 
-    if (driver.name == this.diaprop.userDriver.name || driver.driverIsAssociated && this.bpprop.options.showConnAccounts) {
+    if (driver.name == this.diaprop.userDriver.name || driver.isAssociated && this.bpprop.options.showConnAccounts.checked) {
       this.context.fillStyle = this.bpprop.carclass1.bp.color.user.bg
       this.context.strokeStyle = this.bpprop.carclass1.bp.color.user.line
     } else {
@@ -1207,8 +1227,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.diaprop.calculateLinearFunction(this.data.metadata.median, this.appHeight)
     this.diaprop.renderStart.y = this.convertSecondsToPixels(this.data.metadata.timeframe[1])
     this.diaprop.renderEnd.y = this.convertSecondsToPixels(this.data.metadata.timeframe[0])
-    this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(id => this.cust_id = id?.custId!)
-    this.diaprop.userDriver = this.findUserDriver(this.cust_id)
+    this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.mainAccount = acc!)
+    this.diaprop.userDriver = this.findUserDriver(this.mainAccount)
     this.diaprop.associatedDrivers = this.findAssociatedDrivers(this.associatedAccounts)
   }
 
@@ -1678,9 +1698,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     return [...liveLaps, ...lapsAlreadyDrawn].sort((a,b) => a.lapNr - b.lapNr)
   }
 
-  private findUserDriver(id: number) {
+  private findUserDriver(account: Account) {
     for (let i = 0; i < this.data_original.drivers.length; i++) {
-      if (id == this.data_original.drivers[i].id) {
+      if (account.custId == this.data_original.drivers[i].id) {
         return this.data_original.drivers[i]
       }
     }
@@ -1882,6 +1902,26 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     return false
   }
+
+  private calculateNumberOfDiagonalLines(height: number, diagonalLineSpace: any) {
+    return Math.ceil(-height / diagonalLineSpace) + 1
+  }
+
+  private calculateCuttingPointWithQ1(numberOfDiagonalLines: number, q1_y: number, height: number, q1_x_start: number, q1_x_end: number) {
+    let a_spaceLeft = -height - (numberOfDiagonalLines-2) * this.diaprop.boxplotDiagonalLineSpace
+    let a = this.diaprop.boxplotDiagonalLineSpace
+    let b = q1_x_end - q1_x_start
+    let c = Math.sqrt(Math.pow(a,2) + Math.pow(b, 2))
+
+    let alpha = Math.asin(a / c) * 180/Math.PI
+    let gamma = 90
+    let beta = 180 - gamma - alpha
+
+    let b_new = a_spaceLeft / Math.tan(alpha*(Math.PI/180))
+
+    return q1_x_end - b_new
+
+  }
 }
 
 
@@ -1940,7 +1980,7 @@ export class BoxplotProperties {
         },
         user: {
           bg: "rgba(166,206,255,0.2)",
-          line: "#a6cfff",
+          line: "rgba(116,145,179,0.78)",
           detail: {
             bg: "#d000ff",
             line: "#d000ff"
@@ -2617,7 +2657,7 @@ export class BoxplotProperties {
     showFasterSlower: {label: "Highlight faster / slower drivers", checked: false, available: true},
     showMulticlass: {label: "Show all car classes", checked: false, available: true},
     sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false, available: true},
-    showConnAccounts: {label: "Show connected accounts", checked: false, available: true}
+    showConnAccounts: {label: "Show connected accounts", checked: true, available: true}
   }
 }
 
@@ -2649,15 +2689,15 @@ class DiagramProperties {
     let x1 = median
     let y1 = appHeight / 2
 
-    this.lineafunction_m = -this.fullTick_spacing
-    this.linearfunction_t = y1 - (-this.fullTick_spacing * x1)
+    this.linearFunction_m = -this.fullTick_spacing
+    this.linearFunction_t = y1 - (-this.fullTick_spacing * x1)
   }
 
   userDriver: Driver = new Driver()
-  associatedDrivers: Driver[]
+  associatedDrivers: Driver[] = []
 
-  lineafunction_m: number // calculated
-  linearfunction_t: number // calculated
+  linearFunction_m: number // calculated
+  linearFunction_t: number // calculated
 
   renderStart: xy = {x: 0, y: 0}
   renderEnd: xy = {x: 0, y: 0}
@@ -2696,6 +2736,8 @@ class DiagramProperties {
   drivernameLabel_y: number = 55
   drivernameLabel_fontSize: number = 20
   drivernameLabel_fontColor: string = "#d9d9d9"
+
+  boxplotDiagonalLineSpace: number = 15
 }
 
 class BoxplotElement {
