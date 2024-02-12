@@ -2,7 +2,7 @@
 
   <div class="grid">
     <div class="header">
-      <div class="subsession-info" *ngIf="dataService.subsessionInfo.subsession_id != 0">
+      <div class="subsession-info" *ngIf="dataService.subsessionInfo.subsession_id !== 0">
         <div>Current subsession: <span style="font-weight: bold">{{dataService.subsessionInfo.subsession_id}}</span></div>
         <div class="subsession-wrapper">
         <div class="subsession">
@@ -94,7 +94,7 @@
         </div>
       </div>
       </div>
-      <div class="subsession-info" *ngIf="dataService.subsessionInfo.subsession_id == 0">
+      <div class="subsession-info" *ngIf="dataService.subsessionInfo.subsession_id === 0">
         <span>Choose a race first</span>
       </div>
     </div>
@@ -112,7 +112,7 @@
       </div>
 
       <div class="options-wrapper">
-        <div class="option1" *ngIf="selectedMode.mode == ModeType.Boxplot">
+        <div class="option1" *ngIf="selectedMode.mode === ModeType.Boxplot">
           <ul class="ul-first">
             <li *ngFor="let opt of options | keyvalue">
 

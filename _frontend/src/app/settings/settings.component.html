@@ -32,7 +32,7 @@
               </div>
             </div>
 
-            <div class="card-list-wrapper" *ngIf="mainAccount != undefined" >
+            <div class="card-list-wrapper" *ngIf="mainAccount !== undefined" >
               <div class="card">
                 <button class="x" (click)="deleteItem_main()">x</button>
                 <div class="name">{{mainAccount!.name}}</div>

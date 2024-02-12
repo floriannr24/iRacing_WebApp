@@ -28,7 +28,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.dataService.mainAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.mainAccount = acc)
     this.dataService.otherAcc.pipe(takeUntil(this.stop$)).subscribe(acc => this.otherAccounts = acc)
-    this._showAddButton_main = this.mainAccount == undefined;
+    this._showAddButton_main = this.mainAccount === undefined;
     this._showAddButton_other = true
   }
 
@@ -154,7 +154,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   deleteItem_other(acc: Account) {
-    let deleteIndex = this.otherAccounts.findIndex((accToDelete) => accToDelete.custId == acc.custId)
+    let deleteIndex = this.otherAccounts.findIndex((accToDelete) => accToDelete.custId === acc.custId)
     if (deleteIndex >= 0) {
       this.otherAccounts.splice(deleteIndex, 1)
     }
@@ -163,12 +163,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   private IDisAlreadyInUse(data: number) {
-    if (data == this.mainAccount?.custId) {
+    if (data === this.mainAccount?.custId) {
       return true
     }
 
     for (let i = 0; i < this.otherAccounts.length; i++) {
-      if (this.otherAccounts[i].custId == data) {
+      if (this.otherAccounts[i].custId === data) {
         return true
       }
     }

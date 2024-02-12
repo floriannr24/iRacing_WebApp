@@ -1,9 +1,8 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DataService} from "../../_services/data.service";
 import {BoxplotProperties, OptionsBoxplot} from "../diagram/boxplot/boxplot.component";
-import {map, Observable, Subject, Subscription, takeUntil} from "rxjs";
+import {map, Observable, Subject, takeUntil} from "rxjs";
 import {LocalStorageItem, LocalstorageService} from "../../_services/localstorage.service";
-import {EventData} from "../../_services/api.service";
 
 @Component({
   selector: 'app-sidebar',
@@ -54,7 +53,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   onOptionsChange(master: string, value: boolean, type: string) {
-    if (type == "opt_bp") {
+    if (type === "opt_bp") {
       this.setProperties(master, value)
       this.localstorageService.save(LocalStorageItem.bpprop, this.bpprop)
       this.dataService.changeBpprop(this.bpprop)
@@ -62,7 +61,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   onSubOptionsChange(master: string, sub: string, value: boolean, type: string) {
-    if (type == "opt_bp") {
+    if (type === "opt_bp") {
       this.setSubProperties(master, sub, value)
       this.localstorageService.save(LocalStorageItem.bpprop, this.bpprop)
       this.dataService.changeBpprop(this.bpprop)
@@ -71,7 +70,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private setProperties(firstKey: string, value: boolean) {
     for (const [k, v] of Object.entries(this.bpprop.options)) {
-      if (firstKey == k) {
+      if (firstKey === k) {
         v.checked = value
       }
     }
@@ -80,9 +79,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private setSubProperties(firstKey:  string, secondKey: string, value: boolean) {
 
     for (const [k1,v1] of Object.entries(this.bpprop.options)) {
-      if (firstKey == k1) {
+      if (firstKey === k1) {
         for (const [k2,v2] of Object.entries(v1.suboptions!)) {
-          if (secondKey == k2) {
+          if (secondKey === k2) {
             v2.checked = value
           }
         }
@@ -96,7 +95,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   //
   //   for (let optKey in this.options) {
   //     for (let bpropKey in this.bpprop.options) {
-  //       if (optKey == bpropKey) {
+  //       if (optKey === bpropKey) {
   //         this.options[optKey].checked = this.bpprop.options[bpropKey].checked
   //       }
   //     }

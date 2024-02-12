@@ -96,7 +96,7 @@ export class DataService {
 
     try {
       let accSaved = this.localStorage.load<Accounts>(LocalStorageItem.accountData)
-      if (accSaved != undefined) {
+      if (accSaved !== undefined) {
         return accSaved
       } else {
         return acc

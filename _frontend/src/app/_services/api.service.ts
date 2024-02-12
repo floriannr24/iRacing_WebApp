@@ -13,7 +13,7 @@ export class APIService implements OnDestroy {
 
   constructor(private http: HttpClient, private dataService: DataService) {
     this.custidSubscription = this.dataService.mainAcc.subscribe(acc => {
-      if (acc != undefined) {
+      if (acc !== undefined) {
         this.custId = acc.custId
       }
 

@@ -56,7 +56,7 @@
         <tr cdk-row
             *cdkRowDef="let row; columns: ['time', 'series', 'track', 'start', 'finish', 'winner', 'sof', 'subsession_id'];"
             (click)="selectRow(row)"
-            [ngClass]="{  'cdk-row-selected' : row.subsession_id == selectedRowIndex}">
+            [ngClass]="{  'cdk-row-selected' : row.subsession_id === selectedRowIndex}">
         </tr>
   </table>
     </div>
