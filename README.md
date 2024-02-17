@@ -1,4 +1,3 @@
----- wip ----
 
 This web application provides access to various statistical diagrams which can give you an insight about a selected past iRacing session. These diagrams are interactive and can be manipulated in various ways (such as dragging and zooming). Additionally, you can access more information by hovering over the elements (i.e. median, mean or single data points). Currently, the only type of diagram implemented is the box plot.
 
@@ -14,6 +13,8 @@ The implemented features are as follows and can be activated or deactivated via 
 - sort drivers from fastest to slowest (based on median)
 
 Feel free to explore these features and analyze your iRacing data! 🏎️📊
+
+---- wip ----
 
 ![grafik](https://github.com/floriannr24/iRacing_WebApp/assets/104857253/ca0f968f-8904-4c6f-b192-bdbe36db9ac8)
 
