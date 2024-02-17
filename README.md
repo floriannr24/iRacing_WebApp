@@ -1,4 +1,4 @@
-- - - - - wip - - - - -
+---- wip ----
 
 This web application provides access to various statistical diagrams which can give you an insight about a selected past iRacing session. These diagrams are interactive and can be manipulated in various ways (such as dragging and zooming). Additionally, you can access more information by hovering over the elements (i.e. median, mean or single data points). Currently, the only type of diagram implemented is the box plot.
 
