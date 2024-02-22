@@ -12,8 +12,6 @@ The implemented features are as follows and can be activated or deactivated via 
 - display all car classes (in multiclass races)
 - sort drivers from fastest to slowest (based on median)
 
-Feel free to explore these features and analyze your iRacing data! 🏎️📊
-
 ---- wip ----
 
 ![grafik](https://github.com/floriannr24/iRacing_WebApp/assets/104857253/ca0f968f-8904-4c6f-b192-bdbe36db9ac8)
