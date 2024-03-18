@@ -26,7 +26,7 @@ $saveBttn-bg-hover: #bfbfbf;
   .main {
     width: 60%;
     height: calc(100vh - 273px);
-    background: #12171C;
+    background: #1b232b;
 
     .content {
       padding: 15px;
@@ -37,7 +37,7 @@ $saveBttn-bg-hover: #bfbfbf;
         display: grid;
         grid-template: "mainAcc otherAcc";
         grid-template-columns: 1fr 1fr;
-        background: #1f2834;
+        background: #212c36;
         min-height: max-content;
 
         .mainAcc {
@@ -165,6 +165,47 @@ $saveBttn-bg-hover: #bfbfbf;
                   cursor: pointer;
                   background: $card-bg-hover;
                 }
+              }
+            }
+
+            .card-spinner-wrapper {
+              width: 100%;
+
+              .spinner {
+                position: absolute;
+                top: calc(50% - 15px);
+                left: calc(50% - 15px);
+              }
+
+              .card {
+                position: relative;
+                width: 90%;
+                margin: 25px;
+                height: max-content;
+                background: $card-bg;
+                border-radius: 10px;
+                overflow: hidden;
+                transition: 0.1s;
+
+                .x {
+                  position: absolute;
+                  right: 0;
+                  top: 0;
+                }
+
+                .name {
+                  min-height: 25px;
+                  color: #E6E6E6FF;
+                  margin: 10px;
+                  font-size: 14pt;
+                  font-weight: bold;
+                }
+
+                .custId {
+                  color: #E6E6E6FF;
+                  margin: 10px;
+                }
+
               }
             }
 
@@ -299,6 +340,47 @@ $saveBttn-bg-hover: #bfbfbf;
               }
             }
 
+            .card-spinner-wrapper {
+              width: 100%;
+
+              .spinner {
+                position: absolute;
+                top: calc(50% - 15px);
+                left: calc(50% - 15px);
+              }
+
+              .card {
+                position: relative;
+                width: 90%;
+                margin: 25px;
+                height: max-content;
+                background: $card-bg;
+                border-radius: 10px;
+                overflow: hidden;
+                transition: 0.1s;
+
+                .x {
+                  position: absolute;
+                  right: 0;
+                  top: 0;
+                }
+
+                .name {
+                  min-height: 25px;
+                  color: #E6E6E6FF;
+                  margin: 10px;
+                  font-size: 14pt;
+                  font-weight: bold;
+                }
+
+                .custId {
+                  color: #E6E6E6FF;
+                  margin: 10px;
+                }
+                
+              }
+            }
+
           }
 
         }
@@ -309,6 +391,7 @@ $saveBttn-bg-hover: #bfbfbf;
   }
 
 }
+
 
 
 

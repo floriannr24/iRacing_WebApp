@@ -32,13 +32,23 @@
               </div>
             </div>
 
-            <div class="card-list-wrapper" *ngIf="mainAccount !== undefined" >
+            <div class="card-spinner-wrapper" *ngIf="_showProgressSpinner_main">
+              <div class="card">
+                <div class="spinner">
+                  <mat-spinner diameter="30"></mat-spinner>
+                </div>
+                <button class="x" (click)="deleteItem_main()">x</button>
+                <div class="name">FakeName</div>
+                <div class="custId">FakeID</div>
+              </div>
+            </div>
+
+            <div class="card-list-wrapper" *ngIf="mainAccount !== undefined && !_showProgressSpinner_main" >
               <div class="card">
                 <button class="x" (click)="deleteItem_main()">x</button>
                 <div class="name">{{mainAccount!.name}}</div>
                 <div class="custId">{{mainAccount!.custId}}</div>
               </div>
-
             </div>
 
           </div>
@@ -67,13 +77,23 @@
               </div>
             </div>
 
-            <div class="card-list-wrapper" *ngIf="otherAccounts.length > 0" >
+            <div class="card-spinner-wrapper" *ngIf="_showProgressSpinner_other">
+              <div class="card">
+                <div class="spinner">
+                  <mat-spinner diameter="30"></mat-spinner>
+                </div>
+                <button class="x" (click)="deleteItem_main()">x</button>
+                <div class="name">FakeName</div>
+                <div class="custId">FakeID</div>
+              </div>
+            </div>
+
+            <div class="card-list-wrapper" *ngIf="otherAccounts.length > 0">
               <div class="card" *ngFor="let acc of otherAccounts">
                 <button class="x" (click)="deleteItem_other(acc)">x</button>
                 <div class="name">{{acc.name}}</div>
                 <div class="custId">{{acc.custId}}</div>
               </div>
-
             </div>
 
           </div>

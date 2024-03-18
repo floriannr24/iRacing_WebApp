@@ -1,7 +1,14 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
 body {
   background: #14191F;
   margin: 0;
   font-family: Segoe UI, sans-serif;
 }
+
+.mat-mdc-progress-spinner .mdc-circular-progress__indeterminate-circle-graphic {
+  stroke: #505050 !important;
+}
+
 
 

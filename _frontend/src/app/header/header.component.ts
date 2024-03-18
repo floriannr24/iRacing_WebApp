@@ -15,7 +15,7 @@ export class HeaderComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.name$ = this.dataService.mainAcc.pipe(map(acc => acc ? acc.name.split(/\s+/)[0] : "User"))
+    this.name$ = this.dataService.mainAcc.pipe(map(acc => acc ? acc.name!.split(/\s+/)[0] : "User"))
   }
 
   showProfileMenu() {
