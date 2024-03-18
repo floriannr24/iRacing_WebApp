@@ -43,3 +43,20 @@ app-sidebar {
 app-diagram {
   grid-area: diagram;
 }
+
+.blurIfNoUser {
+  backdrop-filter: blur(10px);
+  width: 100%;
+  height: calc(100vh - 73px);
+  z-index: 1;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .blurInfotext {
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+  }
+}

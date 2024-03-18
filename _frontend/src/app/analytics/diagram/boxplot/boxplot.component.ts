@@ -1318,16 +1318,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
             break
         }
 
-        // if (this.highlightedDetailType === DetailType.MEDIAN) {
-        // }
-        // if (this.highlightedDetailType === DetailType.MEAN) {
-        // }
-        // if (this.highlightedDetailType === DetailType.Q1 || this.highlightedDetailType === DetailType.Q3) {
-        // }
-        // if (this.highlightedDetailType === DetailType.WHISKER_TOP || this.highlightedDetailType === DetailType.WHISKER_BOTTOM) {
-        //   this.drawWhiskerLabel_R(element)
-        // }
-
       } else if (this.driverSelected(element.driver) && !this.driverRunning(element.driver)) {
 
         if (!this._showLabelDetail_lapNr) {
@@ -1349,20 +1339,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
           case DetailType.WHISKER_BOTTOM:
             this.drawWhiskerLabel_D(element)
             break
-
-
-        // if (this.highlightedDetailType === DetailType.MEDIAN) {
-        //   this.drawMedianLabel_D(element)
-        // }
-        // if (this.highlightedDetailType === DetailType.MEAN) {
-        //   this.drawMeanLabel_D(element)
-        // }
-        // if (this.highlightedDetailType === DetailType.Q1 || this.highlightedDetailType === DetailType.Q3) {
-        //   this.drawQLabel_D(element)
-        // }
-        // if (this.highlightedDetailType === DetailType.WHISKER_TOP || this.highlightedDetailType === DetailType.WHISKER_BOTTOM) {
-        //   this.drawWhiskerLabel_D(element)
-
         }
       }
     }

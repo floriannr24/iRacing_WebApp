@@ -1,7 +1,20 @@
-<div class="grid">
-  <app-race-selector (click)="showRaceSelectorPanel()"></app-race-selector>
-  <app-sidebar></app-sidebar>
-  <app-diagram></app-diagram>
+<div class="blurIfNoUser">
+
+  <div class="blurInfotext">
+    Please enter account information in "User" -> "Settings"
+  </div>
+
+
 </div>
 
-<app-race-selector-panel *ngIf="_showRaceSelectorPanel" (closePanelEvent)="showRaceSelectorPanel()"></app-race-selector-panel>
+<div>
+
+  <div class="grid">
+    <app-race-selector (click)="showRaceSelectorPanel()"></app-race-selector>
+    <app-sidebar></app-sidebar>
+    <app-diagram></app-diagram>
+  </div>
+
+  <app-race-selector-panel *ngIf="_showRaceSelectorPanel" (closePanelEvent)="showRaceSelectorPanel()"></app-race-selector-panel>
+
+</div>
