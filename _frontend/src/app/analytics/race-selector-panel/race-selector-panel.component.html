@@ -1,79 +1,90 @@
 <div class="main">
   <div class="grid">
 
-  <div class="radio1">
-    <div><input class="radio-race-selector" type="radio" name="radio-race-selector" id="radio_table" #radio_table checked><label for="radio_table">Race session:</label></div>
-  </div>
-
-  <div class="radio2">
-    <div><input class="radio-race-selector" type="radio" name="radio-race-selector" id="radio_text" #radio_text><label for="radio_text">Subsession ID:</label></div>
-  </div>
-
-  <div class="table-grid">
-    <div class="table-wrapper">
-      <table cdk-table [dataSource]="data">
-        <ng-container cdkColumnDef="time">
-          <th cdk-header-cell *cdkHeaderCellDef> Time </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.session_start_time}} </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="track">
-          <th cdk-header-cell *cdkHeaderCellDef> Track </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.track_name}} </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="series">
-          <th cdk-header-cell *cdkHeaderCellDef> Series </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.series_name}} </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="start">
-          <th cdk-header-cell *cdkHeaderCellDef> Start </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.start_position}} </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="finish">
-          <th cdk-header-cell *cdkHeaderCellDef> Finish </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.finish_position}} </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="winner">
-          <th cdk-header-cell *cdkHeaderCellDef> Winner </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.winner_name}} </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="sof">
-          <th cdk-header-cell *cdkHeaderCellDef> SOF </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.sof}} </td>
-        </ng-container>
-
-        <ng-container cdkColumnDef="subsession_id">
-          <th cdk-header-cell *cdkHeaderCellDef> Subession ID </th>
-          <td cdk-cell *cdkCellDef="let row"> {{row.subsession_id}} </td>
-        </ng-container>
-
-        <tr cdk-header-row *cdkHeaderRowDef="['time', 'series', 'track', 'start', 'finish', 'winner', 'sof', 'subsession_id']"></tr>
-        <tr cdk-row
-            *cdkRowDef="let row; columns: ['time', 'series', 'track', 'start', 'finish', 'winner', 'sof', 'subsession_id'];"
-            (click)="selectRow(row)"
-            [ngClass]="{  'cdk-row-selected' : row.subsession_id === selectedRowIndex}">
-        </tr>
-  </table>
+    <div class="radio1">
+      <div><input class="radio-race-selector" type="radio" name="radio-race-selector" id="radio_table" #radio_table
+                  checked><label for="radio_table">Race session:</label></div>
     </div>
+
+    <div class="radio2">
+      <div><input class="radio-race-selector" type="radio" name="radio-race-selector" id="radio_text" #radio_text><label
+        for="radio_text">Subsession ID:</label></div>
+    </div>
+
+    <div class="table-grid">
+      <div class="table-wrapper">
+        <table cdk-table [dataSource]="data">
+          <ng-container cdkColumnDef="time">
+            <th cdk-header-cell *cdkHeaderCellDef> Time</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.session_start_time}} </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="track">
+            <th cdk-header-cell *cdkHeaderCellDef> Track</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.track_name}} </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="series">
+            <th cdk-header-cell *cdkHeaderCellDef> Series</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.series_name}} </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="start">
+            <th cdk-header-cell *cdkHeaderCellDef> Start</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.start_position}} </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="finish">
+            <th cdk-header-cell *cdkHeaderCellDef> Finish</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.finish_position}} </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="winner">
+            <th cdk-header-cell *cdkHeaderCellDef> Winner</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.winner_name}} </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="sof">
+            <th cdk-header-cell *cdkHeaderCellDef> SOF</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.sof}} </td>
+          </ng-container>
+
+          <ng-container cdkColumnDef="subsession_id">
+            <th cdk-header-cell *cdkHeaderCellDef> Subession ID</th>
+            <td cdk-cell *cdkCellDef="let row"> {{row.subsession_id}} </td>
+          </ng-container>
+
+          <tr cdk-header-row
+              *cdkHeaderRowDef="['time', 'series', 'track', 'start', 'finish', 'winner', 'sof', 'subsession_id']"></tr>
+          <tr cdk-row
+              *cdkRowDef="let row; columns: ['time', 'series', 'track', 'start', 'finish', 'winner', 'sof', 'subsession_id'];"
+              (click)="selectRow(row)"
+              [ngClass]="{  'cdk-row-selected' : row.subsession_id === selectedRowIndex}">
+          </tr>
+        </table>
+        @if (loadingRaceListInProgress) {
+        <div class="loadingRaceList-wrapper">
+          <div class="loadingRaceList-text">
+            <mat-spinner diameter="60" style="margin-bottom: 20px"></mat-spinner>
+            <div>Loading...</div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="input-wrapper">
+      <input type="text" name="subesssion_id" #input_text>
+      <button (click)="refreshTable()">Refresh table</button>
+
+    </div>
+
+    <div class="button-wrapper">
+      <button (click)="confirm(radio_table, radio_text, input_text.value)">Confirm</button>
+      <span class="error" *ngIf="_showValidationError">{{error_text}}</span>
+    </div>
+
   </div>
-
-  <div class="input-wrapper">
-    <input type="text" name="subesssion_id" #input_text>
-    <button (click)="refreshTable()">Refresh table</button>
-
-  </div>
-
-  <div class="button-wrapper">
-    <button (click)="confirm(radio_table, radio_text, input_text.value)">Confirm</button>
-    <span class="error" *ngIf="_showValidationError">{{error_text}}</span>
-  </div>
-
-</div>
 </div>
 
 

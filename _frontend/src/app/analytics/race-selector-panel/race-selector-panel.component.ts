@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, signal} from '@angular/core';
 import {lastValueFrom} from 'rxjs';
 import {DataService} from "../../_services/data.service";
 import {APIService, Event} from "../../_services/api.service";
@@ -13,12 +13,13 @@ import {LocalstorageService} from "../../_services/localstorage.service";
 
 // todo: convert gmt to corresponding timezone
 
-export class RaceSelectorPanelComponent implements OnInit{
+export class RaceSelectorPanelComponent implements OnInit {
   @Output() closePanelEvent = new EventEmitter<any>()
   @Output() errorTag = new EventEmitter<string>()
   data: Event[]
   selectedRow: Event
   _showValidationError: boolean
+  loadingRaceListInProgress: boolean = false
   error_text: String
   selectedRowIndex = -1
 
@@ -39,6 +40,7 @@ export class RaceSelectorPanelComponent implements OnInit{
         this.showError("No session has been selected in the table")
       } else {
         try {
+          this.dataService.loadingAnalyticsDataInProgress.set(true)
           this.sendToSubsessionService(this.selectedRow)
           this.localstorageService.save("subsessionInfo", this.selectedRow)
           this.fetchData_boxplot(this.dataService.subsessionInfo.subsession_id)
@@ -99,7 +101,9 @@ export class RaceSelectorPanelComponent implements OnInit{
   }
 
   async refreshTable() {
+    this.loadingRaceListInProgress = true
     this.data = await this.fetchData_recentRaces()
+    this.loadingRaceListInProgress = false
     this.convertToTimezone(this.data)
     this.localstorageService.save("recentRaces", this.data)
   }
@@ -131,9 +135,10 @@ export class RaceSelectorPanelComponent implements OnInit{
 
   private async fetchData_boxplot(subsession: number | null) {
     if (subsession) {
-      var data = await lastValueFrom(this.apiService.getBoxplotData(subsession))
+      let data = await lastValueFrom(this.apiService.getBoxplotData(subsession))
       this.dataService.changeSubsession(data)
       this.localstorageService.save("analyticsData", data)
+      this.dataService.loadingAnalyticsDataInProgress.set(false)
     }
   }
 
@@ -152,10 +157,38 @@ export class RaceSelectorPanelComponent implements OnInit{
   }
 
   private convertToTimezone(data: Event[]) {
-      data.forEach(session => {
-        session.session_start_time = session.session_start_time.replace(/T|:00Z/g, ' ')
-      })
+    data.forEach(session => {
+      let dateAndTime = session.session_start_time.replace(/T|:00Z/g, ' ')
+      let dateObjectAsLocalTime = this.convertToDatetime(dateAndTime)
+      session.session_start_time = dateObjectAsLocalTime
+
+    })
 
   }
+
+  convertToDatetime(dateAndTime: string): string {
+
+    try {
+      const [dateString, timeString] = dateAndTime.split(" ");
+      const [yearStr, monthStr, dayStr] = dateString.split("-")
+      const [hourStr, minuteStr] = timeString.split(":")
+
+      const year = parseInt(yearStr, 10);
+      const month = parseInt(monthStr, 10) - 1; // Months are zero-indexed in JS
+      const day = parseInt(dayStr, 10);
+      const hour = parseInt(hourStr, 10);
+      const minute = parseInt(minuteStr, 10);
+
+      const dateObj = new Date(Date.UTC(year, month, day, hour, minute))
+
+      // return date in format "YYYY-MM-DD hh:mm"
+      return `${dateObj.getFullYear().toString()}-${(dateObj.getMonth()+1).toString().padStart(2,"0")}-${dateObj.getDay().toString().padStart(2,"0")}
+      ${dateObj.getHours().toString()}:${dateObj.getMinutes().toString()}`
+    } catch (error) {
+      console.error("Error creating Date object:", error);
+      return "errorDateConversion";
+    }
+  }
+
 }
 

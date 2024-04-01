@@ -1,6 +1,6 @@
 <div class="blurIfNoUser" *ngIf="!mainAccount">
   <div class="blurInfotext">
-    Please enter account information in "User" -> "Settings"
+    Please enter account information for your main account in "User" -> "Settings"
   </div>
 </div>
 
@@ -9,7 +9,10 @@
   <div class="grid">
     <app-race-selector (click)="showRaceSelectorPanel()"></app-race-selector>
     <app-sidebar></app-sidebar>
-    <app-diagram></app-diagram>
+
+    @if (mainAccount) {
+      <app-diagram></app-diagram>
+    }
   </div>
 
   <app-race-selector-panel *ngIf="_showRaceSelectorPanel" (closePanelEvent)="showRaceSelectorPanel()"></app-race-selector-panel>

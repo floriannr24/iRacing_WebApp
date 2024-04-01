@@ -1,3 +1,20 @@
+@if (race.metadata.subsession_id === 1) {
+  <div class="ifNoRaceSelected-wrapper">
+    <div class="infotext">Please select a race to analyze</div>
+  </div>
+}
+
+@if (loadingAnalyticsDataInProgress()) {
+  <div class="ifLoading-wrapper">
+    <mat-spinner diameter="40"></mat-spinner>
+    <div class="infotext">Loading...</div>
+  </div>
+}
+
 <app-boxplot *ngIf="(mode$ | async) === ModeType.Boxplot"></app-boxplot>
 <app-delta *ngIf="(mode$ | async) === ModeType.Delta"></app-delta>
+
+
+
+
 

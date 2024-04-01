@@ -1,3 +1,36 @@
 .wrapper {
   background: #0f1317;
 }
+
+.ifNoRaceSelected-wrapper {
+  width: 100%;
+  height: calc(100vh - 73px);
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .infotext {
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+  }
+}
+
+.ifLoading-wrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(10px);
+  z-index: 1;
+
+  .infotext {
+    margin: 20px;
+    left: 10px;
+    color: white;
+    font-size: 20px;
+  }
+}

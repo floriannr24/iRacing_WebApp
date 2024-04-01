@@ -11,7 +11,7 @@ import {log} from "@angular-devkit/build-angular/src/builders/ssr-dev-server";
 })
 export class AnalyticsComponent {
   title = "angular-app";
-  _showRaceSelectorPanel = false;
+  _showRaceSelectorPanel = false
   mainAccount: Account | undefined
 
   constructor(private dataService: DataService) {
