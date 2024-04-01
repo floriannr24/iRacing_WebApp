@@ -181,11 +181,12 @@ export class RaceSelectorPanelComponent implements OnInit {
 
       const dateObj = new Date(Date.UTC(year, month, day, hour, minute))
 
+      console.log(dateObj)
+
       // return date in format "YYYY-MM-DD hh:mm"
-      return `${dateObj.getFullYear().toString()}-${(dateObj.getMonth()+1).toString().padStart(2,"0")}-${dateObj.getDay().toString().padStart(2,"0")}
-      ${dateObj.getHours().toString()}:${dateObj.getMinutes().toString()}`
+      return `${dateObj.getFullYear().toString()}-${(dateObj.getMonth()+1).toString().padStart(2,"0")}-${dateObj.getDate().toString().padStart(2,"0")}
+      ${dateObj.getHours().toString().padStart(2,"0")}:${dateObj.getMinutes().toString()}`
     } catch (error) {
-      console.error("Error creating Date object:", error);
       return "errorDateConversion";
     }
   }
