@@ -5,10 +5,10 @@
 .ifNoRaceSelected-wrapper {
   width: 100%;
   height: calc(100vh - 73px);
-  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;
+  backdrop-filter: blur(10px);
 
   .infotext {
     color: white;
