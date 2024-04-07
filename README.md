@@ -1,4 +1,5 @@
 iRacing is a subscription-based online racing simulation video game developed and published by iRacing.com Motorsport Simulations in 2008. All in-game sessions are hosted on the publisher's servers. The game simulates real world cars, tracks, and racing events, and enforces rules of conduct modeled on real auto racing events.
+
 https://www.iracing.com/
 
 https://en.wikipedia.org/wiki/IRacing
