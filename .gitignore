@@ -1,3 +1,2 @@
-./_frontend/node_modules
-./frontend/.angular
-./backend/application/sessionbuilder/files/*
+/.vscode
+/_backend/application/sessionbuilder/files/*
