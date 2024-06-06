@@ -150,7 +150,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.drawBoxplot()
     this.drawAxes()
     this.drawDetailLabels()
-    this.drawClickCompare()
 
     requestAnimationFrame(this.draw.bind(this))
 
@@ -1003,39 +1002,39 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private setColor_Box(driver: Driver) {
 
     if (driver.name === this.diaprop.userDriver.name || driver.isAssociated && this.bpprop.options.showConnAccounts.checked) {
-      this.context.fillStyle = this.bpprop.carclass1.bp.color.user.bg
-      this.context.strokeStyle = this.bpprop.carclass1.bp.color.user.line
+      this.context.fillStyle = this.bpprop.carclass1.bp_color_user_background
+      this.context.strokeStyle = this.bpprop.carclass1.bp_color_user_line
     } else {
       if (driver.car_class_id === this.diaprop.userDriver.car_class_id) {
-        this.context.fillStyle = this.bpprop.carclass1.bp.color.running.bg
-        this.context.strokeStyle = this.bpprop.carclass1.bp.color.running.line
+        this.context.fillStyle = this.bpprop.carclass1.bp_color_running_background
+        this.context.strokeStyle = this.bpprop.carclass1.bp_color_running_line
       } else {
         let carclassProp = this.setBprop_carclass(driver)
-        this.context.fillStyle = carclassProp.bp.color.running.bg
-        this.context.strokeStyle = carclassProp.bp.color.running.line
+        this.context.fillStyle = carclassProp.bp_color_running_background
+        this.context.strokeStyle = carclassProp.bp_color_running_line
       }
     }
 
     if (driver.result_status === "Disconnected" || driver.result_status === "Disqualified") {
-      this.context.fillStyle = this.bpprop.carclass1.bp.color.disc.bg
-      this.context.strokeStyle = this.bpprop.carclass1.bp.color.disc.line
+      this.context.fillStyle = this.bpprop.carclass1.bp_color_disc_background
+      this.context.strokeStyle = this.bpprop.carclass1.bp_color_disc_line
     }
   }
 
   private setColor_Median(driver: Driver) {
 
     // default median color
-    this.context.strokeStyle = this.bpprop.carclass1.median.color.running.line
+    this.context.strokeStyle = this.bpprop.carclass1.median_color_running_line
 
     // username
     if (driver.name === this.diaprop.userDriver.name) {
-      this.context.strokeStyle = this.bpprop.carclass1.median.color.user.line
+      this.context.strokeStyle = this.bpprop.carclass1.median_color_running_user_line_DEFAULT
     } else {
       if (driver.car_class_id === this.diaprop.userDriver.car_class_id) {
-        this.context.strokeStyle = this.bpprop.carclass1.median.color.running.line
+        this.context.strokeStyle = this.bpprop.carclass1.median_color_running_line
       } else {
         let carclassProp = this.setBprop_carclass(driver)
-        this.context.strokeStyle = carclassProp.median.color.running.line
+        this.context.strokeStyle = carclassProp.median_color_running_line
       }
     }
 
@@ -1043,43 +1042,43 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.bpprop.options['showFasterSlower'].checked) {
 
       if (driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
-        this.context.strokeStyle = this.bpprop.carclass1.median.color.slower.line
+        this.context.strokeStyle = this.bpprop.carclass1.median_color_slower_line
       }
       if (driver.bpdata.median < this.diaprop.userDriver.bpdata.median) {
-        this.context.strokeStyle = this.bpprop.carclass1.median.color.faster.line
+        this.context.strokeStyle = this.bpprop.carclass1.median_color_faster_line
       }
       if (driver.name === this.diaprop.userDriver.name) {
-        this.context.strokeStyle = this.bpprop.carclass1.median.color.user.highlight.line
+        this.context.strokeStyle = this.bpprop.carclass1.median_color_running_user_line_HIGHLIGHT
       }
     }
 
     // disc, disq = grey
     if (driver.result_status === "Disconnected" || driver.result_status === "Disqualified") {
-      this.context.strokeStyle = this.bpprop.carclass1.median.color.disc.line
+      this.context.strokeStyle = this.bpprop.carclass1.median_color_disc_line
     }
   }
 
   private setColor_Mean() {
-    this.context.fillStyle = this.bpprop.carclass1.mean_color_line
+    this.context.fillStyle = this.bpprop.general.mean_color_line
   }
 
   private setColor_Whiskers(driver: Driver) {
 
     if (driver.result_status === "Disconnected" || driver.result_status === "Disqualified") {
-      this.context.strokeStyle = this.bpprop.carclass1.whiskers.color.disc.line
+      this.context.strokeStyle = this.bpprop.carclass1.whisker_color_disc_line
     } else if (driver.name === this.diaprop.userDriver.name) {
-      this.context.strokeStyle = this.bpprop.carclass1.whiskers.color.user.line
+      this.context.strokeStyle = this.bpprop.carclass1.whisker_color_running_user_line
     } else if (driver.car_class_id === this.diaprop.userDriver.car_class_id) {
-      this.context.strokeStyle = this.bpprop.carclass1.whiskers.color.running.line
+      this.context.strokeStyle = this.bpprop.carclass1.whisker_color_running_line
     } else {
       let carclassProp = this.setBprop_carclass(driver)
-      this.context.strokeStyle = carclassProp.whiskers.color.running.line
+      this.context.strokeStyle = carclassProp.whisker_color_running_line
     }
 
   }
 
   private setColor_Fliers() {
-    this.context.strokeStyle = this.bpprop.carclass1.flier_color_line
+    this.context.strokeStyle = this.bpprop.general.flier_color_line
   }
 
   private updateDiagram() {
@@ -1361,13 +1360,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetail_time_content = time_str
 
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.running.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.running.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_running_detail_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_running_detail_bg
 
     if (this.bpprop.options.showMulticlass.checked && this.diaprop.userDriver.car_class_id !== driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
-      this.labelDetail.nativeElement.style.borderColor = carclassProp.median.color.running.detail.line
-      this.labelDetail.nativeElement.style.background = carclassProp.median.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = carclassProp.median_color_running_detail_line
+      this.labelDetail.nativeElement.style.background = carclassProp.median_color_running_detail_bg
     }
 
     if (this.bpprop.options.showFasterSlower.checked) {
@@ -1383,16 +1382,16 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
 
       if (element.driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.slower.detail.line
-        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.slower.detail.bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_slower_detail_line
+        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_slower_detail_bg
       } else {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.faster.detail.line
-        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.faster.detail.bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_faster_detail_line
+        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_faster_detail_bg
       }
 
       if (element.driver.name === this.diaprop.userDriver.name) {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.user.highlight.detail.line
-        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.user.highlight.detail.bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_running_user_detail_line_HIGHLIGHT
+        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_running_user_detail_bg_HIGHLIGHT
       }
     }
 
@@ -1414,8 +1413,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median.color.disc.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median.color.disc.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_disc_detail_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_disc_detail_bg
     this.context.stroke()
 
   }
@@ -1435,8 +1434,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.mean_color_detail_line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.mean_color_detail_bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.mean_color_detail_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.general.mean_color_detail_bg
 
     if (this.bpprop.options.showFasterSlower.checked) {
       let delta = (driver.bpdata.mean - this.diaprop.userDriver.bpdata.mean)
@@ -1482,11 +1481,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     if (this.bpprop.options.showMulticlass.checked && this.diaprop.userDriver.car_class_id !== driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
-      this.labelDetail.nativeElement.style.borderColor = carclassProp.bp.color.running.detail.line
-      this.labelDetail.nativeElement.style.background = carclassProp.bp.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = carclassProp.bp_color_running_detail_line
+      this.labelDetail.nativeElement.style.background = carclassProp.bp_color_running_detail_bg
     } else {
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp.color.running.detail.line
-      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp_color_running_detail_line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp_color_running_detail_bg
     }
 
     this.context.stroke()
@@ -1521,11 +1520,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     if (this.bpprop.options.showMulticlass.checked && this.diaprop.userDriver.car_class_id !== driver.car_class_id) {
       let carclassProp = this.setBprop_carclass(driver)
-      this.labelDetail.nativeElement.style.borderColor = carclassProp.whiskers.color.running.line
-      this.labelDetail.nativeElement.style.background = carclassProp.whiskers.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = carclassProp.whisker_color_running_line
+      this.labelDetail.nativeElement.style.background = carclassProp.whisker_color_running_detail_bg
     } else {
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whiskers.color.running.line
-      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.whiskers.color.running.detail.bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whisker_color_running_line
+      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp_color_running_detail_bg
     }
 
     this.context.stroke()
@@ -1546,8 +1545,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_dot_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.mean_color_detail_line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.mean_color_detail_bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.mean_color_detail_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.general.mean_color_detail_bg
     this.context.stroke()
 
   }
@@ -1576,8 +1575,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whiskers.color.disc.detail.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.whiskers.color.disc.detail.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whisker_color_disc_detail_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.whisker_color_disc_detail_bg
     this.context.stroke()
   }
 
@@ -1605,8 +1604,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp.color.disc.line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp.color.disc.bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp_color_disc_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp_color_disc_detail_bg
 
     this.context.stroke()
   }
@@ -1630,16 +1629,16 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.labelDetail_time_content = time_str
       this.labelDetail_lap_content = lapNr_str
       this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps_color_incident_detail_line
-      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps_color_incident_detail_bg
-      this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.carclass1.laps_color_incident_detail_line
-      this.labelDetail_lapText.nativeElement.style.color = this.bpprop.carclass1.laps_color_incident_detail_bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.laps_color_incident_detail_line
+      this.labelDetail.nativeElement.style.background = this.bpprop.general.laps_color_incident_detail_bg
+      this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.general.laps_color_incident_detail_line
+      this.labelDetail_lapText.nativeElement.style.color = this.bpprop.general.laps_color_incident_detail_bg
 
       //incident events label styling
       this.labelDetail_inc_content = incEvents_str
       this.labelDetail_inc.nativeElement.style.left = x_pos + 80 + this.diaprop.laptime_detail_dot_gap + "px"
-      this.labelDetail_inc.nativeElement.style.borderColor = this.bpprop.carclass1.laps_color_incident_detail_line
-      this.labelDetail_inc.nativeElement.style.background = this.bpprop.carclass1.laps_color_incident_detail_bg
+      this.labelDetail_inc.nativeElement.style.borderColor = this.bpprop.general.laps_color_incident_detail_line
+      this.labelDetail_inc.nativeElement.style.background = this.bpprop.general.laps_color_incident_detail_bg
     }
   }
 
@@ -1663,7 +1662,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
           this.context.arc(lap_x, lap_y, this.bpprop.general.laps_radius_DEFAULT, 0, (Math.PI / 180) * 360)
         }
 
-        this.context.fillStyle = this.bpprop.carclass1.laps_color_incident_line
+        this.context.fillStyle = this.bpprop.general.laps_color_incident_line
         this.context.fill()
 
         liveLaps.push({
@@ -1698,7 +1697,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         this.context.arc(lap_x, lap_y, this.bpprop.general.laps_radius_DEFAULT, 0, (Math.PI / 180) * 360)
       }
 
-      this.context.fillStyle = this.bpprop.carclass1.laps_color_normal_line
+      this.context.fillStyle = this.bpprop.general.laps_color_normal_line
       this.context.fill()
 
       liveLaps.push({
@@ -1736,10 +1735,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       this.labelDetail_time_content = time_str
       this.labelDetail_lap_content = lapNr_str
       this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
-      this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps_color_normal_detail_line
-      this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps_color_normal_detail_bg
-      this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.carclass1.laps_color_normal_detail_line
-      this.labelDetail_lapText.nativeElement.style.color = this.bpprop.carclass1.laps_color_normal_detail_bg
+      this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.laps_color_normal_detail_line
+      this.labelDetail.nativeElement.style.background = this.bpprop.general.laps_color_normal_detail_bg
+      this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.general.laps_color_normal_detail_line
+      this.labelDetail_lapText.nativeElement.style.color = this.bpprop.general.laps_color_normal_detail_bg
     }
   }
 
@@ -1794,7 +1793,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
           this.context.arc(lap_x, lap_y, this.bpprop.general.laps_radius_DEFAULT, 0, (Math.PI / 180) * 360)
         }
 
-        this.context.fillStyle = this.bpprop.carclass1.laps_color_fastest_line
+        this.context.fillStyle = this.bpprop.general.laps_color_fastest_line
         this.context.fill()
 
         liveLaps.push({
@@ -1830,7 +1829,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
           this.context.arc(lap_x, lap_y, this.bpprop.general.laps_radius_DEFAULT, 0, (Math.PI / 180) * 360)
         }
 
-        this.context.fillStyle = this.bpprop.carclass1.laps_color_fastest_line
+        this.context.fillStyle = this.bpprop.general.laps_color_fastest_line
         this.context.fill()
 
         liveLaps.push({
@@ -1860,10 +1859,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         this.labelDetail_time_content = time_str
         this.labelDetail_lap_content = lapNr_str
         this.labelDetail.nativeElement.style.padding = "0px 0px 0px 5px"
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.laps_color_fastest_detail_line
-        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.laps_color_fastest_detail_bg
-        this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.carclass1.laps_color_fastest_detail_line
-        this.labelDetail_lapText.nativeElement.style.color = this.bpprop.carclass1.laps_color_fastest_detail_bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.laps_color_fastest_detail_line
+        this.labelDetail.nativeElement.style.background = this.bpprop.general.laps_color_fastest_detail_bg
+        this.labelDetail_lapBg.nativeElement.style.background = this.bpprop.general.laps_color_fastest_detail_line
+        this.labelDetail_lapText.nativeElement.style.color = this.bpprop.general.laps_color_fastest_detail_bg
       }
   }
 
@@ -1938,41 +1937,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   }
 
-  private drawLinesBetweenSelectedLaps() {
-
-    let laps = []
-
-    if (this.highlightedLap.lapNr !== undefined) {
-      this.clickCompareLap = this.highlightedLap.lapNr
-    }
-
-    for (let i = 0; i < this.data_live.length; i++) {
-      for (let j = 0; j < this.data_live[i].laps.length; j++) {
-        if (this.data_live[i].laps[j].lapNr === this.clickCompareLap) {
-          laps.push(this.data_live[i].laps[j])
-        }
-      }
-    }
-
-    for (let i = 0; i < laps.length; i++) {
-      if (laps[i+1] === undefined) {
-        return
-      }
-      this.context.beginPath()
-      this.context.strokeStyle = this.bpprop.carclass1.laps_color_normal_line
-      this.context.lineWidth = this.bpprop.general.q3_lineThickness_DEFAULT / this.scale.x
-      this.context.moveTo(laps[i].x, laps[i].y)
-      this.context.lineTo(laps[i+1].x, laps[i+1].y)
-      this.context.stroke()
-    }
-  }
-
-  private drawClickCompare() {
-    if (this._isClicked) {
-      this.drawLinesBetweenSelectedLaps()
-    }
-  }
-
   private handleMouseClick(event: MouseEvent) {
 
     event.preventDefault()
@@ -2008,19 +1972,677 @@ export class BoxplotProperties {
     bp_color_running_detail_bg: "#093059",
     bp_color_running_detail_line: "#1a88ff",
     bp_color_disc_background: "rgba(0,27,59,0.2)",
-    bp_color_disc_line: "#1a88ff",
-    bp_color_disc_detail_bg: "#093059",
-    bp_color_disc_detail_line: "#1a88ff",
-    bp_color_user_background: "rgba(0,27,59,0.2)",
-    bp_color_user_line: "#1a88ff",
-    bp_color_user_detail_bg: "#093059",
-    bp_color_user_detail_line: "#1a88ff",
+    bp_color_disc_line: "#999999",
+    bp_color_disc_detail_bg: "rgb(51,51,51)",
+    bp_color_disc_detail_line: "#999999",
+    bp_color_user_background: "rgba(166,206,255,0.2)",
+    bp_color_user_line: "#a6cfff",
+    bp_color_user_detail_bg: "#d000ff",
+    bp_color_user_detail_line: "#d000ff",
 
     bp_colorFriend_running_background: "rgba(166,206,255,0.2)",
     bp_colorFriend_running_line: "rgba(116,145,179,0.78)",
     bp_colorFriend_running_detail_bg: "#d000ff",
     bp_colorFriend_running_detail_line: "#d000ff",
 
+    median_color_running_line: "#22ff1a",
+    median_color_running_detail_bg: "#063306",
+    median_color_running_detail_line: "#22ff1a",
+    median_color_disc_line: "#999999",
+    median_color_disc_detail_bg: "rgb(51,51,51)",
+    median_color_disc_detail_line: "#999999",
+    median_color_faster_line: "#ff0000",
+    median_color_faster_detail_bg: "#590000",
+    median_color_faster_detail_line: "#ff0000",
+    median_color_slower_line: "#22ff1a",
+    median_color_slower_detail_bg: "#063306",
+    median_color_slower_detail_line: "#22ff1a",
+    median_color_running_user_line_DEFAULT: "#22ff1a",
+    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
+    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
+    median_color_running_user_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
+
+    whisker_color_running_line: "#76b3ff",
+    whisker_color_running_detail_line: "#76b3ff",
+    whisker_color_running_detail_bg: "#293f59",
+    whisker_color_disc_line: "#76b3ff",
+    whisker_color_disc_detail_line: "#999999",
+    whisker_color_disc_detail_bg: "rgb(51,51,51)",
+    whisker_color_running_user_line: "#a6cfff",
+  }
+  
+  carclass2 = {
+    carclass_id: 0, // calculated
+
+    bp_color_running_background: "rgba(59,37,89,0.2)",
+    bp_color_running_line: "#AE6BFF",
+    bp_color_running_detail_bg: "#2b1b40",
+    bp_color_running_detail_line: "#AE6BFF",
+    bp_color_disc_background: "rgba(0,27,59,0.2)",
+    bp_color_disc_line: "#999999",
+    bp_color_disc_detail_bg: "rgb(51,51,51)",
+    bp_color_disc_detail_line: "#999999",
+    
+    bp_colorFriend_running_background: "rgba(166,206,255,0.2)",
+    bp_colorFriend_running_line: "rgba(116,145,179,0.78)",
+    bp_colorFriend_running_detail_bg: "#d000ff",
+    bp_colorFriend_running_detail_line: "#d000ff",
+
+    median_color_running_line: "#AE6BFF",
+    median_color_running_detail_bg: "#2b1b40",
+    median_color_running_detail_line: "#AE6BFF",
+    median_color_disc_line: "#999999",
+    median_color_disc_detail_bg: "rgb(51,51,51)",
+    median_color_disc_detail_line: "#999999",
+    median_color_faster_line: "#ff0000",
+    median_color_faster_detail_bg: "#590000",
+    median_color_faster_detail_line: "#ff0000",
+    median_color_slower_line: "#22ff1a",
+    median_color_slower_detail_bg: "#063306",
+    median_color_slower_detail_line: "#22ff1a",
+    median_color_running_user_line_DEFAULT: "#22ff1a",
+    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
+    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
+    median_color_running_user_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
+
+    whisker_color_running_line: "#76b3ff",
+    whisker_color_running_detail_line: "#76b3ff",
+    whisker_color_running_detail_bg: "#293f59",
+    whisker_color_disc_line: "#76b3ff",
+    whisker_color_disc_detail_line: "#999999",
+    whisker_color_disc_detail_bg: "rgb(51,51,51)",
+    whisker_color_running_user_line: "#a6cfff",
+  }
+
+  carclass3 = {
+    carclass_id: 0, // calculated
+
+    bp_color_running_background: "rgba(0,27,59,0.2)",
+    bp_color_running_line: "#1a88ff",
+    bp_color_running_detail_bg: "#093059",
+    bp_color_running_detail_line: "#1a88ff",
+    bp_color_disc_background: "rgba(0,27,59,0.2)",
+    bp_color_disc_line: "#999999",
+    bp_color_disc_detail_bg: "rgb(51,51,51)",
+    bp_color_disc_detail_line: "#999999",
+    bp_color_user_background: "rgba(166,206,255,0.2)",
+    bp_color_user_line: "#a6cfff",
+    bp_color_user_detail_bg: "#d000ff",
+    bp_color_user_detail_line: "#d000ff",
+
+    median_color_running_line: "#22ff1a",
+    median_color_running_detail_bg: "#063306",
+    median_color_running_detail_line: "#22ff1a",
+    median_color_disc_line: "#999999",
+    median_color_disc_detail_bg: "rgb(51,51,51)",
+    median_color_disc_detail_line: "#999999",
+    median_color_faster_line: "#ff0000",
+    median_color_faster_detail_bg: "#590000",
+    median_color_faster_detail_line: "#ff0000",
+    median_color_slower_line: "#22ff1a",
+    median_color_slower_detail_bg: "#063306",
+    median_color_slower_detail_line: "#22ff1a",
+    median_color_running_user_line_DEFAULT: "#22ff1a",
+    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
+    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
+    median_color_running_user_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
+
+    whisker_color_running_line: "#76b3ff",
+    whisker_color_running_detail_line: "#76b3ff",
+    whisker_color_running_detail_bg: "#293f59",
+    whisker_color_disc_line: "#76b3ff",
+    whisker_color_disc_detail_line: "#999999",
+    whisker_color_disc_detail_bg: "rgb(51,51,51)",
+    whisker_color_running_user_line: "#a6cfff",
+  }
+
+  carclass4 = {
+    carclass_id: 0, // calculated
+
+    bp_color_running_background: "rgba(0,27,59,0.2)",
+    bp_color_running_line: "#1a88ff",
+    bp_color_running_detail_bg: "#093059",
+    bp_color_running_detail_line: "#1a88ff",
+    bp_color_disc_background: "rgba(0,27,59,0.2)",
+    bp_color_disc_line: "#999999",
+    bp_color_disc_detail_bg: "rgb(51,51,51)",
+    bp_color_disc_detail_line: "#999999",
+    bp_color_user_background: "rgba(166,206,255,0.2)",
+    bp_color_user_line: "#a6cfff",
+    bp_color_user_detail_bg: "#d000ff",
+    bp_color_user_detail_line: "#d000ff",
+
+    median_color_running_line: "#22ff1a",
+    median_color_running_detail_bg: "#063306",
+    median_color_running_detail_line: "#22ff1a",
+    median_color_disc_line: "#999999",
+    median_color_disc_detail_bg: "rgb(51,51,51)",
+    median_color_disc_detail_line: "#999999",
+    median_color_faster_line: "#ff0000",
+    median_color_faster_detail_bg: "#590000",
+    median_color_faster_detail_line: "#ff0000",
+    median_color_slower_line: "#22ff1a",
+    median_color_slower_detail_bg: "#063306",
+    median_color_slower_detail_line: "#22ff1a",
+    median_color_running_user_line_DEFAULT: "#22ff1a",
+    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
+    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
+    median_color_running_user_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
+
+    whisker_color_running_line: "#76b3ff",
+    whisker_color_running_detail_line: "#76b3ff",
+    whisker_color_running_detail_bg: "#293f59",
+    whisker_color_disc_line: "#76b3ff",
+    whisker_color_disc_detail_line: "#999999",
+    whisker_color_disc_detail_bg: "rgb(51,51,51)",
+    whisker_color_running_user_line: "#a6cfff",
+  }
+
+  carclass5 = {
+    carclass_id: 0, // calculated
+
+    bp_color_running_background: "rgba(0,27,59,0.2)",
+    bp_color_running_line: "#1a88ff",
+    bp_color_running_detail_bg: "#093059",
+    bp_color_running_detail_line: "#1a88ff",
+    bp_color_disc_background: "rgba(0,27,59,0.2)",
+    bp_color_disc_line: "#999999",
+    bp_color_disc_detail_bg: "rgb(51,51,51)",
+    bp_color_disc_detail_line: "#999999",
+    bp_color_user_background: "rgba(166,206,255,0.2)",
+    bp_color_user_line: "#a6cfff",
+    bp_color_user_detail_bg: "#d000ff",
+    bp_color_user_detail_line: "#d000ff",
+
+    median_color_running_line: "#22ff1a",
+    median_color_running_detail_bg: "#063306",
+    median_color_running_detail_line: "#22ff1a",
+    median_color_disc_line: "#999999",
+    median_color_disc_detail_bg: "rgb(51,51,51)",
+    median_color_disc_detail_line: "#999999",
+    median_color_faster_line: "#ff0000",
+    median_color_faster_detail_bg: "#590000",
+    median_color_faster_detail_line: "#ff0000",
+    median_color_slower_line: "#22ff1a",
+    median_color_slower_detail_bg: "#063306",
+    median_color_slower_detail_line: "#22ff1a",
+    median_color_running_user_line_DEFAULT: "#22ff1a",
+    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
+    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
+    median_color_running_user_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
+
+    whisker_color_running_line: "#76b3ff",
+    whisker_color_running_detail_line: "#76b3ff",
+    whisker_color_running_detail_bg: "#293f59",
+    whisker_color_disc_line: "#76b3ff",
+    whisker_color_disc_detail_line: "#999999",
+    whisker_color_disc_detail_bg: "rgb(51,51,51)",
+    whisker_color_running_user_line: "#a6cfff",
+  }
+
+  // carclass2 = {
+  //   carclass_id: 0,
+  //   bp: {
+  //     color: {
+  //       running: {
+  //         bg: "rgba(59,37,89,0.2)",
+  //         line: "#AE6BFF",
+  //         detail: {
+  //           bg: "#2b1b40",
+  //           line: "#AE6BFF"
+  //         }
+  //       },
+  //       disc: {
+  //         bg: "rgba(77,77,77,0.4)",
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999",
+  //         }
+  //       },
+  //     },
+  //   },
+  //   median: {
+  //     color: {
+  //       running: {
+  //         line: "#AE6BFF",
+  //         detail: {
+  //           bg: "#2b1b40",
+  //           line: "#AE6BFF"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999"
+  //         },
+  //       },
+  //       user: {
+  //         line: "#AE6BFF",
+  //         highlight: {
+  //           line: "#ffd900",
+  //           detail: {
+  //             line: "#ffd900",
+  //             bg: "#4d4900"
+  //           }
+  //         },
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a",
+  //         },
+  //       },
+  //       faster: {
+  //         line: "#ff0000",
+  //         detail: {
+  //           bg: "#590000",
+  //           line: "#ff0000"
+  //         }
+  //       },
+  //       slower: {
+  //         line: "#22ff1a",
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a"
+  //         }
+  //       },
+  //     },
+  //   },
+  //   mean: {
+  //     color: {
+  //       line: "#ff0000",
+  //       detail: {
+  //         bg: "#590000",
+  //         line: "#ff0000"
+  //       }
+  //     }
+  //   },
+  //   whiskers: {
+  //     color: {
+  //       running: {
+  //         line: "#a087a8",
+  //         detail: {
+  //           line: "#a087a8",
+  //           bg: "#3c3340"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           line: "#999999",
+  //           bg: "rgb(51,51,51)"
+  //         }
+  //       },
+  //     },
+  //   },
+  //   laps: {
+  //     color: {
+  //       line: "#fffb00",
+  //       detail: {
+  //         line: "#fffb00",
+  //         bg: "#4d4900"
+  //       }
+  //     },
+  //   },
+  //   fliers: {
+  //     color: "rgba(176,176,176)",
+  //   },
+  // }
+  // carclass3 = {
+  //   carclass_id: 0,
+  //   bp: {
+  //     color: {
+  //       running: {
+  //         bg: "rgba(89,76,29,0.3)",
+  //         line: "#FFDA59",
+  //         detail: {
+  //           bg: "#403716",
+  //           line: "#FFDA59"
+  //         }
+  //       },
+  //       disc: {
+  //         bg: "rgba(77,77,77,0.4)",
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999",
+  //         }
+  //       },
+  //     },
+  //   },
+  //   median: {
+  //     color: {
+  //       running: {
+  //         line: "#FFDA59",
+  //         detail: {
+  //           bg: "#403716",
+  //           line: "#FFDA59"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999"
+  //         },
+  //       },
+  //       user: {
+  //         line: "#22ff1a",
+  //         highlight: {
+  //           line: "#ffd900",
+  //           detail: {
+  //             line: "#ffd900",
+  //             bg: "#4d4900"
+  //           }
+  //         },
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a",
+  //         },
+  //       },
+  //       faster: {
+  //         line: "#ff0000",
+  //         detail: {
+  //           bg: "#590000",
+  //           line: "#ff0000"
+  //         }
+  //       },
+  //       slower: {
+  //         line: "#22ff1a",
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a"
+  //         }
+  //       },
+  //     },
+  //   },
+  //   mean: {
+  //     color: {
+  //       line: "#ff0000",
+  //       detail: {
+  //         bg: "#590000",
+  //         line: "#ff0000"
+  //       }
+  //     },
+  //   },
+  //   whiskers: {
+  //     color: {
+  //       running: {
+  //         line: "#a3a87e",
+  //         detail: {
+  //           line: "#a3a87e",
+  //           bg: "#3e402f"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           line: "#999999",
+  //           bg: "rgb(51,51,51)"
+  //         }
+  //       },
+  //     },
+  //   },
+  //   laps: {
+  //     color: {
+  //       line: "#fffb00",
+  //       detail: {
+  //         line: "#fffb00",
+  //         bg: "#4d4900"
+  //       }
+  //     },
+  //   },
+  //   fliers: {
+  //     color: "rgba(176,176,176)",
+  //   }
+  // }
+  // carclass4 = {
+  //   carclass_id: 0,
+  //   bp: {
+  //     color: {
+  //       running: {
+  //         bg: "rgba(89,29,47,0.2)",
+  //         line: "#FF5888",
+  //         detail: {
+  //           bg: "#401622",
+  //           line: "#FF5888"
+  //         }
+  //       },
+  //       disc: {
+  //         bg: "rgba(77,77,77,0.4)",
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999",
+  //         }
+  //       },
+  //     },
+  //   },
+  //   median: {
+  //     color: {
+  //       running: {
+  //         line: "#FF5888",
+  //         detail: {
+  //           bg: "#401622",
+  //           line: "#FF5888"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999"
+  //         },
+  //       },
+  //       faster: {
+  //         line: "#ff0000",
+  //         detail: {
+  //           bg: "#590000",
+  //           line: "#ff0000"
+  //         }
+  //       },
+  //       slower: {
+  //         line: "#22ff1a",
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a"
+  //         }
+  //       },
+  //     }
+  //   },
+  //   mean: {
+  //     color: {
+  //       line: "#ff0000",
+  //       detail: {
+  //         bg: "#590000",
+  //         line: "#ff0000"
+  //       }
+  //     },
+  //   },
+  //   whiskers: {
+  //     color: {
+  //       running: {
+  //         line: "#b38686",
+  //         detail: {
+  //           line: "#b38686",
+  //           bg: "#403030"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           line: "#999999",
+  //           bg: "rgb(51,51,51)"
+  //         }
+  //       },
+  //     },
+  //   },
+  //   laps: {
+  //     color: {
+  //       line: "#fffb00",
+  //       detail: {
+  //         line: "#fffb00",
+  //         bg: "#4d4900"
+  //       }
+  //     },
+  //   },
+  //   fliers: {
+  //     color: "rgba(176,176,176)",
+  //   },
+  // }
+  // carclass5 = {
+  //   carclass_id: 0,
+  //   bp: {
+  //     color: {
+  //       running: {
+  //         bg: "rgba(0,27,59,0.2)",
+  //         line: "#24a8a8",
+  //         detail: {
+  //           bg: "#093059",
+  //           line: "#24a8a8"
+  //         }
+  //       },
+  //       disc: {
+  //         bg: "rgba(77,77,77,0.4)",
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999",
+  //         }
+  //       },
+  //       user: {
+  //         bg: "rgba(166,206,255,0.2)",
+  //         line: "#a6cfff",
+  //         detail: {
+  //           bg: "#d000ff",
+  //           line: "#d000ff"
+  //         }
+  //       },
+  //     },
+  //   },
+  //   q1: {
+  //     prop: {
+  //       lineThickness_DEFAULT: 2,
+  //       lineThickness_HITBOX: 3,
+  //       lineThickness_SELECT: 4
+  //     }
+  //   },
+  //   q3: {
+  //     prop: {
+  //       lineThickness_DEFAULT: 2,
+  //       lineThickness_HITBOX: 3,
+  //       lineThickness_SELECT: 4
+
+  //     }
+  //   },
+  //   median: {
+  //     color: {
+  //       running: {
+  //         line: "#22ff1a",
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           bg: "rgb(51,51,51)",
+  //           line: "#999999"
+  //         },
+  //       },
+  //       user: {
+  //         line: "#22ff1a",
+  //         highlight: {
+  //           line: "#ffd900",
+  //           detail: {
+  //             line: "#ffd900",
+  //             bg: "#4d4900"
+  //           }
+  //         },
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a",
+  //         },
+  //       },
+  //       faster: {
+  //         line: "#ff0000",
+  //         detail: {
+  //           bg: "#590000",
+  //           line: "#ff0000"
+  //         }
+  //       },
+  //       slower: {
+  //         line: "#22ff1a",
+  //         detail: {
+  //           bg: "#063306",
+  //           line: "#22ff1a"
+  //         }
+  //       },
+  //     },
+  //   },
+  //   mean: {
+  //     color: {
+  //       line: "#ff0000",
+  //       detail: {
+  //         bg: "#590000",
+  //         line: "#ff0000"
+  //       }
+  //     },
+  //   },
+  //   whiskers: {
+  //     color: {
+  //       running: {
+  //         line: "#76b3ff",
+  //         detail: {
+  //           line: "#76b3ff",
+  //           bg: "#293f59"
+  //         }
+  //       },
+  //       disc: {
+  //         line: "#999999",
+  //         detail: {
+  //           line: "#999999",
+  //           bg: "rgb(51,51,51)"
+  //         }
+  //       },
+  //       user: {
+  //         line: "#a6cfff"
+  //       },
+  //     },
+  //   },
+  //   laps: {
+  //     color: {
+  //       line: "#fffb00",
+  //       detail: {
+  //         line: "#fffb00",
+  //         bg: "#4d4900"
+  //       }
+  //     },
+  //     prop: {
+  //       radius_DEFAULT: 2,
+  //       radius_HITBOX: 2.5,
+  //       radius_SELECT: 2.5
+  //     }
+  //   },
+  //   fliers: {
+  //     color: "rgba(176,176,176)",
+  //   },
+  // }
+
+  general = {
+
+    // colors
     mean_color_line: "#ff0000",
     mean_color_detail_bg: "#590000",
     mean_color_detail_line: "#ff0000",
@@ -2039,555 +2661,7 @@ export class BoxplotProperties {
 
     flier_color_line: "rgba(176,176,176)",
 
-
-    bp: {
-      color: {
-        running: {
-          bg: "rgba(0,27,59,0.2)",
-          line: "#1a88ff",
-          detail: {
-            bg: "#093059",
-            line: "#1a88ff"
-          }
-        },
-        disc: {
-          bg: "rgba(77,77,77,0.4)",
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999",
-          }
-        },
-        user: {
-          bg: "rgba(166,206,255,0.2)",
-          line: "#a6cfff",
-          detail: {
-            bg: "#d000ff",
-            line: "#d000ff"
-          }
-        },
-      },
-      },
-    median: {
-      color: {
-        running: {
-          line: "#22ff1a",
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999"
-          },
-        },
-        user: {
-          line: "#22ff1a",
-          highlight: {
-            line: "#ffd900",
-            detail: {
-              line: "#ffd900",
-              bg: "#4d4900"
-            }
-          },
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a",
-          },
-        },
-        faster: {
-          line: "#ff0000",
-          detail: {
-            bg: "#590000",
-            line: "#ff0000"
-          }
-        },
-        slower: {
-          line: "#22ff1a",
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a"
-          }
-        },
-      },
-    },
-    whiskers: {
-      color: {
-        running: {
-          line: "#76b3ff",
-          detail: {
-            line: "#76b3ff",
-            bg: "#293f59"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            line: "#999999",
-            bg: "rgb(51,51,51)"
-          }
-        },
-        user: {
-          line: "#a6cfff"
-        },
-      },
-    },
-  }
-
-  carclass2 = {
-    carclass_id: 0,
-    bp: {
-      color: {
-        running: {
-          bg: "rgba(59,37,89,0.2)",
-          line: "#AE6BFF",
-          detail: {
-            bg: "#2b1b40",
-            line: "#AE6BFF"
-          }
-        },
-        disc: {
-          bg: "rgba(77,77,77,0.4)",
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999",
-          }
-        },
-      },
-    },
-    median: {
-      color: {
-        running: {
-          line: "#AE6BFF",
-          detail: {
-            bg: "#2b1b40",
-            line: "#AE6BFF"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999"
-          },
-        },
-        user: {
-          line: "#AE6BFF",
-          highlight: {
-            line: "#ffd900",
-            detail: {
-              line: "#ffd900",
-              bg: "#4d4900"
-            }
-          },
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a",
-          },
-        },
-        faster: {
-          line: "#ff0000",
-          detail: {
-            bg: "#590000",
-            line: "#ff0000"
-          }
-        },
-        slower: {
-          line: "#22ff1a",
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a"
-          }
-        },
-      },
-    },
-    mean: {
-      color: {
-        line: "#ff0000",
-        detail: {
-          bg: "#590000",
-          line: "#ff0000"
-        }
-      }
-    },
-    whiskers: {
-      color: {
-        running: {
-          line: "#a087a8",
-          detail: {
-            line: "#a087a8",
-            bg: "#3c3340"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            line: "#999999",
-            bg: "rgb(51,51,51)"
-          }
-        },
-      },
-    },
-    laps: {
-      color: {
-        line: "#fffb00",
-        detail: {
-          line: "#fffb00",
-          bg: "#4d4900"
-        }
-      },
-    },
-    fliers: {
-      color: "rgba(176,176,176)",
-    },
-  }
-  carclass3 = {
-    carclass_id: 0,
-    bp: {
-      color: {
-        running: {
-          bg: "rgba(89,76,29,0.3)",
-          line: "#FFDA59",
-          detail: {
-            bg: "#403716",
-            line: "#FFDA59"
-          }
-        },
-        disc: {
-          bg: "rgba(77,77,77,0.4)",
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999",
-          }
-        },
-      },
-    },
-    median: {
-      color: {
-        running: {
-          line: "#FFDA59",
-          detail: {
-            bg: "#403716",
-            line: "#FFDA59"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999"
-          },
-        },
-        user: {
-          line: "#22ff1a",
-          highlight: {
-            line: "#ffd900",
-            detail: {
-              line: "#ffd900",
-              bg: "#4d4900"
-            }
-          },
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a",
-          },
-        },
-        faster: {
-          line: "#ff0000",
-          detail: {
-            bg: "#590000",
-            line: "#ff0000"
-          }
-        },
-        slower: {
-          line: "#22ff1a",
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a"
-          }
-        },
-      },
-    },
-    mean: {
-      color: {
-        line: "#ff0000",
-        detail: {
-          bg: "#590000",
-          line: "#ff0000"
-        }
-      },
-    },
-    whiskers: {
-      color: {
-        running: {
-          line: "#a3a87e",
-          detail: {
-            line: "#a3a87e",
-            bg: "#3e402f"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            line: "#999999",
-            bg: "rgb(51,51,51)"
-          }
-        },
-      },
-    },
-    laps: {
-      color: {
-        line: "#fffb00",
-        detail: {
-          line: "#fffb00",
-          bg: "#4d4900"
-        }
-      },
-    },
-    fliers: {
-      color: "rgba(176,176,176)",
-    }
-  }
-  carclass4 = {
-    carclass_id: 0,
-    bp: {
-      color: {
-        running: {
-          bg: "rgba(89,29,47,0.2)",
-          line: "#FF5888",
-          detail: {
-            bg: "#401622",
-            line: "#FF5888"
-          }
-        },
-        disc: {
-          bg: "rgba(77,77,77,0.4)",
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999",
-          }
-        },
-      },
-    },
-    median: {
-      color: {
-        running: {
-          line: "#FF5888",
-          detail: {
-            bg: "#401622",
-            line: "#FF5888"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999"
-          },
-        },
-        faster: {
-          line: "#ff0000",
-          detail: {
-            bg: "#590000",
-            line: "#ff0000"
-          }
-        },
-        slower: {
-          line: "#22ff1a",
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a"
-          }
-        },
-      }
-    },
-    mean: {
-      color: {
-        line: "#ff0000",
-        detail: {
-          bg: "#590000",
-          line: "#ff0000"
-        }
-      },
-    },
-    whiskers: {
-      color: {
-        running: {
-          line: "#b38686",
-          detail: {
-            line: "#b38686",
-            bg: "#403030"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            line: "#999999",
-            bg: "rgb(51,51,51)"
-          }
-        },
-      },
-    },
-    laps: {
-      color: {
-        line: "#fffb00",
-        detail: {
-          line: "#fffb00",
-          bg: "#4d4900"
-        }
-      },
-    },
-    fliers: {
-      color: "rgba(176,176,176)",
-    },
-  }
-  carclass5 = {
-    carclass_id: 0,
-    bp: {
-      color: {
-        running: {
-          bg: "rgba(0,27,59,0.2)",
-          line: "#24a8a8",
-          detail: {
-            bg: "#093059",
-            line: "#24a8a8"
-          }
-        },
-        disc: {
-          bg: "rgba(77,77,77,0.4)",
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999",
-          }
-        },
-        user: {
-          bg: "rgba(166,206,255,0.2)",
-          line: "#a6cfff",
-          detail: {
-            bg: "#d000ff",
-            line: "#d000ff"
-          }
-        },
-      },
-    },
-    q1: {
-      prop: {
-        lineThickness_DEFAULT: 2,
-        lineThickness_HITBOX: 3,
-        lineThickness_SELECT: 4
-      }
-    },
-    q3: {
-      prop: {
-        lineThickness_DEFAULT: 2,
-        lineThickness_HITBOX: 3,
-        lineThickness_SELECT: 4
-
-      }
-    },
-    median: {
-      color: {
-        running: {
-          line: "#22ff1a",
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            bg: "rgb(51,51,51)",
-            line: "#999999"
-          },
-        },
-        user: {
-          line: "#22ff1a",
-          highlight: {
-            line: "#ffd900",
-            detail: {
-              line: "#ffd900",
-              bg: "#4d4900"
-            }
-          },
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a",
-          },
-        },
-        faster: {
-          line: "#ff0000",
-          detail: {
-            bg: "#590000",
-            line: "#ff0000"
-          }
-        },
-        slower: {
-          line: "#22ff1a",
-          detail: {
-            bg: "#063306",
-            line: "#22ff1a"
-          }
-        },
-      },
-    },
-    mean: {
-      color: {
-        line: "#ff0000",
-        detail: {
-          bg: "#590000",
-          line: "#ff0000"
-        }
-      },
-    },
-    whiskers: {
-      color: {
-        running: {
-          line: "#76b3ff",
-          detail: {
-            line: "#76b3ff",
-            bg: "#293f59"
-          }
-        },
-        disc: {
-          line: "#999999",
-          detail: {
-            line: "#999999",
-            bg: "rgb(51,51,51)"
-          }
-        },
-        user: {
-          line: "#a6cfff"
-        },
-      },
-    },
-    laps: {
-      color: {
-        line: "#fffb00",
-        detail: {
-          line: "#fffb00",
-          bg: "#4d4900"
-        }
-      },
-      prop: {
-        radius_DEFAULT: 2,
-        radius_HITBOX: 2.5,
-        radius_SELECT: 2.5
-      }
-    },
-    fliers: {
-      color: "rgba(176,176,176)",
-    },
-  }
-
-  general = {
+    // dimensions
     q1_lineThickness_DEFAULT: 2,
     q1_lineThickness_HITBOX: 3,
     q1_lineThickness_SELECT: 4,
