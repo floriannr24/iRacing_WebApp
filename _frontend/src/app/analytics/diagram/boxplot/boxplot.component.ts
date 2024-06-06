@@ -1002,8 +1002,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private setColor_Box(driver: Driver) {
 
     if (driver.name === this.diaprop.userDriver.name || driver.isAssociated && this.bpprop.options.showConnAccounts.checked) {
-      this.context.fillStyle = this.bpprop.carclass1.bp_color_user_background
-      this.context.strokeStyle = this.bpprop.carclass1.bp_color_user_line
+      this.context.fillStyle = this.bpprop.general.bp_color_user_background
+      this.context.strokeStyle = this.bpprop.general.bp_color_user_line
     } else {
       if (driver.car_class_id === this.diaprop.userDriver.car_class_id) {
         this.context.fillStyle = this.bpprop.carclass1.bp_color_running_background
@@ -1016,8 +1016,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     if (driver.result_status === "Disconnected" || driver.result_status === "Disqualified") {
-      this.context.fillStyle = this.bpprop.carclass1.bp_color_disc_background
-      this.context.strokeStyle = this.bpprop.carclass1.bp_color_disc_line
+      this.context.fillStyle = this.bpprop.general.bp_color_disc_background
+      this.context.strokeStyle = this.bpprop.general.bp_color_disc_line
     }
   }
 
@@ -1028,7 +1028,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // username
     if (driver.name === this.diaprop.userDriver.name) {
-      this.context.strokeStyle = this.bpprop.carclass1.median_color_running_user_line_DEFAULT
+      this.context.strokeStyle = this.bpprop.general.median_color_running_user_line_DEFAULT
     } else {
       if (driver.car_class_id === this.diaprop.userDriver.car_class_id) {
         this.context.strokeStyle = this.bpprop.carclass1.median_color_running_line
@@ -1042,19 +1042,19 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.bpprop.options['showFasterSlower'].checked) {
 
       if (driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
-        this.context.strokeStyle = this.bpprop.carclass1.median_color_slower_line
+        this.context.strokeStyle = this.bpprop.general.median_color_slower_line
       }
       if (driver.bpdata.median < this.diaprop.userDriver.bpdata.median) {
-        this.context.strokeStyle = this.bpprop.carclass1.median_color_faster_line
+        this.context.strokeStyle = this.bpprop.general.median_color_faster_line
       }
       if (driver.name === this.diaprop.userDriver.name) {
-        this.context.strokeStyle = this.bpprop.carclass1.median_color_running_user_line_HIGHLIGHT
+        this.context.strokeStyle = this.bpprop.general.median_color_running_user_line_HIGHLIGHT
       }
     }
 
     // disc, disq = grey
     if (driver.result_status === "Disconnected" || driver.result_status === "Disqualified") {
-      this.context.strokeStyle = this.bpprop.carclass1.median_color_disc_line
+      this.context.strokeStyle = this.bpprop.general.median_color_disc_line
     }
   }
 
@@ -1065,9 +1065,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private setColor_Whiskers(driver: Driver) {
 
     if (driver.result_status === "Disconnected" || driver.result_status === "Disqualified") {
-      this.context.strokeStyle = this.bpprop.carclass1.whisker_color_disc_line
+      this.context.strokeStyle = this.bpprop.general.whisker_color_disc_line
     } else if (driver.name === this.diaprop.userDriver.name) {
-      this.context.strokeStyle = this.bpprop.carclass1.whisker_color_running_user_line
+      this.context.strokeStyle = this.bpprop.general.whisker_color_running_user_line
     } else if (driver.car_class_id === this.diaprop.userDriver.car_class_id) {
       this.context.strokeStyle = this.bpprop.carclass1.whisker_color_running_line
     } else {
@@ -1382,16 +1382,16 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
 
       if (element.driver.bpdata.median > this.diaprop.userDriver.bpdata.median) {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_slower_detail_line
-        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_slower_detail_bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.median_color_slower_detail_line
+        this.labelDetail.nativeElement.style.background = this.bpprop.general.median_color_slower_detail_bg
       } else {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_faster_detail_line
-        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_faster_detail_bg
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.median_color_faster_detail_line
+        this.labelDetail.nativeElement.style.background = this.bpprop.general.median_color_faster_detail_bg
       }
 
       if (element.driver.name === this.diaprop.userDriver.name) {
-        this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_running_user_detail_line_HIGHLIGHT
-        this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_running_user_detail_bg_HIGHLIGHT
+        this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.median_color_running_user_detail_line_HIGHLIGHT
+        this.labelDetail.nativeElement.style.background = this.bpprop.general.median_color_running_user_detail_bg_HIGHLIGHT
       }
     }
 
@@ -1413,8 +1413,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.median_color_disc_detail_line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.median_color_disc_detail_bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.median_color_disc_detail_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.general.median_color_disc_detail_bg
     this.context.stroke()
 
   }
@@ -1575,8 +1575,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_whisker_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.whisker_color_disc_detail_line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.whisker_color_disc_detail_bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.whisker_color_disc_detail_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.general.whisker_color_disc_detail_bg
     this.context.stroke()
   }
 
@@ -1604,8 +1604,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.labelDetail.nativeElement.style.top = y_pos + "px"
     this.labelDetail.nativeElement.style.left = x_pos + this.diaprop.laptime_detail_q1q3median_gap + "px"
     this.labelDetail_time_content = time_str
-    this.labelDetail.nativeElement.style.borderColor = this.bpprop.carclass1.bp_color_disc_line
-    this.labelDetail.nativeElement.style.background = this.bpprop.carclass1.bp_color_disc_detail_bg
+    this.labelDetail.nativeElement.style.borderColor = this.bpprop.general.bp_color_disc_line
+    this.labelDetail.nativeElement.style.background = this.bpprop.general.bp_color_disc_detail_bg
 
     this.context.stroke()
   }
@@ -1928,8 +1928,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let c = Math.sqrt(Math.pow(a,2) + Math.pow(b, 2))
 
     let alpha = Math.asin(a / c) * 180/Math.PI
-    let gamma = 90
-    let beta = 180 - gamma - alpha
 
     let b_new = a_spaceLeft / Math.tan(alpha*(Math.PI/180))
 
@@ -1971,48 +1969,16 @@ export class BoxplotProperties {
     bp_color_running_line: "#1a88ff",
     bp_color_running_detail_bg: "#093059",
     bp_color_running_detail_line: "#1a88ff",
-    bp_color_disc_background: "rgba(0,27,59,0.2)",
-    bp_color_disc_line: "#999999",
-    bp_color_disc_detail_bg: "rgb(51,51,51)",
-    bp_color_disc_detail_line: "#999999",
-    bp_color_user_background: "rgba(166,206,255,0.2)",
-    bp_color_user_line: "#a6cfff",
-    bp_color_user_detail_bg: "#d000ff",
-    bp_color_user_detail_line: "#d000ff",
-
-    bp_colorFriend_running_background: "rgba(166,206,255,0.2)",
-    bp_colorFriend_running_line: "rgba(116,145,179,0.78)",
-    bp_colorFriend_running_detail_bg: "#d000ff",
-    bp_colorFriend_running_detail_line: "#d000ff",
 
     median_color_running_line: "#22ff1a",
     median_color_running_detail_bg: "#063306",
     median_color_running_detail_line: "#22ff1a",
-    median_color_disc_line: "#999999",
-    median_color_disc_detail_bg: "rgb(51,51,51)",
-    median_color_disc_detail_line: "#999999",
-    median_color_faster_line: "#ff0000",
-    median_color_faster_detail_bg: "#590000",
-    median_color_faster_detail_line: "#ff0000",
-    median_color_slower_line: "#22ff1a",
-    median_color_slower_detail_bg: "#063306",
-    median_color_slower_detail_line: "#22ff1a",
-    median_color_running_user_line_DEFAULT: "#22ff1a",
-    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
-    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
-    median_color_running_user_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
 
     whisker_color_running_line: "#76b3ff",
     whisker_color_running_detail_line: "#76b3ff",
     whisker_color_running_detail_bg: "#293f59",
-    whisker_color_disc_line: "#76b3ff",
-    whisker_color_disc_detail_line: "#999999",
-    whisker_color_disc_detail_bg: "rgb(51,51,51)",
-    whisker_color_running_user_line: "#a6cfff",
   }
-  
+
   carclass2 = {
     carclass_id: 0, // calculated
 
@@ -2020,42 +1986,14 @@ export class BoxplotProperties {
     bp_color_running_line: "#AE6BFF",
     bp_color_running_detail_bg: "#2b1b40",
     bp_color_running_detail_line: "#AE6BFF",
-    bp_color_disc_background: "rgba(0,27,59,0.2)",
-    bp_color_disc_line: "#999999",
-    bp_color_disc_detail_bg: "rgb(51,51,51)",
-    bp_color_disc_detail_line: "#999999",
-    
-    bp_colorFriend_running_background: "rgba(166,206,255,0.2)",
-    bp_colorFriend_running_line: "rgba(116,145,179,0.78)",
-    bp_colorFriend_running_detail_bg: "#d000ff",
-    bp_colorFriend_running_detail_line: "#d000ff",
 
     median_color_running_line: "#AE6BFF",
-    median_color_running_detail_bg: "#2b1b40",
+    median_color_running_detail_bg: "#063306",
     median_color_running_detail_line: "#AE6BFF",
-    median_color_disc_line: "#999999",
-    median_color_disc_detail_bg: "rgb(51,51,51)",
-    median_color_disc_detail_line: "#999999",
-    median_color_faster_line: "#ff0000",
-    median_color_faster_detail_bg: "#590000",
-    median_color_faster_detail_line: "#ff0000",
-    median_color_slower_line: "#22ff1a",
-    median_color_slower_detail_bg: "#063306",
-    median_color_slower_detail_line: "#22ff1a",
-    median_color_running_user_line_DEFAULT: "#22ff1a",
-    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
-    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
-    median_color_running_user_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
 
-    whisker_color_running_line: "#76b3ff",
-    whisker_color_running_detail_line: "#76b3ff",
-    whisker_color_running_detail_bg: "#293f59",
-    whisker_color_disc_line: "#76b3ff",
-    whisker_color_disc_detail_line: "#999999",
-    whisker_color_disc_detail_bg: "rgb(51,51,51)",
-    whisker_color_running_user_line: "#a6cfff",
+    whisker_color_running_line: "#a087a8",
+    whisker_color_running_detail_line: "#a087a8",
+    whisker_color_running_detail_bg: "#3c3340",
   }
 
   carclass3 = {
@@ -2065,41 +2003,14 @@ export class BoxplotProperties {
     bp_color_running_line: "#1a88ff",
     bp_color_running_detail_bg: "#093059",
     bp_color_running_detail_line: "#1a88ff",
-    bp_color_disc_background: "rgba(0,27,59,0.2)",
-    bp_color_disc_line: "#999999",
-    bp_color_disc_detail_bg: "rgb(51,51,51)",
-    bp_color_disc_detail_line: "#999999",
-    bp_color_user_background: "rgba(166,206,255,0.2)",
-    bp_color_user_line: "#a6cfff",
-    bp_color_user_detail_bg: "#d000ff",
-    bp_color_user_detail_line: "#d000ff",
 
     median_color_running_line: "#22ff1a",
     median_color_running_detail_bg: "#063306",
     median_color_running_detail_line: "#22ff1a",
-    median_color_disc_line: "#999999",
-    median_color_disc_detail_bg: "rgb(51,51,51)",
-    median_color_disc_detail_line: "#999999",
-    median_color_faster_line: "#ff0000",
-    median_color_faster_detail_bg: "#590000",
-    median_color_faster_detail_line: "#ff0000",
-    median_color_slower_line: "#22ff1a",
-    median_color_slower_detail_bg: "#063306",
-    median_color_slower_detail_line: "#22ff1a",
-    median_color_running_user_line_DEFAULT: "#22ff1a",
-    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
-    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
-    median_color_running_user_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
 
     whisker_color_running_line: "#76b3ff",
     whisker_color_running_detail_line: "#76b3ff",
     whisker_color_running_detail_bg: "#293f59",
-    whisker_color_disc_line: "#76b3ff",
-    whisker_color_disc_detail_line: "#999999",
-    whisker_color_disc_detail_bg: "rgb(51,51,51)",
-    whisker_color_running_user_line: "#a6cfff",
   }
 
   carclass4 = {
@@ -2109,41 +2020,14 @@ export class BoxplotProperties {
     bp_color_running_line: "#1a88ff",
     bp_color_running_detail_bg: "#093059",
     bp_color_running_detail_line: "#1a88ff",
-    bp_color_disc_background: "rgba(0,27,59,0.2)",
-    bp_color_disc_line: "#999999",
-    bp_color_disc_detail_bg: "rgb(51,51,51)",
-    bp_color_disc_detail_line: "#999999",
-    bp_color_user_background: "rgba(166,206,255,0.2)",
-    bp_color_user_line: "#a6cfff",
-    bp_color_user_detail_bg: "#d000ff",
-    bp_color_user_detail_line: "#d000ff",
 
     median_color_running_line: "#22ff1a",
     median_color_running_detail_bg: "#063306",
     median_color_running_detail_line: "#22ff1a",
-    median_color_disc_line: "#999999",
-    median_color_disc_detail_bg: "rgb(51,51,51)",
-    median_color_disc_detail_line: "#999999",
-    median_color_faster_line: "#ff0000",
-    median_color_faster_detail_bg: "#590000",
-    median_color_faster_detail_line: "#ff0000",
-    median_color_slower_line: "#22ff1a",
-    median_color_slower_detail_bg: "#063306",
-    median_color_slower_detail_line: "#22ff1a",
-    median_color_running_user_line_DEFAULT: "#22ff1a",
-    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
-    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
-    median_color_running_user_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
 
     whisker_color_running_line: "#76b3ff",
     whisker_color_running_detail_line: "#76b3ff",
     whisker_color_running_detail_bg: "#293f59",
-    whisker_color_disc_line: "#76b3ff",
-    whisker_color_disc_detail_line: "#999999",
-    whisker_color_disc_detail_bg: "rgb(51,51,51)",
-    whisker_color_running_user_line: "#a6cfff",
   }
 
   carclass5 = {
@@ -2153,151 +2037,16 @@ export class BoxplotProperties {
     bp_color_running_line: "#1a88ff",
     bp_color_running_detail_bg: "#093059",
     bp_color_running_detail_line: "#1a88ff",
-    bp_color_disc_background: "rgba(0,27,59,0.2)",
-    bp_color_disc_line: "#999999",
-    bp_color_disc_detail_bg: "rgb(51,51,51)",
-    bp_color_disc_detail_line: "#999999",
-    bp_color_user_background: "rgba(166,206,255,0.2)",
-    bp_color_user_line: "#a6cfff",
-    bp_color_user_detail_bg: "#d000ff",
-    bp_color_user_detail_line: "#d000ff",
 
     median_color_running_line: "#22ff1a",
     median_color_running_detail_bg: "#063306",
     median_color_running_detail_line: "#22ff1a",
-    median_color_disc_line: "#999999",
-    median_color_disc_detail_bg: "rgb(51,51,51)",
-    median_color_disc_detail_line: "#999999",
-    median_color_faster_line: "#ff0000",
-    median_color_faster_detail_bg: "#590000",
-    median_color_faster_detail_line: "#ff0000",
-    median_color_slower_line: "#22ff1a",
-    median_color_slower_detail_bg: "#063306",
-    median_color_slower_detail_line: "#22ff1a",
-    median_color_running_user_line_DEFAULT: "#22ff1a",
-    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
-    median_color_running_user_detail_bg_DEFAULT: "#22ff1a",
-    median_color_running_user_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
-    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
 
     whisker_color_running_line: "#76b3ff",
     whisker_color_running_detail_line: "#76b3ff",
     whisker_color_running_detail_bg: "#293f59",
-    whisker_color_disc_line: "#76b3ff",
-    whisker_color_disc_detail_line: "#999999",
-    whisker_color_disc_detail_bg: "rgb(51,51,51)",
-    whisker_color_running_user_line: "#a6cfff",
   }
-
-  // carclass2 = {
-  //   carclass_id: 0,
-  //   bp: {
-  //     color: {
-  //       running: {
-  //         bg: "rgba(59,37,89,0.2)",
-  //         line: "#AE6BFF",
-  //         detail: {
-  //           bg: "#2b1b40",
-  //           line: "#AE6BFF"
-  //         }
-  //       },
-  //       disc: {
-  //         bg: "rgba(77,77,77,0.4)",
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999",
-  //         }
-  //       },
-  //     },
-  //   },
-  //   median: {
-  //     color: {
-  //       running: {
-  //         line: "#AE6BFF",
-  //         detail: {
-  //           bg: "#2b1b40",
-  //           line: "#AE6BFF"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999"
-  //         },
-  //       },
-  //       user: {
-  //         line: "#AE6BFF",
-  //         highlight: {
-  //           line: "#ffd900",
-  //           detail: {
-  //             line: "#ffd900",
-  //             bg: "#4d4900"
-  //           }
-  //         },
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a",
-  //         },
-  //       },
-  //       faster: {
-  //         line: "#ff0000",
-  //         detail: {
-  //           bg: "#590000",
-  //           line: "#ff0000"
-  //         }
-  //       },
-  //       slower: {
-  //         line: "#22ff1a",
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a"
-  //         }
-  //       },
-  //     },
-  //   },
-  //   mean: {
-  //     color: {
-  //       line: "#ff0000",
-  //       detail: {
-  //         bg: "#590000",
-  //         line: "#ff0000"
-  //       }
-  //     }
-  //   },
-  //   whiskers: {
-  //     color: {
-  //       running: {
-  //         line: "#a087a8",
-  //         detail: {
-  //           line: "#a087a8",
-  //           bg: "#3c3340"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           line: "#999999",
-  //           bg: "rgb(51,51,51)"
-  //         }
-  //       },
-  //     },
-  //   },
-  //   laps: {
-  //     color: {
-  //       line: "#fffb00",
-  //       detail: {
-  //         line: "#fffb00",
-  //         bg: "#4d4900"
-  //       }
-  //     },
-  //   },
-  //   fliers: {
-  //     color: "rgba(176,176,176)",
-  //   },
-  // }
+  
   // carclass3 = {
   //   carclass_id: 0,
   //   bp: {
@@ -2643,9 +2392,39 @@ export class BoxplotProperties {
   general = {
 
     // colors
+    bp_color_disc_background: "rgba(0,27,59,0.2)",
+    bp_color_disc_line: "#999999",
+    bp_color_disc_detail_bg: "rgb(51,51,51)",
+    bp_color_disc_detail_line: "#999999",
+    bp_color_user_background: "rgba(166,206,255,0.2)",
+    bp_color_user_line: "#a6cfff",
+    bp_color_user_detail_bg: "#d000ff",
+    bp_color_user_detail_line: "#d000ff",
+
+    bp_colorFriend_running_background: "rgba(166,206,255,0.2)",
+    bp_colorFriend_running_line: "rgba(116,145,179,0.78)",
+    bp_colorFriend_running_detail_bg: "#d000ff",
+    bp_colorFriend_running_detail_line: "#d000ff",
+
     mean_color_line: "#ff0000",
     mean_color_detail_bg: "#590000",
     mean_color_detail_line: "#ff0000",
+
+    median_color_running_user_line_DEFAULT: "#22ff1a",
+    median_color_running_user_detail_line_DEFAUT: "#22ff1a",
+    median_color_running_user_detail_bg_DEFAULT: "#07cc0063",
+    median_color_running_user_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_line_HIGHLIGHT: "#ffd900",
+    median_color_running_user_detail_bg_HIGHLIGHT: "#4d4900",
+    median_color_disc_line: "#999999",
+    median_color_disc_detail_bg: "rgb(51,51,51)",
+    median_color_disc_detail_line: "#999999",
+    median_color_faster_line: "#ff0000",
+    median_color_faster_detail_bg: "#590000",
+    median_color_faster_detail_line: "#ff0000",
+    median_color_slower_line: "#22ff1a",
+    median_color_slower_detail_bg: "#063306",
+    median_color_slower_detail_line: "#22ff1a",
 
     laps_color_normal_line: "#fffb00",
     laps_color_normal_detail_line: "#fffb00",
@@ -2661,29 +2440,41 @@ export class BoxplotProperties {
 
     flier_color_line: "rgba(176,176,176)",
 
+    whisker_color_disc_line: "#76b3ff",
+    whisker_color_disc_detail_line: "#999999",
+    whisker_color_disc_detail_bg: "rgb(51,51,51)",
+    whisker_color_running_user_line: "#a6cfff",
+
     // dimensions
     q1_lineThickness_DEFAULT: 2,
     q1_lineThickness_HITBOX: 3,
     q1_lineThickness_SELECT: 4,
+
     q3_lineThickness_DEFAULT: 2,
     q3_lineThickness_HITBOX: 3,
     q3_lineThickness_SELECT: 4,
+
     median_lineThickness_DEFAULT: 2,
     median_lineThickness_SELECT: 3,
     median_lineThickness_HITBOX: 4,
     median_width: 0, // calculated
+
     mean_radius_DEFAULT: 4,
     mean_radius_SELECT: 5,
     mean_radius_HITBOX: 5,
+
     whisker_lineThickness_DEFAULT: 2,
     whisker_lineThickness_HITBOX: 2,
     whisker_lineThickness_SELECT: 2,
     whisker_width: 0, // calculated
+
     laps_radius_DEFAULT: 2,
     laps_radius_HITBOX: 2.5,
     laps_radius_SELECT: 2.5,    
+
     flier_radius: 3.5,
     flier_lineThickness: 0.7,
+
     box_width: 200, // start-value - exact value to be determined
     box_location: 0, // calculated
     box_middle: 0, // calculated
