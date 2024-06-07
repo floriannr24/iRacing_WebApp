@@ -6,6 +6,8 @@ from _backend.application.data_processor.boxplot import Boxplot
 from _backend.application.data_processor.sessionInfo import SessionInfo
 from _backend.application.sessionbuilder.session_builder import SessionBuilder, responseIsValid
 
+# uvicorn _backend.api.api:app --reload
+
 app = FastAPI()
 
 origins = [

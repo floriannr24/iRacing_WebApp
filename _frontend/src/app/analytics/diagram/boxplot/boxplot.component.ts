@@ -3,6 +3,7 @@ import {DataService} from "../../../_services/data.service";
 import {Driver, EventData} from "../../../_services/api.service";
 import {Subject,takeUntil} from "rxjs";
 import {Account} from "../../../settings/settings.component";
+import { log } from '@angular-devkit/build-angular/src/builders/ssr-dev-server';
 
 @Component({
   selector: 'app-boxplot',
@@ -12,6 +13,7 @@ import {Account} from "../../../settings/settings.component";
 
 export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
+  @ViewChild('body') body: ElementRef<HTMLBodyElement>
   @ViewChild('canvas') canvas: ElementRef<HTMLCanvasElement>
   @ViewChild('canvasAxis') canvasAxis: ElementRef<HTMLCanvasElement>
   @ViewChild('svgTime') svgTime: ElementRef<SVGElement>
@@ -31,7 +33,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   _showLabelDetail_lapNr: boolean = false
   _showLabelDetail_inc: boolean = false
   private _isClicked: boolean = false
-  private clickCompareLap: number | null
 
   private stop$ = new Subject<void>()
   private context: CanvasRenderingContext2D | any
@@ -267,6 +268,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.data_live = new Array<BoxplotElement>()
     this.calculateBoxplotWidth()
+    this.calculateLapThickness()
 
     for (const [i, driver] of this.data.drivers.entries()) {
 
@@ -308,6 +310,9 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     }
   }
+  calculateLapThickness() {
+    this.bpprop.general.laps_radius_DEFAULT = -(1/12) * this.data.drivers.length + 4
+  }
 
   private drawBox(q1: number, q3: number, driver: Driver) {
 
@@ -324,7 +329,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     // pattern for associated driver
     if (this.bpprop.options.showConnAccounts.checked && driver.isAssociated) {
 
-      this.context.strokeStyle = this.bpprop.carclass1.bp_colorFriend_running_line
+      this.context.strokeStyle = this.bpprop.general.bp_colorFriend_running_line
 
       let numberOfDiagonalLines = this.calculateNumberOfDiagonalLines(height, this.diaprop.boxplotDiagonalLineSpace)
       let q1_x_cut = this.calculateCuttingPointWithQ1(numberOfDiagonalLines, height, q1_x_start, q1_x_end)
@@ -808,7 +813,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private calculateBoxplotWidth() {
 
-    // use carclass1 boxplot width (=200px) and subtract -0.1 from it until the array of boxplots (incl gaps between) fits into the canvas
+    // use carclass1 boxplot width (=200px) as start and subtract -0.1 until all boxplots (incl gaps inbetween) fit into the canvas
     while (this.canvas.nativeElement.width < this.bpprop.general.box_gap + this.data.drivers.length * (this.bpprop.general.box_width + this.bpprop.general.box_gap)) {
       this.bpprop.general.box_width = this.bpprop.general.box_width - 0.1
     }
@@ -1160,6 +1165,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     event.preventDefault()
     event.stopPropagation()
     this.isDown = false
+    this.canvas.nativeElement.style.cursor = 'default'
   }
 
   private handleMouseDown(event: MouseEvent) {
@@ -1169,6 +1175,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.startX = event.clientX - this.cameraOffset.x
     this.startY = event.clientY - this.cameraOffset.y
+
+    this.canvas.nativeElement.style.cursor = 'all-scroll'
 
     this.isDown = true
   }
@@ -1195,6 +1203,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.drawSVG_Y_laptimeLabels()
     this.drawSVG_X_driverLabels()
+
   }
 
   private scaleCanvas(event: WheelEvent) {
@@ -1946,7 +1955,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 }
 
-
 export class BoxplotProperties {
 
   private static _instance: BoxplotProperties
@@ -1988,7 +1996,7 @@ export class BoxplotProperties {
     bp_color_running_detail_line: "#AE6BFF",
 
     median_color_running_line: "#AE6BFF",
-    median_color_running_detail_bg: "#063306",
+    median_color_running_detail_bg: "#2b1b40",
     median_color_running_detail_line: "#AE6BFF",
 
     whisker_color_running_line: "#a087a8",
@@ -1999,44 +2007,44 @@ export class BoxplotProperties {
   carclass3 = {
     carclass_id: 0, // calculated
 
-    bp_color_running_background: "rgba(0,27,59,0.2)",
-    bp_color_running_line: "#1a88ff",
-    bp_color_running_detail_bg: "#093059",
-    bp_color_running_detail_line: "#1a88ff",
+    bp_color_running_background: "rgba(89,76,29,0.3)",
+    bp_color_running_line: "#FFDA59",
+    bp_color_running_detail_bg: "#403716",
+    bp_color_running_detail_line: "#FFDA59",
 
     median_color_running_line: "#22ff1a",
     median_color_running_detail_bg: "#063306",
     median_color_running_detail_line: "#22ff1a",
 
-    whisker_color_running_line: "#76b3ff",
-    whisker_color_running_detail_line: "#76b3ff",
-    whisker_color_running_detail_bg: "#293f59",
+    whisker_color_running_line: "#a3a87e",
+    whisker_color_running_detail_line: "#a3a87e",
+    whisker_color_running_detail_bg: "#3e402f",
   }
 
   carclass4 = {
     carclass_id: 0, // calculated
 
-    bp_color_running_background: "rgba(0,27,59,0.2)",
-    bp_color_running_line: "#1a88ff",
-    bp_color_running_detail_bg: "#093059",
-    bp_color_running_detail_line: "#1a88ff",
+    bp_color_running_background: "rgba(89,29,47,0.2)",
+    bp_color_running_line: "#FF5888",
+    bp_color_running_detail_bg:"#401622",
+    bp_color_running_detail_line: "#FF5888",
 
     median_color_running_line: "#22ff1a",
     median_color_running_detail_bg: "#063306",
     median_color_running_detail_line: "#22ff1a",
 
-    whisker_color_running_line: "#76b3ff",
-    whisker_color_running_detail_line: "#76b3ff",
-    whisker_color_running_detail_bg: "#293f59",
+    whisker_color_running_line: "#b38686",
+    whisker_color_running_detail_line: "#b38686",
+    whisker_color_running_detail_bg: "#403030",
   }
 
   carclass5 = {
     carclass_id: 0, // calculated
 
     bp_color_running_background: "rgba(0,27,59,0.2)",
-    bp_color_running_line: "#1a88ff",
+    bp_color_running_line: "#24a8a8",
     bp_color_running_detail_bg: "#093059",
-    bp_color_running_detail_line: "#1a88ff",
+    bp_color_running_detail_line: "#24a8a8",
 
     median_color_running_line: "#22ff1a",
     median_color_running_detail_bg: "#063306",
@@ -2047,348 +2055,6 @@ export class BoxplotProperties {
     whisker_color_running_detail_bg: "#293f59",
   }
   
-  // carclass3 = {
-  //   carclass_id: 0,
-  //   bp: {
-  //     color: {
-  //       running: {
-  //         bg: "rgba(89,76,29,0.3)",
-  //         line: "#FFDA59",
-  //         detail: {
-  //           bg: "#403716",
-  //           line: "#FFDA59"
-  //         }
-  //       },
-  //       disc: {
-  //         bg: "rgba(77,77,77,0.4)",
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999",
-  //         }
-  //       },
-  //     },
-  //   },
-  //   median: {
-  //     color: {
-  //       running: {
-  //         line: "#FFDA59",
-  //         detail: {
-  //           bg: "#403716",
-  //           line: "#FFDA59"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999"
-  //         },
-  //       },
-  //       user: {
-  //         line: "#22ff1a",
-  //         highlight: {
-  //           line: "#ffd900",
-  //           detail: {
-  //             line: "#ffd900",
-  //             bg: "#4d4900"
-  //           }
-  //         },
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a",
-  //         },
-  //       },
-  //       faster: {
-  //         line: "#ff0000",
-  //         detail: {
-  //           bg: "#590000",
-  //           line: "#ff0000"
-  //         }
-  //       },
-  //       slower: {
-  //         line: "#22ff1a",
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a"
-  //         }
-  //       },
-  //     },
-  //   },
-  //   mean: {
-  //     color: {
-  //       line: "#ff0000",
-  //       detail: {
-  //         bg: "#590000",
-  //         line: "#ff0000"
-  //       }
-  //     },
-  //   },
-  //   whiskers: {
-  //     color: {
-  //       running: {
-  //         line: "#a3a87e",
-  //         detail: {
-  //           line: "#a3a87e",
-  //           bg: "#3e402f"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           line: "#999999",
-  //           bg: "rgb(51,51,51)"
-  //         }
-  //       },
-  //     },
-  //   },
-  //   laps: {
-  //     color: {
-  //       line: "#fffb00",
-  //       detail: {
-  //         line: "#fffb00",
-  //         bg: "#4d4900"
-  //       }
-  //     },
-  //   },
-  //   fliers: {
-  //     color: "rgba(176,176,176)",
-  //   }
-  // }
-  // carclass4 = {
-  //   carclass_id: 0,
-  //   bp: {
-  //     color: {
-  //       running: {
-  //         bg: "rgba(89,29,47,0.2)",
-  //         line: "#FF5888",
-  //         detail: {
-  //           bg: "#401622",
-  //           line: "#FF5888"
-  //         }
-  //       },
-  //       disc: {
-  //         bg: "rgba(77,77,77,0.4)",
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999",
-  //         }
-  //       },
-  //     },
-  //   },
-  //   median: {
-  //     color: {
-  //       running: {
-  //         line: "#FF5888",
-  //         detail: {
-  //           bg: "#401622",
-  //           line: "#FF5888"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999"
-  //         },
-  //       },
-  //       faster: {
-  //         line: "#ff0000",
-  //         detail: {
-  //           bg: "#590000",
-  //           line: "#ff0000"
-  //         }
-  //       },
-  //       slower: {
-  //         line: "#22ff1a",
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a"
-  //         }
-  //       },
-  //     }
-  //   },
-  //   mean: {
-  //     color: {
-  //       line: "#ff0000",
-  //       detail: {
-  //         bg: "#590000",
-  //         line: "#ff0000"
-  //       }
-  //     },
-  //   },
-  //   whiskers: {
-  //     color: {
-  //       running: {
-  //         line: "#b38686",
-  //         detail: {
-  //           line: "#b38686",
-  //           bg: "#403030"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           line: "#999999",
-  //           bg: "rgb(51,51,51)"
-  //         }
-  //       },
-  //     },
-  //   },
-  //   laps: {
-  //     color: {
-  //       line: "#fffb00",
-  //       detail: {
-  //         line: "#fffb00",
-  //         bg: "#4d4900"
-  //       }
-  //     },
-  //   },
-  //   fliers: {
-  //     color: "rgba(176,176,176)",
-  //   },
-  // }
-  // carclass5 = {
-  //   carclass_id: 0,
-  //   bp: {
-  //     color: {
-  //       running: {
-  //         bg: "rgba(0,27,59,0.2)",
-  //         line: "#24a8a8",
-  //         detail: {
-  //           bg: "#093059",
-  //           line: "#24a8a8"
-  //         }
-  //       },
-  //       disc: {
-  //         bg: "rgba(77,77,77,0.4)",
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999",
-  //         }
-  //       },
-  //       user: {
-  //         bg: "rgba(166,206,255,0.2)",
-  //         line: "#a6cfff",
-  //         detail: {
-  //           bg: "#d000ff",
-  //           line: "#d000ff"
-  //         }
-  //       },
-  //     },
-  //   },
-  //   q1: {
-  //     prop: {
-  //       lineThickness_DEFAULT: 2,
-  //       lineThickness_HITBOX: 3,
-  //       lineThickness_SELECT: 4
-  //     }
-  //   },
-  //   q3: {
-  //     prop: {
-  //       lineThickness_DEFAULT: 2,
-  //       lineThickness_HITBOX: 3,
-  //       lineThickness_SELECT: 4
-
-  //     }
-  //   },
-  //   median: {
-  //     color: {
-  //       running: {
-  //         line: "#22ff1a",
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           bg: "rgb(51,51,51)",
-  //           line: "#999999"
-  //         },
-  //       },
-  //       user: {
-  //         line: "#22ff1a",
-  //         highlight: {
-  //           line: "#ffd900",
-  //           detail: {
-  //             line: "#ffd900",
-  //             bg: "#4d4900"
-  //           }
-  //         },
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a",
-  //         },
-  //       },
-  //       faster: {
-  //         line: "#ff0000",
-  //         detail: {
-  //           bg: "#590000",
-  //           line: "#ff0000"
-  //         }
-  //       },
-  //       slower: {
-  //         line: "#22ff1a",
-  //         detail: {
-  //           bg: "#063306",
-  //           line: "#22ff1a"
-  //         }
-  //       },
-  //     },
-  //   },
-  //   mean: {
-  //     color: {
-  //       line: "#ff0000",
-  //       detail: {
-  //         bg: "#590000",
-  //         line: "#ff0000"
-  //       }
-  //     },
-  //   },
-  //   whiskers: {
-  //     color: {
-  //       running: {
-  //         line: "#76b3ff",
-  //         detail: {
-  //           line: "#76b3ff",
-  //           bg: "#293f59"
-  //         }
-  //       },
-  //       disc: {
-  //         line: "#999999",
-  //         detail: {
-  //           line: "#999999",
-  //           bg: "rgb(51,51,51)"
-  //         }
-  //       },
-  //       user: {
-  //         line: "#a6cfff"
-  //       },
-  //     },
-  //   },
-  //   laps: {
-  //     color: {
-  //       line: "#fffb00",
-  //       detail: {
-  //         line: "#fffb00",
-  //         bg: "#4d4900"
-  //       }
-  //     },
-  //     prop: {
-  //       radius_DEFAULT: 2,
-  //       radius_HITBOX: 2.5,
-  //       radius_SELECT: 2.5
-  //     }
-  //   },
-  //   fliers: {
-  //     color: "rgba(176,176,176)",
-  //   },
-  // }
-
   general = {
 
     // colors
@@ -2464,11 +2130,11 @@ export class BoxplotProperties {
     mean_radius_HITBOX: 5,
 
     whisker_lineThickness_DEFAULT: 2,
-    whisker_lineThickness_HITBOX: 2,
-    whisker_lineThickness_SELECT: 2,
+    whisker_lineThickness_HITBOX: 3,
+    whisker_lineThickness_SELECT: 3,
     whisker_width: 0, // calculated
 
-    laps_radius_DEFAULT: 2,
+    laps_radius_DEFAULT: 3,
     laps_radius_HITBOX: 2.5,
     laps_radius_SELECT: 2.5,    
 
@@ -2488,7 +2154,6 @@ export class BoxplotProperties {
         showFastestLapOverall: {label: "Fastest overall //", checked: false },
         showPersonalBestLaps: {"label": "Personal best // OR", checked: false },
         showIncidents: {"label": "Laps with incidents", checked: false },
-        clickCompare: {"label": "Click-compare", checked: true}
       }},
     showMean: {label: "Show mean", checked: false, available: true},
     showFasterSlower: {label: "Highlight faster / slower drivers", checked: false, available: true},
