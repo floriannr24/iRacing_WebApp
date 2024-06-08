@@ -915,6 +915,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
   private drawSVG_X_driverLabels_positionsGained(x_pos: number, driver: Driver) {
+
+    if ((this.bpprop.options.showMulticlass.checked && this.scale.x <= 1.3) || (!this.bpprop.options.showMulticlass.checked && this.scale.x < 0.9) ) {
+      return document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    }
+
     let driver_positionsGained = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     let y_pos = this.diaprop.driverPositionLabel_y
     x_pos = x_pos + 25
