@@ -310,7 +310,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       }
     }
   }
-  calculateLapThickness() {
+
+  private calculateLapThickness() {
     this.bpprop.general.laps_radius_DEFAULT = -(1/12) * this.data.drivers.length + 4
   }
 
@@ -440,6 +441,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private drawMean(mean: number, driver: Driver) {
 
+    // mean dot
     this.setColor_Mean()
 
     let mean_x = this.bpprop.general.box_middle - this.scrollX
@@ -454,6 +456,16 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     this.context.fill()
+
+    // //mean line overall
+    // let mean_overall_x = this.appWidth
+    // let mean_overall_y = this.convertSecondsToPixels(this.data.metadata.median)
+
+    // this.context.beginPath()
+    // this.context.lineWidth = 2 / this.scale.x
+    // this.context.moveTo(0 - this.scrollX, mean_overall_y - this.scrollY)
+    // this.context.lineTo(mean_overall_x  - this.scrollX, mean_overall_y - this.scrollY)
+    // this.context.stroke()
 
     return {
       x: mean_x,
@@ -1209,11 +1221,20 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private scaleCanvas(event: WheelEvent) {
     event.preventDefault()
     event.stopPropagation()
+  
     let previousScale: xy = {x: this.scale.x, y: this.scale.y}
     let direction = event.deltaY > 0 ? -1 : 1
 
+    let calculatedNewScaleX = this.scale.x + this.scaleFactor * direction
+
+    // stop zoom out once 0.5x has been reached
+    if (calculatedNewScaleX <= 0.5) {
+      return
+    }
+
     this.scale.x = this.scale.x + this.scaleFactor * direction
     this.scale.y = this.scale.y + this.scaleFactor * direction
+
 
     this.label_scale = this.scale.y.toFixed(1)
 
