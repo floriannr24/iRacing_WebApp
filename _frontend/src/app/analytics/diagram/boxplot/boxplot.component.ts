@@ -98,6 +98,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.contextAxis = this.canvasAxis.nativeElement.getContext('2d')
     this.initBpprop()
     this.initDiaprop()
+    this.calculateLapDotThickness()
+    this.calculateMeanDotThickness()
     this.canvasAxis.nativeElement.width = this.diaprop.yAxisBgWidth
     this.canvasAxis.nativeElement.height = this.appHeight
     this.initSVGs()
@@ -267,8 +269,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   private drawBoxplot() {
 
     this.data_live = new Array<BoxplotElement>()
-    this.calculateBoxplotWidth()
-    this.calculateLapThickness()
 
     for (const [i, driver] of this.data.drivers.entries()) {
 
@@ -311,8 +311,11 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private calculateLapThickness() {
+  private calculateLapDotThickness() {
     this.bpprop.general.laps_radius_DEFAULT = -(1/12) * this.data.drivers.length + 4
+    this.bpprop.general.dotPercentageSizeDifference = ((this.bpprop.general.laps_radius_DEFAULT - 2) / this.bpprop.general.laps_radius_DEFAULT) + 1
+    this.bpprop.general.laps_radius_SELECT = this.bpprop.general.laps_radius_SELECT * this.bpprop.general.dotPercentageSizeDifference
+    this.bpprop.general.laps_radius_HITBOX = this.bpprop.general.laps_radius_HITBOX * this.bpprop.general.dotPercentageSizeDifference
   }
 
   private drawBox(q1: number, q3: number, driver: Driver) {
@@ -825,7 +828,10 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private calculateBoxplotWidth() {
 
-    // use carclass1 boxplot width (=200px) as start and subtract -0.1 until all boxplots (incl gaps inbetween) fit into the canvas
+    // reset bp width
+    this.bpprop.general.box_width = 200
+
+    // use carclass1 boxplot width (=200px) as initial value and subtract -0.1 until all boxplots (incl gaps inbetween) fit into the canvas
     while (this.canvas.nativeElement.width < this.bpprop.general.box_gap + this.data.drivers.length * (this.bpprop.general.box_width + this.bpprop.general.box_gap)) {
       this.bpprop.general.box_width = this.bpprop.general.box_width - 0.1
     }
@@ -1109,8 +1115,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private initBpprop() {
 
-    // reset bp-width
-    this.bpprop.general.box_width = 200
+    this.calculateBoxplotWidth()
 
     // if multiclass: for each car-class, assign a specific property-object (= color scheme)
     if (this.bpprop.options.showMulticlass.checked && this.data.metadata.carclasses.length > 1) {
@@ -1125,7 +1130,13 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         listOfCarclassProps[i].carclass_id = listWithoutUserCarclass[i]
       }
     }
+
   }
+  private calculateMeanDotThickness() {
+      this.bpprop.general.mean_radius_DEFAULT = this.bpprop.general.mean_radius_DEFAULT * this.bpprop.general.dotPercentageSizeDifference
+      this.bpprop.general.mean_radius_HITBOX = this.bpprop.general.mean_radius_HITBOX * this.bpprop.general.dotPercentageSizeDifference
+      this.bpprop.general.mean_radius_SELECT = this.bpprop.general.mean_radius_SELECT * this.bpprop.general.dotPercentageSizeDifference
+    }
 
   private removeCarClasses(data: EventData) {
 
@@ -1992,7 +2003,7 @@ export class BoxplotProperties {
 
   // carclass1 as default
   carclass1 = {
-    carclass_id: 0, // calculated
+    carclass_id: -1, // calculated
 
     bp_color_running_background: "rgba(0,27,59,0.2)",
     bp_color_running_line: "#1a88ff",
@@ -2009,7 +2020,7 @@ export class BoxplotProperties {
   }
 
   carclass2 = {
-    carclass_id: 0, // calculated
+    carclass_id: -1, // calculated
 
     bp_color_running_background: "rgba(59,37,89,0.2)",
     bp_color_running_line: "#AE6BFF",
@@ -2026,7 +2037,7 @@ export class BoxplotProperties {
   }
 
   carclass3 = {
-    carclass_id: 0, // calculated
+    carclass_id: -1, // calculated
 
     bp_color_running_background: "rgba(89,76,29,0.3)",
     bp_color_running_line: "#FFDA59",
@@ -2043,7 +2054,7 @@ export class BoxplotProperties {
   }
 
   carclass4 = {
-    carclass_id: 0, // calculated
+    carclass_id: -1, // calculated
 
     bp_color_running_background: "rgba(89,29,47,0.2)",
     bp_color_running_line: "#FF5888",
@@ -2060,7 +2071,7 @@ export class BoxplotProperties {
   }
 
   carclass5 = {
-    carclass_id: 0, // calculated
+    carclass_id: -1, // calculated
 
     bp_color_running_background: "rgba(0,27,59,0.2)",
     bp_color_running_line: "#24a8a8",
@@ -2144,27 +2155,29 @@ export class BoxplotProperties {
     median_lineThickness_DEFAULT: 2,
     median_lineThickness_SELECT: 3,
     median_lineThickness_HITBOX: 4,
-    median_width: 0, // calculated
+    median_width: -1, // calculated
 
     mean_radius_DEFAULT: 4,
-    mean_radius_SELECT: 5,
-    mean_radius_HITBOX: 5,
+    mean_radius_SELECT: 5.5,
+    mean_radius_HITBOX: 5.5,
 
     whisker_lineThickness_DEFAULT: 2,
     whisker_lineThickness_HITBOX: 3,
     whisker_lineThickness_SELECT: 3,
-    whisker_width: 0, // calculated
+    whisker_width: -1, // calculated
 
     laps_radius_DEFAULT: 3,
-    laps_radius_HITBOX: 2.5,
-    laps_radius_SELECT: 2.5,    
+    laps_radius_HITBOX: 3,
+    laps_radius_SELECT: 3,    
+
+    dotPercentageSizeDifference: -1, // calculated
 
     flier_radius: 3.5,
     flier_lineThickness: 0.7,
 
-    box_width: 200, // start-value - exact value to be determined
-    box_location: 0, // calculated
-    box_middle: 0, // calculated
+    box_width: 200, // init-value: exact value calculated
+    box_location: -1, // calculated
+    box_middle: -1, // calculated
     box_gap: 14
   }
 
