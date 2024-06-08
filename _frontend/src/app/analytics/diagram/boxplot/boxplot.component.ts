@@ -916,7 +916,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
   private drawSVG_X_driverLabels_positionsGained(x_pos: number, driver: Driver) {
 
-    if ((this.bpprop.options.showMulticlass.checked && this.scale.x <= 1.3) || (!this.bpprop.options.showMulticlass.checked && this.scale.x < 0.9) ) {
+    if ((this.bpprop.options.showMulticlass.checked && this.scale.x < 1.1) || (!this.bpprop.options.showMulticlass.checked && this.scale.x < 0.9) ) {
       return document.createElementNS('http://www.w3.org/2000/svg', 'text');
     }
 
@@ -2319,7 +2319,7 @@ export class BoxplotProperties {
   general = {
 
     // colors
-    bp_color_disc_background: "rgba(0,27,59,0.2)",
+    bp_color_disc_background: "rgba(48, 48, 48, 0.2)",
     bp_color_disc_line: "#999999",
     bp_color_disc_detail_bg: "rgb(51,51,51)",
     bp_color_disc_detail_line: "#999999",
@@ -2367,7 +2367,7 @@ export class BoxplotProperties {
 
     flier_color_line: "rgba(176,176,176)",
 
-    whisker_color_disc_line: "#76b3ff",
+    whisker_color_disc_line: "#999999",
     whisker_color_disc_detail_line: "#999999",
     whisker_color_disc_detail_bg: "rgb(51,51,51)",
     whisker_color_running_user_line: "#a6cfff",
