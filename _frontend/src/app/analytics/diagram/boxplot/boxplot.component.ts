@@ -909,7 +909,40 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
       let textElement_finishPosition = this.drawSVG_X_driverLabels_finishPosition(x_pos, driver);
       gContainer.append(textElement_finishPosition)
 
+      let textElement_positionsGained = this.drawSVG_X_driverLabels_positionsGained(x_pos, driver);
+      gContainer.append(textElement_positionsGained)
+
     }
+  }
+  private drawSVG_X_driverLabels_positionsGained(x_pos: number, driver: Driver) {
+    let driver_positionsGained = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    let y_pos = this.diaprop.driverPositionLabel_y
+    x_pos = x_pos + 25
+
+    driver_positionsGained.setAttribute("x", x_pos.toString())
+    driver_positionsGained.setAttribute("y", y_pos.toString())
+    driver_positionsGained.style.transformBox = "fill-box"
+    driver_positionsGained.style.transformOrigin = "center 50%"
+    driver_positionsGained.setAttribute("text-anchor", "middle")
+    driver_positionsGained.setAttribute("font-size", this.diaprop.driverPositionsGained_fontSize + "px")
+    driver_positionsGained.setAttribute("text-rendering", "geometricPrecision")
+
+    switch (true) {
+      case driver.positions_gained_in_class > 0: 
+        driver_positionsGained.setAttribute("fill", this.diaprop.driverPositionsGained_pos_fontColor)
+        driver_positionsGained.textContent = "+" + driver.positions_gained_in_class.toString()
+        break
+      case driver.positions_gained_in_class < 0: 
+        driver_positionsGained.setAttribute("fill", this.diaprop.driverPositionsGained_neg_fontColor)
+        driver_positionsGained.textContent = driver.positions_gained_in_class.toString()
+        break
+      default:
+        driver_positionsGained.setAttribute("fill", this.diaprop.fullTickLabel_fontColor)
+        driver_positionsGained.textContent = driver.positions_gained_in_class.toString()
+    }
+
+    return driver_positionsGained
+
   }
 
   private init_gContainer(name: string, svgElement: ElementRef<SVGElement>) {
@@ -2464,6 +2497,10 @@ class DiagramProperties {
   drivernameLabel_y: number = 55
   drivernameLabel_fontSize: number = 20
   drivernameLabel_fontColor: string = "#d9d9d9"
+
+  driverPositionsGained_neg_fontColor: string =  "#ff0000"
+  driverPositionsGained_pos_fontColor: string = "#22ff1a"
+  driverPositionsGained_fontSize: number = 15
 
   boxplotDiagonalLineSpace: number = 15
 
