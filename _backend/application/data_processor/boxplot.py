@@ -43,8 +43,9 @@ class Boxplot:
         dictionary = self.calculateMedian(dictionary)
         dictionary = self.sortDictionary(dictionary)
         dictionary = self.removePositionsForDiscDisq(dictionary)
-        dictionary = self.numberOfLapsInEvent(dictionary)
-        dictionary = self.findMeanAndMedianPerCarclass(dictionary)
+        dictionary = self.meanAndMedianPerCarclass(dictionary)
+        dictionary = self.numberOfLapsPerCarclass(dictionary)
+
 
         return {
             "response": response1["response"],
@@ -354,7 +355,7 @@ class Boxplot:
 
         return unique_cc_list
     
-    def findMeanAndMedianPerCarclass(self, dict):
+    def meanAndMedianPerCarclass(self, dict):
         cc_list = dict["metadata"]["carclasses"]
 
         list = []
@@ -442,16 +443,15 @@ class Boxplot:
                     {"lap": record["lap_number"] - 1, "incidents": record["incident"], "events": record["lap_events"]})
         return laps
 
-    def numberOfLapsInEvent(self, dict):
-        # depends on class
+    def numberOfLapsPerCarclass(self, dict):
 
-        dict["metadata"]["laps"] = {}
         carclasses = dict["metadata"]["carclasses"]
 
-        for cclass in carclasses:
-            cclass_laps = self.lapsOfCarclass(cclass, dict)
-            dict["metadata"]["laps"][str(cclass)] = cclass_laps
-
+        for cc in carclasses:
+            cc_id = cc["carclass_id"]
+            laps = self.lapsOfCarclass(cc_id, dict)
+            cc["laps"] = laps
+            
         return dict
 
     def lapsOfCarclass(self, cclass, dict):

@@ -109,20 +109,25 @@ export class EventData {
   constructor() {
     this.metadata = {
       subsession_id: 0,
-      laps: 0,
       timeframe: [70,110],
       median: 90,
-      carclasses: [0]
+      carclasses: new Array<CarclassData>
     }
   }
 }
 
 export interface Metadata {
     subsession_id: number,
-    laps: number,
     timeframe: number[],
     median: number
-    carclasses: number[]
+    carclasses: CarclassData[]
+}
+
+export interface CarclassData {
+  carclass_id: number,
+  median: number,
+  mean: number
+  laps: number
 }
 
 

@@ -90,7 +90,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-
     // first init when view loads
     this.canvas.nativeElement.width = this.appWidth = this.app.nativeElement.parentNode.clientWidth - 150 // 1390
     this.canvas.nativeElement.height = this.appHeight = this.app.nativeElement.parentNode.clientHeight // 786
@@ -98,8 +97,8 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.contextAxis = this.canvasAxis.nativeElement.getContext('2d')
     this.initBpprop()
     this.initDiaprop()
-    this.calculateLapDotThickness()
-    this.calculateMeanDotThickness()
+    this.bpprop.calculateLapDotThickness(this.data)
+    this.bpprop.calculateMeanDotThickness()
     this.canvasAxis.nativeElement.width = this.diaprop.yAxisBgWidth
     this.canvasAxis.nativeElement.height = this.appHeight
     this.initSVGs()
@@ -153,72 +152,159 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     this.drawBoxplot()
     this.drawAxes()
     this.drawDetailLabels()
+    this.drawMedianMeanOverlay()
 
     requestAnimationFrame(this.draw.bind(this))
 
   }
 
+  private drawMedianMeanOverlay() {
+
+    //mean
+    if (this.bpprop.options.showMean.checked) {
+
+      let usercarclass = this.diaprop.userDriver.car_class_id
+      let mean: number = -1
+
+      for (const cc of this.data.metadata.carclasses) {
+        if (cc.carclass_id === usercarclass) {
+          mean = cc.mean
+        }
+      }
+    
+      this.context.beginPath()
+      this.context.lineWidth = 2 / this.scale.x
+      this.context.strokeStyle = this.bpprop.general.median_color_faster_line
+      this.context.moveTo(0 - this.cameraOffset.x / this.scale.x, this.convertSecondsToPixels(mean) - this.scrollY)
+      this.context.lineTo((this.context.canvas.width - this.cameraOffset.x) / this.scale.x, this.convertSecondsToPixels(mean) - this.scrollY)
+      this.context.stroke()
+    }
+
+    //median
+    if (this.bpprop.options.showFasterSlower.checked) {
+
+      let usercarclass = this.diaprop.userDriver.car_class_id
+      let median: number = -1
+
+      for (const cc of this.data.metadata.carclasses) {
+        if (cc.carclass_id === usercarclass) {
+          median = cc.median
+        }
+      }
+        
+      this.context.beginPath()
+      this.context.lineWidth = 2 / this.scale.x
+      this.context.strokeStyle = this.bpprop.general.median_color_running_user_line_HIGHLIGHT
+      this.context.moveTo(0 - this.cameraOffset.x / this.scale.x, this.convertSecondsToPixels(median) - this.scrollY)
+      this.context.lineTo((this.context.canvas.width - this.cameraOffset.x) / this.scale.x, this.convertSecondsToPixels(median) - this.scrollY)
+      this.context.stroke()
+    }
+  }
+
   private drawAxes() {
 
-    // y-axis
-    this.contextAxis.beginPath()
-    this.contextAxis.moveTo(this.diaprop.yAxis_pos / this.scale.x, this.diaprop.renderStart.y)
-    this.contextAxis.lineTo(this.diaprop.yAxis_pos / this.scale.x, this.diaprop.renderEnd.y / this.scale.y)
-    this.contextAxis.strokeStyle = this.diaprop.yAxis_color
-    this.contextAxis.lineWidth = 1 / this.scale.x
-    this.contextAxis.stroke()
+    this.drawYAxis();
+    this.drawYTicks()
 
-    // full ticks
-    for (let i = 0; i < this.diaprop.yAxisTicks_end; i++) {
+    if (this.bpprop.options.showMean.checked) {
 
+      let usercarclass = this.diaprop.userDriver.car_class_id
+      let mean: number = -1
+
+      for (const cc of this.data.metadata.carclasses) {
+        if (cc.carclass_id === usercarclass) {
+          mean = cc.mean
+        }
+      }
+    
       this.contextAxis.beginPath()
-      this.contextAxis.strokeStyle = this.diaprop.yAxis_color
-      this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-      this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-      this.contextAxis.stroke()
-
-      this.contextAxis.beginPath()
-      this.contextAxis.strokeStyle = this.diaprop.fullTick_color
-      this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale.x, (this.convertSecondsToPixels(i)) - this.scrollY)
-      this.contextAxis.lineTo((this.diaprop.yAxisBgWidth / this.scale.x), (this.convertSecondsToPixels(i)) - this.scrollY)
+      this.contextAxis.lineWidth = 2 / this.scale.x
+      this.contextAxis.strokeStyle = this.bpprop.general.median_color_faster_line
+      this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(mean) - this.scrollY)
+      this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(mean) - this.scrollY)
       this.contextAxis.stroke()
     }
 
-    // 1/2 ticks
-    if (this.scale.x > 1.0) {
-      for (let i = 0.5; i < this.diaprop.yAxisTicks_end; i++) {
-        this.contextAxis.beginPath()
-        this.contextAxis.strokeStyle = this.diaprop.yAxis_color
-        this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.stroke()
+    //median
+    if (this.bpprop.options.showFasterSlower.checked) {
 
-        this.contextAxis.beginPath()
-        this.contextAxis.strokeStyle = this.diaprop.halfTick_color
-        this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.lineTo(this.diaprop.yAxisBgWidth / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.stroke()
+      let usercarclass = this.diaprop.userDriver.car_class_id
+      let median: number = -1
+
+      for (const cc of this.data.metadata.carclasses) {
+        if (cc.carclass_id === usercarclass) {
+          median = cc.median
+        }
       }
+        
+      this.contextAxis.beginPath()
+      this.contextAxis.lineWidth = 2 / this.scale.x
+      this.contextAxis.strokeStyle = this.bpprop.general.median_color_running_user_line_HIGHLIGHT
+      this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(median) - this.scrollY)
+      this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(median) - this.scrollY)
+      this.contextAxis.stroke()
     }
 
-    // 1/4 ticks
-    if (this.scale.x > 2.0) {
-      for (let i = 0.25; i < this.diaprop.yAxisTicks_end;) {
-        this.contextAxis.beginPath()
-        this.contextAxis.strokeStyle = this.diaprop.yAxis_color
-        this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.stroke()
 
-        this.contextAxis.beginPath()
-        this.contextAxis.strokeStyle = this.diaprop.quarterTick_color
-        this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.lineTo(this.diaprop.yAxisBgWidth / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
-        this.contextAxis.stroke()
 
-        i = i + 0.5
-      }
-    }
+  }
+
+  private drawYAxis() {
+    this.contextAxis.beginPath();
+    this.contextAxis.moveTo(this.diaprop.yAxis_pos / this.scale.x, this.diaprop.renderStart.y);
+    this.contextAxis.lineTo(this.diaprop.yAxis_pos / this.scale.x, this.diaprop.renderEnd.y / this.scale.y);
+    this.contextAxis.strokeStyle = this.diaprop.yAxis_color;
+    this.contextAxis.lineWidth = 1 / this.scale.x;
+    this.contextAxis.stroke();
+  }
+
+  private drawYTicks() {
+
+        // full ticks
+        for (let i = 0; i < this.diaprop.yAxisTicks_end; i++) {
+
+          this.contextAxis.beginPath()
+          this.contextAxis.strokeStyle = this.diaprop.yAxis_color
+          this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+          this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.fullTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+          this.contextAxis.stroke()
+        }
+    
+        // 1/2 ticks
+        if (this.scale.x > 1.0) {
+          for (let i = 0.5; i < this.diaprop.yAxisTicks_end; i++) {
+            this.contextAxis.beginPath()
+            this.contextAxis.strokeStyle = this.diaprop.yAxis_color
+            this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.stroke()
+    
+            this.contextAxis.beginPath()
+            this.contextAxis.strokeStyle = this.diaprop.halfTick_color
+            this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.halfTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.lineTo(this.diaprop.yAxisBgWidth / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.stroke()
+          }
+        }
+    
+        // 1/4 ticks
+        if (this.scale.x > 2.0) {
+          for (let i = 0.25; i < this.diaprop.yAxisTicks_end;) {
+            this.contextAxis.beginPath()
+            this.contextAxis.strokeStyle = this.diaprop.yAxis_color
+            this.contextAxis.moveTo((this.diaprop.yAxis_pos - this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.lineTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.stroke()
+    
+            this.contextAxis.beginPath()
+            this.contextAxis.strokeStyle = this.diaprop.quarterTick_color
+            this.contextAxis.moveTo((this.diaprop.yAxis_pos + this.diaprop.quarterTick_width / 2) / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.lineTo(this.diaprop.yAxisBgWidth / this.scale.x, this.convertSecondsToPixels(i) - this.scrollY)
+            this.contextAxis.stroke()
+    
+            i = i + 0.5
+          }
+        }
   }
 
   private drawBackground() {
@@ -274,7 +360,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
       if (driver.laps.length > 0) {
 
-        if (this.bpprop.options.showConnAccounts.checked) {
+        if (this.bpprop.options.showAssociatedAccounts.checked) {
           driver.isAssociated = this.checkIfDriverIsAssociated(driver)
         }
 
@@ -311,13 +397,6 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  private calculateLapDotThickness() {
-    this.bpprop.general.laps_radius_DEFAULT = -(1/12) * this.data.drivers.length + 4
-    this.bpprop.general.dotPercentageSizeDifference = ((this.bpprop.general.laps_radius_DEFAULT - 2) / this.bpprop.general.laps_radius_DEFAULT) + 1
-    this.bpprop.general.laps_radius_SELECT = this.bpprop.general.laps_radius_SELECT * this.bpprop.general.dotPercentageSizeDifference
-    this.bpprop.general.laps_radius_HITBOX = this.bpprop.general.laps_radius_HITBOX * this.bpprop.general.dotPercentageSizeDifference
-  }
-
   private drawBox(q1: number, q3: number, driver: Driver) {
 
     let q3_x_start = this.bpprop.general.box_location - this.scrollX
@@ -331,7 +410,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
     let height = this.convertSecondsToPixels(q3) - this.convertSecondsToPixels(q1)
 
     // pattern for associated driver
-    if (this.bpprop.options.showConnAccounts.checked && driver.isAssociated) {
+    if (this.bpprop.options.showAssociatedAccounts.checked && driver.isAssociated) {
 
       this.context.strokeStyle = this.bpprop.general.bp_colorFriend_running_line
 
@@ -626,7 +705,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     let x = this.diaprop.tickLabel_x
 
-    // omit every 2nd tick
+    // omit every 2nd tick if zoom below 0.7
     if (this.scale.x < 0.7) {
       for (let i = 0; i < this.diaprop.yAxisTicks_end;) {
 
@@ -709,6 +788,110 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
       }
+    }
+
+    // mean label
+    this.drawSVG_Y_meanLabel(gContainer)
+
+    // median label
+    this.drawSVG_Y_medianLabel(gContainer)
+
+  }
+
+  private drawSVG_Y_medianLabel(gContainer: SVGGElement) {
+
+    if (this.bpprop.options.showFasterSlower.checked) {
+
+      let usercarclass = this.diaprop.userDriver.car_class_id
+      let median: number = -1
+
+      for (const cc of this.data.metadata.carclasses) {
+        if (cc.carclass_id === usercarclass) {
+          median = cc.median
+        }
+      }
+
+      // shape
+      let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+      let y = (this.convertSecondsToPixels(median) - this.scrollY) * this.scale.x - 10 + this.cameraOffset.y
+      let x = 56
+
+      rect.setAttribute("x", x.toString())
+      rect.setAttribute("y", y.toString())
+      rect.setAttribute("width", "80px")
+      rect.setAttribute("height", "21px")
+      rect.setAttribute("fill", this.bpprop.general.median_color_running_user_line_HIGHLIGHT)
+
+      gContainer.append(rect)
+
+      // text
+      let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+
+      y = (this.convertSecondsToPixels(median) - this.scrollY) * this.scale.x + 8 + this.cameraOffset.y
+      x = 45
+      let time = this.convertTimeFormat(median)
+
+      text.setAttribute("x", x.toString())
+      text.setAttribute("y", y.toString())
+      text.setAttribute("fill", "#00000")
+      text.setAttribute("transform", "scale(0.8)")
+      text.style.transformBox = "fill-box"
+      text.style.transformOrigin = "right 50%"
+      text.setAttribute("font-size", this.diaprop.fullTickLabel_fontSize + "px")
+      text.setAttribute("text-rendering", "geometricPrecision")
+      text.textContent = time
+
+      gContainer.append(text)
+
+    }
+  }
+
+  private drawSVG_Y_meanLabel(gContainer: SVGGElement) {
+    if (this.bpprop.options.showMean.checked) {
+
+      let usercarclass = this.diaprop.userDriver.car_class_id
+      let mean: number = -1
+
+      for (const cc of this.data.metadata.carclasses) {
+        if (cc.carclass_id === usercarclass) {
+          mean = cc.mean
+        }
+      }
+
+      // shape
+      let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+
+      let y = (this.convertSecondsToPixels(mean) - this.scrollY) * this.scale.x - 10 + this.cameraOffset.y
+      let x = 56
+
+      rect.setAttribute("x", x.toString())
+      rect.setAttribute("y", y.toString())
+      rect.setAttribute("width", "80px")
+      rect.setAttribute("height", "21px")
+      rect.setAttribute("fill", this.bpprop.general.mean_color_line)
+
+      gContainer.append(rect)
+
+      // text
+      let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+
+      y = (this.convertSecondsToPixels(mean) - this.scrollY) * this.scale.x + 8 + this.cameraOffset.y
+      x = 45
+      let time = this.convertTimeFormat(mean)
+
+      text.setAttribute("x", x.toString())
+      text.setAttribute("y", y.toString())
+      text.setAttribute("fill", this.diaprop.fullTickLabel_fontColor)
+      text.setAttribute("transform", "scale(0.8)")
+      text.style.transformBox = "fill-box"
+      text.style.transformOrigin = "right 50%"
+      text.setAttribute("font-size", this.diaprop.fullTickLabel_fontSize + "px")
+      text.setAttribute("text-rendering", "geometricPrecision")
+      text.textContent = time
+
+      gContainer.append(text)
+
     }
   }
 
@@ -1024,7 +1207,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private setColor_Box(driver: Driver) {
 
-    if (driver.name === this.diaprop.userDriver.name || driver.isAssociated && this.bpprop.options.showConnAccounts.checked) {
+    if (driver.name === this.diaprop.userDriver.name || driver.isAssociated && this.bpprop.options.showAssociatedAccounts.checked) {
       this.context.fillStyle = this.bpprop.general.bp_color_user_background
       this.context.strokeStyle = this.bpprop.general.bp_color_user_line
     } else {
@@ -1117,26 +1300,21 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.calculateBoxplotWidth()
 
-    // if multiclass: for each car-class, assign a specific property-object (= color scheme)
+    // if multiclass: for each car-class, assign a specific property-object (= color theme)
     if (this.bpprop.options.showMulticlass.checked && this.data.metadata.carclasses.length > 1) {
-      let listWithoutUserCarclass = this.data.metadata.carclasses.filter(item => item !== this.diaprop.userDriver.car_class_id)
-      let listOfCarclassProps = [this.bpprop.carclass2, this.bpprop.carclass3, this.bpprop.carclass4, this.bpprop.carclass5]
+      let listWithoutUserCarclass = this.data.metadata.carclasses.filter(item => item.carclass_id !== this.diaprop.userDriver.car_class_id)
+      let listOfCarclassThemes = [this.bpprop.carclass2, this.bpprop.carclass3, this.bpprop.carclass4, this.bpprop.carclass5]
 
-            while (listWithoutUserCarclass.length < listOfCarclassProps.length) {
-        listOfCarclassProps = listOfCarclassProps.splice(0,listOfCarclassProps.length-1)
+      while (listWithoutUserCarclass.length < listOfCarclassThemes.length) {
+        listOfCarclassThemes = listOfCarclassThemes.splice(0,listOfCarclassThemes.length-1)
       }
 
       for (let i = 0; i < listWithoutUserCarclass.length; i++) {
-        listOfCarclassProps[i].carclass_id = listWithoutUserCarclass[i]
+        listOfCarclassThemes[i].carclass_id = listWithoutUserCarclass[i].carclass_id
       }
     }
 
   }
-  private calculateMeanDotThickness() {
-      this.bpprop.general.mean_radius_DEFAULT = this.bpprop.general.mean_radius_DEFAULT * this.bpprop.general.dotPercentageSizeDifference
-      this.bpprop.general.mean_radius_HITBOX = this.bpprop.general.mean_radius_HITBOX * this.bpprop.general.dotPercentageSizeDifference
-      this.bpprop.general.mean_radius_SELECT = this.bpprop.general.mean_radius_SELECT * this.bpprop.general.dotPercentageSizeDifference
-    }
 
   private removeCarClasses(data: EventData) {
 
@@ -2001,6 +2179,19 @@ export class BoxplotProperties {
     return BoxplotProperties._instance
   }
 
+  calculateLapDotThickness(data: EventData) {
+    this.general.laps_radius_DEFAULT = -(1/12) * data.drivers.length + 4
+    this.general.dotPercentageSizeDifference = ((this.general.laps_radius_DEFAULT - 2) / this.general.laps_radius_DEFAULT) + 1
+    this.general.laps_radius_SELECT = this.general.laps_radius_SELECT * this.general.dotPercentageSizeDifference
+    this.general.laps_radius_HITBOX = this.general.laps_radius_HITBOX * this.general.dotPercentageSizeDifference
+  }
+
+  calculateMeanDotThickness() {
+    this.general.mean_radius_DEFAULT = this.general.mean_radius_DEFAULT * this.general.dotPercentageSizeDifference
+    this.general.mean_radius_HITBOX = this.general.mean_radius_HITBOX * this.general.dotPercentageSizeDifference
+    this.general.mean_radius_SELECT = this.general.mean_radius_SELECT * this.general.dotPercentageSizeDifference
+  }
+
   // carclass1 as default
   carclass1 = {
     carclass_id: -1, // calculated
@@ -2183,7 +2374,7 @@ export class BoxplotProperties {
 
   options: OptionsBoxplot = {
     showDiscDisq: {label: "Show disconnected / disqualified drivers", checked: false, available: true},
-    showIndividualLaps: {label: "Show individual laps", checked: true, available: true,
+    showIndividualLaps: {label: "Show individual laps", checked: false, available: true,
       suboptions: {
         showFastestLapOverall: {label: "Fastest overall //", checked: false },
         showPersonalBestLaps: {"label": "Personal best // OR", checked: false },
@@ -2193,7 +2384,7 @@ export class BoxplotProperties {
     showFasterSlower: {label: "Highlight faster / slower drivers", checked: false, available: true},
     showMulticlass: {label: "Show all car classes", checked: false, available: true},
     sortBySpeed: {label: "Sort drivers from fastest to slowest", checked: false, available: true},
-    showConnAccounts: {label: "Show connected accounts", checked: false, available: true}
+    showAssociatedAccounts: {label: "Show connected accounts", checked: false, available: true}
   }
 }
 
@@ -2205,7 +2396,7 @@ type OptionName =
   | "showFasterSlower"
   | "showMulticlass"
   | "sortBySpeed"
-  | "showConnAccounts"
+  | "showAssociatedAccounts"
 
 type SuboptionName =
   | "showPersonalBestLaps"
