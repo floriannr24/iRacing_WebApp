@@ -117,6 +117,7 @@ class Boxplot:
             "id": driver_id,
             "finish_position": self.set_finishPosition(list_of_positions),
             "finish_position_in_class": self.set_finishPositionInClass(driver_id),
+            "positions_gained_in_class": self.set_positionsGainedInClass(driver_id),
             "result_status": self.set_resultStatus(driver_id),
             "laps_completed": self.set_lapsCompleted(list_of_positions),
             "laps": self.set_laps(driver_id),
@@ -128,6 +129,12 @@ class Boxplot:
         }
 
         return intDict
+    
+    def set_positionsGainedInClass(self, driver_id):
+        for data in self.iRacing_results["session_results"][2]["results"]:
+            if data["cust_id"] == driver_id:
+                return data["starting_position_in_class"] - data["finish_position_in_class"]
+                
 
     def list_of_positions(self, driver_id):
         laps_completed_pos = []
