@@ -44,6 +44,7 @@ class Boxplot:
         dictionary = self.sortDictionary(dictionary)
         dictionary = self.removePositionsForDiscDisq(dictionary)
         dictionary = self.numberOfLapsInEvent(dictionary)
+        dictionary = self.findMeanAndMedianPerCarclass(dictionary)
 
         return {
             "response": response1["response"],
@@ -352,6 +353,42 @@ class Boxplot:
         unique_cc_list.sort()
 
         return unique_cc_list
+    
+    def findMeanAndMedianPerCarclass(self, dict):
+        cc_list = dict["metadata"]["carclasses"]
+
+        list = []
+
+        for cc in cc_list:
+            data = {
+                "carclass_id": cc,
+                "median": self.findMedianForCarclass(cc, dict),
+                "mean": self.findMeanForCarclass(cc, dict)
+            }
+
+            list.append(data)
+        
+        dict["metadata"]["carclasses"] = list
+
+        return dict
+    
+    def findMedianForCarclass(self, cc, dict):
+        lapsWithStatusRunning = []
+
+        for driver in dict["drivers"]:
+            if driver["result_status"] == "Running" and driver["car_class_id"] == cc:
+                lapsWithStatusRunning.extend(driver["laps"])
+        
+        return round(statistics.median(lapsWithStatusRunning),2)
+    
+    def findMeanForCarclass(self, cc, dict):
+        lapsWithStatusRunning = []
+
+        for driver in dict["drivers"]:
+            if driver["result_status"] == "Running" and driver["car_class_id"] == cc:
+                lapsWithStatusRunning.extend(driver["laps"])
+        
+        return round(statistics.mean(lapsWithStatusRunning),2)
 
     def addDriverInfo(self, unique_drivers):
 
@@ -359,7 +396,6 @@ class Boxplot:
 
         for driver in unique_drivers:
             output = self.collectInfo(driver)
-            # output = self.deleteInvalidLaptimes(output)
             output = self.caclulateBoxplotData(output)
             driverArray.append(output)
 

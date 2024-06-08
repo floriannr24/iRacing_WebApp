@@ -2027,7 +2027,7 @@ export class BoxplotProperties {
     bp_color_running_detail_bg: "#2b1b40",
     bp_color_running_detail_line: "#AE6BFF",
 
-    median_color_running_line: "#AE6BFF",
+    median_color_running_line: "#ae6bff",
     median_color_running_detail_bg: "#2b1b40",
     median_color_running_detail_line: "#AE6BFF",
 
