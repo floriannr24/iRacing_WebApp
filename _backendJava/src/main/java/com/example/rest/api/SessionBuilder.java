@@ -2,30 +2,41 @@ package com.example.rest.api;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.net.CookieStore;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.swing.text.html.parser.Entity;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.boot.autoconfigure.integration.IntegrationProperties.RSocket.Client;
+import org.springframework.boot.web.server.Cookie;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.client.reactive.JettyClientHttpConnector;
+import org.springframework.objenesis.strategy.StdInstantiatorStrategy;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import java.nio.charset.StandardCharsets;
+import jakarta.servlet.http.HttpSession;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.Map;
+import org.eclipse.jetty.client.HttpClient;
+import org.eclipse.jetty.http.HttpCookieStore;
+import org.eclipse.jetty.http.HttpHeader;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SessionBuilder {
+
+    WebClient wc;
 
     private Map<String, String> readCredentialsFromFile() {
 
@@ -50,7 +61,9 @@ public class SessionBuilder {
         Map<String, String> credentialsClear = this.readCredentialsFromFile();
         String encodedPassword = this.encodePW(credentialsClear);
         Credentials credentialsEncoded = new Credentials(credentialsClear.get("email"), encodedPassword);
+        //if cookie exists
         this.login(credentialsEncoded);
+        //if no cookie exists
     }
 
     private String encodePW(Map<String, String> credentialsClear) throws NoSuchAlgorithmException {
@@ -71,20 +84,33 @@ public class SessionBuilder {
     }
 
     private void login(Credentials credentials) {
-        String loginAdress = "https://members-ng.iracing.com/auth";
+        CookieHandler ch = new CookieHandler();
 
-        WebClient wc = WebClient.create();
+        WebClient wc = WebClient.create("https://members-ng.iracing.com/");
 
-        String result = wc.post()
-            .uri("https://members-ng.iracing.com/auth")
-            .contentType(MediaType.APPLICATION_JSON)
+        String loadedCookies = ch.loadCookies();
+
+        if (loadedCookies.equals("")) {
+            String result = wc.post()
+            .uri("/auth")
             .bodyValue(credentials)
             .retrieve()
             .bodyToMono(String.class)
             .block();
+    
+            ch.saveCookies(result);
+        }
 
-        System.out.println(result);
+        // String auth = ch.loadCookies();
 
+        // String str = wc.get()
+        //     .uri("/data/car/get")
+        //     .header(auth)
+        //     .retrieve()
+        //     .bodyToMono(String.class)
+        //     .block();   
+            
+        // System.out.println(str);
     }
 
     // loginAdress = "https://members-ng.iracing.com/auth"
@@ -115,5 +141,38 @@ public class SessionBuilder {
     // else:
     //     print('[session_builder] loading saved cookies')
     //     self.session.cookies.load(cookie_File)
+
+}
+
+class CookieHandler {
+
+    Path cookieFilePath;
+
+    public CookieHandler() {
+        this.cookieFilePath = Paths.get("C:/Users/FSX-P/Documents/VisualStudioCode/iRacing_WebApp/_backendJava/cookie.txt");
+    }
+
+    // public MultiValueMap<String, HttpCookie> getCookies() {
+    //     this.loadCookies();
+    //     return new LinkedMultiValueMap<>();
+    // }
+
+    public String loadCookies() {
+
+        try {
+            byte[] contentBytes = Files.readAllBytes(this.cookieFilePath);
+            return new String(contentBytes);
+        } catch (IOException e) {
+            return "";
+        }
+    }
+
+    public void saveCookies(String content) {
+        try {
+            Files.write(this.cookieFilePath, content.getBytes());
+        } catch (IOException e) {
+
+        }
+    }
 
 }

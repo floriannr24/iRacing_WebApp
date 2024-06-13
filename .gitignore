@@ -1,6 +1,7 @@
 ./_frontend/node_modules
 ./frontend/.angular
 ./backend/application/sessionbuilder/files/*
+_backendJava/src/main/resources/cookie.json
 _backendJava/src/main/resources/credentials.properties
 .vscode
 
