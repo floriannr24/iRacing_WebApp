@@ -943,7 +943,7 @@ export class BoxplotComponent implements AfterViewInit, OnInit, OnDestroy {
         break
       default:
         driver_positionsGained.setAttribute("fill", this.diaprop.fullTickLabel_fontColor)
-        driver_positionsGained.textContent = driver.positions_gained_in_class.toString()
+        driver_positionsGained.textContent = "-"
     }
 
     return driver_positionsGained

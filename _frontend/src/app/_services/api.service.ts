@@ -77,7 +77,7 @@ export class Driver {
   id: number = 0
   finish_position: number | string = 1
   finish_position_in_class: number | string = 1
-  positions_gained_in_class: number 
+  positions_gained_in_class: number
   result_status: string = "Running"
   laps_completed: number = 10
   laps: number[] = new Array<number>(10)
