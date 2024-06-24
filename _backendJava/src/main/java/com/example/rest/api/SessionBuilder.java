@@ -113,10 +113,19 @@ public class SessionBuilder {
 
         System.out.println(myCookies);
 
-        // webClient.get()
-        // .uri("/data/car/get")
-        // .cookies(cookieMap -> cookieMap.addAll(myCookies))
-        // .retrieve();
+        String test2 = webClient.get()
+        .uri("/data/car/get")
+        .cookies(cookieMap -> cookieMap.addAll(myCookies))
+        .exchangeToMono(response -> {
+            if (response.statusCode().is2xxSuccessful()) {
+                return response.bodyToMono(String.class);
+            } else {
+                return response.createException().flatMap(null);
+            }
+        })
+        .block();
+
+        System.out.println(test2);
 
     }
 
