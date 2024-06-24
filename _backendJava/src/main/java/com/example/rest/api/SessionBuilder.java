@@ -16,16 +16,24 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.JettyClientHttpConnector;
 import org.springframework.objenesis.strategy.StdInstantiatorStrategy;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import jakarta.servlet.http.HttpSession;
+import reactor.core.publisher.Mono;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Base64;
+
+import org.apache.tomcat.util.openssl.pem_password_cb;
 import org.eclipse.jetty.client.HttpClient;
 import org.eclipse.jetty.http.HttpCookieStore;
 import org.eclipse.jetty.http.HttpHeader;
@@ -84,33 +92,32 @@ public class SessionBuilder {
     }
 
     private void login(Credentials credentials) {
-        CookieHandler ch = new CookieHandler();
+        MultiValueMap<String, String> myCookies = new LinkedMultiValueMap<>();
+       
+        WebClient webClient = WebClient.builder().baseUrl("https://members-ng.iracing.com").build();
 
-        WebClient wc = WebClient.create("https://members-ng.iracing.com/");
+        String test = webClient.post()
+        .uri("/auth")
+        .header(org.springframework.http.HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+        .bodyValue(credentials)
+        .exchangeToMono(response -> {
+            if (response.statusCode().is2xxSuccessful()) {
+                // response.cookies().forEach((key, respCookies) -> System.out.println(respCookies));
+                response.cookies().forEach((key, respCookies) -> myCookies.add(key, respCookies.get(0).getValue()));
+                return response.bodyToMono(String.class);
+            } else {
+                return response.createException().flatMap(e -> Mono.error(new Exception("Something went wrong")));
+            }
+        })
+        .block();
 
-        String loadedCookies = ch.loadCookies();
+        System.out.println(myCookies);
 
-        if (loadedCookies.equals("")) {
-            String result = wc.post()
-            .uri("/auth")
-            .bodyValue(credentials)
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
-    
-            ch.saveCookies(result);
-        }
+        // webClient.get()
+        // .uri("/data/car/get")
+        // .cookies(cookieMap -> cookieMap.addAll(myCookies))
+        // .retrieve();
 
-        // String auth = ch.loadCookies();
-
-        // String str = wc.get()
-        //     .uri("/data/car/get")
-        //     .header(auth)
-        //     .retrieve()
-        //     .bodyToMono(String.class)
-        //     .block();   
-            
-        // System.out.println(str);
     }
 
     // loginAdress = "https://members-ng.iracing.com/auth"
