@@ -1,54 +1,32 @@
 package com.example.rest.api;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.net.CookieStore;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.springframework.boot.web.server.Cookie;
-import org.springframework.http.HttpCookie;
-import org.springframework.http.HttpMethod;
+import org.eclipse.jetty.http.HttpStatus;
+
 import org.springframework.http.MediaType;
-import org.springframework.http.client.reactive.JettyClientHttpConnector;
-import org.springframework.objenesis.strategy.StdInstantiatorStrategy;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.reactive.function.BodyInserter;
-import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import io.netty.handler.codec.http.HttpHeaders;
-import jakarta.servlet.http.HttpSession;
 import reactor.core.publisher.Mono;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Base64;
-
-import org.apache.tomcat.util.openssl.pem_password_cb;
-import org.eclipse.jetty.client.HttpClient;
-import org.eclipse.jetty.http.HttpCookieStore;
-import org.eclipse.jetty.http.HttpHeader;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
 
 public class SessionBuilder {
 
-    WebClient wc;
+    private WebClient webClient = WebClient.builder().baseUrl("https://members-ng.iracing.com").build();
+    private MultiValueMap<String, String> myCookies = CookieHandler.loadCookies();
 
     private Map<String, String> readCredentialsFromFile() {
 
-        String filePath = "C:/Users/FSX-P/Documents/VisualStudioCode/iRacing_WebApp/_backendJava/src/main/resources/credentials.properties";
+        String filePath = "C:/Users/FSX-P/Documents/VisualStudioCode/iRacing_WebApp_Java/_backendJava/src/main/resources/credentials.properties";
 
         Properties properties = new Properties();
 
@@ -65,13 +43,14 @@ public class SessionBuilder {
         return credentialsClear;
     }
 
-    public void authenticate() throws NoSuchAlgorithmException {
-        Map<String, String> credentialsClear = this.readCredentialsFromFile();
-        String encodedPassword = this.encodePW(credentialsClear);
-        Credentials credentialsEncoded = new Credentials(credentialsClear.get("email"), encodedPassword);
-        //if cookie exists
-        this.login(credentialsEncoded);
-        //if no cookie exists
+    private Map<String, String> buildCredentials() {
+        try {
+            Map<String, String> credentials = this.readCredentialsFromFile();
+            credentials.put("password", this.encodePW(credentials));
+            return credentials;
+        } catch (NoSuchAlgorithmException n) {
+            return new HashMap<>();
+        }
     }
 
     private String encodePW(Map<String, String> credentialsClear) throws NoSuchAlgorithmException {
@@ -91,103 +70,63 @@ public class SessionBuilder {
         return hashInBase64;
     }
 
-    private void login(Credentials credentials) {
-        MultiValueMap<String, String> myCookies = new LinkedMultiValueMap<>();
-       
-        WebClient webClient = WebClient.builder().baseUrl("https://members-ng.iracing.com").build();
-
-        String test = webClient.post()
-        .uri("/auth")
-        .header(org.springframework.http.HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-        .bodyValue(credentials)
-        .exchangeToMono(response -> {
-            if (response.statusCode().is2xxSuccessful()) {
-                // response.cookies().forEach((key, respCookies) -> System.out.println(respCookies));
-                response.cookies().forEach((key, respCookies) -> myCookies.add(key, respCookies.get(0).getValue()));
-                return response.bodyToMono(String.class);
-            } else {
-                return response.createException().flatMap(e -> Mono.error(new Exception("Something went wrong")));
-            }
-        })
-        .block();
-
-        System.out.println(myCookies);
-
-        String test2 = webClient.get()
-        .uri("/data/car/get")
-        .cookies(cookieMap -> cookieMap.addAll(myCookies))
-        .exchangeToMono(response -> {
-            if (response.statusCode().is2xxSuccessful()) {
-                return response.bodyToMono(String.class);
-            } else {
-                return response.createException().flatMap(null);
-            }
-        })
-        .block();
-
-        System.out.println(test2);
-
+    private Mono<Void> login() {
+        this.myCookies = new LinkedMultiValueMap<>();
+        Map<String, String> credentials = this.buildCredentials();
+        return webClient.post()
+            .uri("/auth")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(credentials)
+            .exchangeToMono(response -> {
+                System.out.println(response);
+                if (response.statusCode().is2xxSuccessful()) {
+                    response.cookies().forEach((key, respCookies) -> this.myCookies.add(key, respCookies.get(0).getValue()));
+                    return response.bodyToMono(String.class).then();
+                } else {
+                    return response.createException().flatMap(e -> Mono.error(new Exception("Something went wrong")));
+                }
+            });
     }
 
-    // loginAdress = "https://members-ng.iracing.com/auth"
-    // loginHeaders = {"Content-Type": "application/json"}
-
-    // authBody = {"email": self.credentials["email"], "password": self.encode_pw()}
-
-    // self.session = requests.Session()
-    // cookie_File = "C:/Users/FSX-P/IdeaProjects/iRacing_WebApp/_backend/application/sessionbuilder/files/cookie-jar.txt"
-    // self.session.cookies = LWPCookieJar(cookie_File)
-
-    // if os.path.exists(cookie_File):
-    //     self.session.cookies.load(cookie_File)
-
-    // responseStatusCode = self.session.get('https://members-ng.iracing.com/data/car/get').status_code
-
-    // if responseStatusCode == 401:
-    //     print('[session_builder] setting cookies')
-    //     self.session.cookies.save()
-    //     loginNow = self.session.post(loginAdress, json=authBody, headers=loginHeaders)
-    //     response_Data = loginNow.json()
-
-    //     if loginNow.status_code == 200 and response_Data['authcode']:
-    //         if cookie_File:
-    //             self.session.cookies.save(ignore_discard=True)
-    //     else:
-    //         raise RuntimeError("Error from iRacing: ", response_Data)
-    // else:
-    //     print('[session_builder] loading saved cookies')
-    //     self.session.cookies.load(cookie_File)
+    public Mono<String> get() {
+    String path = "/data/car/get"; // temp
+    return webClient.get()
+        .uri("/data/car/get")
+        .cookies(cookieMap -> cookieMap.addAll(this.myCookies))
+        .exchangeToMono(response -> {
+            if (response.statusCode().is2xxSuccessful()) {
+                return response.bodyToMono(String.class);
+            } else if (response.statusCode().value() == 401) {
+                System.out.println("401 catch");
+                return login().then(this.get());
+            } else {
+                System.out.println("catch all error");
+                return response.bodyToMono(String.class);
+            }
+        });
+}
 
 }
 
 class CookieHandler {
 
-    Path cookieFilePath;
+    private static String cookieFilePath = "C:/Users/FSX-P/Documents/VisualStudioCode/iRacing_WebApp_Java/_backendJava/cookie.txt";
 
-    public CookieHandler() {
-        this.cookieFilePath = Paths.get("C:/Users/FSX-P/Documents/VisualStudioCode/iRacing_WebApp/_backendJava/cookie.txt");
-    }
-
-    // public MultiValueMap<String, HttpCookie> getCookies() {
-    //     this.loadCookies();
-    //     return new LinkedMultiValueMap<>();
-    // }
-
-    public String loadCookies() {
-
-        try {
-            byte[] contentBytes = Files.readAllBytes(this.cookieFilePath);
-            return new String(contentBytes);
-        } catch (IOException e) {
-            return "";
+    public static MultiValueMap<String, String> loadCookies() {
+        LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(cookieFilePath))) {
+            return (LinkedMultiValueMap<String, String>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            return map;
         }
     }
 
-    public void saveCookies(String content) {
-        try {
-            Files.write(this.cookieFilePath, content.getBytes());
+    public static void saveCookies(MultiValueMap<String, String> myCookies) {
+        System.out.println("save");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(cookieFilePath))) {
+            oos.writeObject(myCookies);
         } catch (IOException e) {
-
+            e.printStackTrace();
         }
     }
 
