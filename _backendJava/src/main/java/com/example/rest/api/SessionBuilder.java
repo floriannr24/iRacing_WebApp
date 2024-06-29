@@ -5,14 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.eclipse.jetty.http.HttpStatus;
-
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import reactor.core.publisher.Mono;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClient;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -21,7 +19,7 @@ import java.io.*;
 
 public class SessionBuilder {
 
-    private WebClient webClient = WebClient.builder().baseUrl("https://members-ng.iracing.com").build();
+    private RestClient restClient = RestClient.builder().baseUrl("https://members-ng.iracing.com").build();
     private MultiValueMap<String, String> myCookies = CookieHandler.loadCookies();
 
     private Map<String, String> readCredentialsFromFile() {
@@ -48,7 +46,7 @@ public class SessionBuilder {
             Map<String, String> credentials = this.readCredentialsFromFile();
             credentials.put("password", this.encodePW(credentials));
             return credentials;
-        } catch (NoSuchAlgorithmException n) {
+        } catch (NoSuchAlgorithmException e) {
             return new HashMap<>();
         }
     }
@@ -70,41 +68,53 @@ public class SessionBuilder {
         return hashInBase64;
     }
 
-    private Mono<Void> login() {
+    private void login() {
         this.myCookies = new LinkedMultiValueMap<>();
         Map<String, String> credentials = this.buildCredentials();
-        return webClient.post()
+        ResponseEntity<String> response = restClient.post()
             .uri("/auth")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(credentials)
-            .exchangeToMono(response -> {
-                System.out.println(response);
-                if (response.statusCode().is2xxSuccessful()) {
-                    response.cookies().forEach((key, respCookies) -> this.myCookies.add(key, respCookies.get(0).getValue()));
-                    return response.bodyToMono(String.class).then();
-                } else {
-                    return response.createException().flatMap(e -> Mono.error(new Exception("Something went wrong")));
-                }
-            });
+            .body(credentials)
+            .retrieve()
+            .toEntity(String.class);
+    
+        if (response.getStatusCode().is2xxSuccessful()) {
+            response.getHeaders().get(HttpHeaders.SET_COOKIE).forEach(cookie ->
+                this.myCookies.add(HttpHeaders.COOKIE, cookie.split(";")[0]));
+                CookieHandler.saveCookies(this.myCookies);
+        } else {
+            throw new RuntimeException("Login failed");
+        }
     }
-
-    public Mono<String> get() {
-    String path = "/data/car/get"; // temp
-    return webClient.get()
-        .uri("/data/car/get")
-        .cookies(cookieMap -> cookieMap.addAll(this.myCookies))
-        .exchangeToMono(response -> {
-            if (response.statusCode().is2xxSuccessful()) {
-                return response.bodyToMono(String.class);
-            } else if (response.statusCode().value() == 401) {
+    
+    public String get() {
+        String path = "/data/car/get"; // temp
+        try {
+            ResponseEntity<String> response = restClient.get()
+                .uri(path)
+                .headers(headers -> headers.addAll(this.myCookies))
+                .retrieve()
+                .toEntity(String.class);
+    
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else if (response.getStatusCode().value() == 401) {
                 System.out.println("401 catch");
-                return login().then(this.get());
+                this.login();
+                return this.get();
             } else {
                 System.out.println("catch all error");
-                return response.bodyToMono(String.class);
+                return response.getBody();
             }
-        });
-}
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 401) {
+                System.out.println("401 catch");
+                this.login();
+                return this.get();
+            } else {
+                throw e;
+            }
+        }
+    }
 
 }
 
